@@ -116,11 +116,14 @@
         android:hint="Enter your password"/>
 
     <TextView
+        android:id="@+id/loginTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="Already have an account? Login"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"/>
 
     <Button
         android:id = "@+id/login_btn"
