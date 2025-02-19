@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="200dp"
@@ -11,9 +12,19 @@
         android:background="@drawable/border"
         android:gravity="center_vertical">
 
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logout Account"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true"/>
 
             <TextView
                 android:id="@+id/text"
@@ -21,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:text="Are you sure you want to logout?"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_below="@id/logout"/>
 
             <LinearLayout
                 android:id="@+id/buttons"
