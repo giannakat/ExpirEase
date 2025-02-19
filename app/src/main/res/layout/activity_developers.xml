@@ -60,11 +60,20 @@
                         android:textColor="@color/black"
                         android:layout_centerHorizontal="true"/>
 
+                    <TextView
+                        android:id="@+id/giannatext2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UI / UX Designer"
+                        android:textColor="@color/black"
+                        android:layout_below="@id/giannatext"
+                        android:layout_centerHorizontal="true"/>
+
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:src="@drawable/fb_logo"
-                        android:layout_below="@id/giannatext"
+                        android:layout_below="@id/giannatext2"
                         android:layout_margin="5dp"
                         android:layout_centerHorizontal="true"/>
                 </RelativeLayout>
@@ -96,11 +105,20 @@
                         android:textColor="@color/black"
                         android:layout_centerHorizontal="true"/>
 
+                    <TextView
+                        android:id="@+id/jmtext2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Software Developer"
+                        android:textColor="@color/black"
+                        android:layout_below="@id/jmtext"
+                        android:layout_centerHorizontal="true"/>
+
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:src="@drawable/fb_logo"
-                        android:layout_below="@id/jmtext"
+                        android:layout_below="@id/jmtext2"
                         android:layout_margin="5dp"
                         android:layout_centerHorizontal="true"/>
 
