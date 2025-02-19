@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/outer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
+
+        <EditText
+            android:id="@+id/header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Our Team"
+            android:textSize="30dp"
+            android:layout_gravity="center"/>
+
+        <LinearLayout
+            android:id="@+id/inner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/gianna"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:background="@color/green"
+                android:layout_margin="10dp">
+
+                <ImageView
+                    android:id="@+id/giannapic"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:src="@drawable/gianna"
+                    android:layout_centerHorizontal="true"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circleborder"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gianna Katrin D. Carreon"
+                    android:layout_below="@id/giannapic"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/jm"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:background="@color/green"
+                android:layout_margin="10dp">
+
+                <ImageView
+                    android:id="@+id/jmpic"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:src="@drawable/jm"
+                    android:layout_centerHorizontal="true"
+                    android:clipToOutline="true"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circleborder"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jon Mari A. Casipong"
+                    android:layout_below="@id/jmpic"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
