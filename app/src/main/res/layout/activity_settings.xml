@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageView
+
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/arrow"
+        android:layout_margin="20dp"/>
 
     <ImageView
         android:id="@+id/setting"
@@ -18,64 +26,155 @@
         android:layout_below="@id/setting"
         android:layout_centerHorizontal="true"
         android:text="Settings"
-        android:textStyle="bold"
         android:textAlignment="center"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <LinearLayout
         android:layout_width="400dp"
         android:layout_height="300dp"
         android:layout_below="@id/setting_text"
-        android:orientation="vertical"
         android:layout_margin="10dp"
-        >
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/setting_option1"
-            android:layout_wi
-            android:layout_height="wrap_content"
-            android:layout_below="@id/setting"
-            android:layout_centerHorizontal="true"
-            android:text="Settings"
-            android:textStyle="bold"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:layout_marginBottom="40dp"/>
-
-        <EditText
-            android:id="@+id/setting_option2"
+        <LinearLayout
+            android:id="@+id/general"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/setting"
-            android:layout_centerHorizontal="true"
-            android:text="Settings"
-            android:textStyle="bold"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:layout_marginBottom="40dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
-        <EditText
-            android:id="@+id/setting_option3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/setting"
-            android:layout_centerHorizontal="true"
-            android:text="Settings"
-            android:textStyle="bold"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:layout_marginBottom="40dp"/>
+            <EditText
+                android:id="@+id/general_title"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/setting"
+                android:text="General"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/setting_option4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/setting"
-            android:layout_centerHorizontal="true"
-            android:text="Settings"
-            android:textStyle="bold"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:layout_marginBottom="40dp"/>
+            <LinearLayout
+                android:id="@+id/general_option1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/account" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="Account"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/general_option2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/bell" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="Notifications"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/general_option3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/logout" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="Logout"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/feedback_title"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Feedback"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/feedback_option1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/report" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="Report a bug"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/feedback_option2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/airplane" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="Send feedback"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+
     </LinearLayout>
 </RelativeLayout>
