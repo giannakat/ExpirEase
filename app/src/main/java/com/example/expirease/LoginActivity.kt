@@ -9,6 +9,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 
 class LoginActivity : Activity() {
@@ -17,6 +18,11 @@ class LoginActivity : Activity() {
         setContentView(R.layout.activity_login)
 
 
+        val login_button : Button = findViewById<Button>(R.id.btnlogin)
+        login_button.setOnClickListener{
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
 
 
         val signUpTextView: TextView = findViewById(R.id.signUpTextView)
