@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfileActivity"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="100dp"
+        android:gravity="center_horizontal">
+
+        <!-- Profile Picture -->
+        <ImageView
+            android:id="@+id/accountIcon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/profile_icon"/>
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Change Photo"-->
+<!--            android:textSize="14sp"-->
+<!--            android:textColor="@color/green"-->
+<!--            android:layout_marginBottom="30dp"-->
+<!--            android:gravity="center"-->
+<!--            android:textStyle="bold"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true"/>-->
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="30dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change Photo "
+                android:textSize="14sp"
+                android:textColor="@color/green"
+                android:textStyle="bold"/>
+
+            <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/green_edit_pen"
+            android:layout_marginEnd="0dp"/>
+
+        </LinearLayout>
+
+
+
+
+        <!-- Name Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="30dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Name"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/nameValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gianna Carreon"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <ImageView
+                    android:id="@+id/editName"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/edit_pen"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Username Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="30dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Username"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/usernameValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+63 912 345 6789"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <ImageView
+                    android:id="@+id/editUsername"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/edit_pen"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Email Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="30dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Email"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/emailValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="gianna@example.com"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <ImageView
+                    android:id="@+id/editEmail"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/edit_pen"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Phone Number Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="30dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Phone Number"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/phoneValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+63 912 345 6789"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <ImageView
+                    android:id="@+id/editPhone"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/edit_pen"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- Password Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="30dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Password"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/passwordValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="**********"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <ImageView
+                    android:id="@+id/editPassword"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/edit_pen"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Save Changes Button -->
+        <Button
+            android:id="@+id/saveProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Save Changes"
+            android:background = "@drawable/button_background"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="30dp"/>
+
+    </LinearLayout>
+</ScrollView>
