@@ -47,11 +47,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Yes"
+                    android:background="@color/green"
+                    android:layout_marginEnd="10dp"
                     />
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#FF0000"
                     android:text="No" />
 
             </LinearLayout>
