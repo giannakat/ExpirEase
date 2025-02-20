@@ -20,9 +20,10 @@ class LoginActivity : Activity() {
 
         val login_button : Button = findViewById<Button>(R.id.btnlogin)
         login_button.setOnClickListener{
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-        }
+
+            val intent = Intent(this, ProfileActivity::class.java)
+
+  
 
 
         val signUpTextView: TextView = findViewById(R.id.signUpTextView)
