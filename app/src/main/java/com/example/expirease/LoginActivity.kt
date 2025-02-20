@@ -20,7 +20,7 @@ class LoginActivity : Activity() {
 
         val login_button : Button = findViewById<Button>(R.id.btnlogin)
         login_button.setOnClickListener{
-            val intent = Intent(this, HomeActivity::class.java)
+            val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
 
