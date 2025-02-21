@@ -5,9 +5,55 @@
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/first"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="6dp"
+        android:layout_margin="10dp"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <!-- Icon (Takes up available space) -->
+            <ImageView
+                android:id="@+id/category_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/nav_hom"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:layout_weight="1"/> <!-- Pushes text to the bottom -->
+
+            <!-- Text (Always at the bottom) -->
+            <TextView
+                android:id="@+id/category_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/second"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/first"
+        app:cardCornerRadius="15dp"
         app:cardElevation="6dp"
         android:layout_margin="10dp">
 
@@ -16,6 +62,38 @@
             android:layout_height="80dp"
             android:background="@drawable/category_box"/>
 
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/third"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/second"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="6dp"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/category_box"/>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/third"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="6dp"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/category_box"/>
 
     </androidx.cardview.widget.CardView>
 
