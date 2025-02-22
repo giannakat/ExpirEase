@@ -17,30 +17,28 @@ class LoginActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-
-        val login_button : Button = findViewById<Button>(R.id.btnlogin)
-        login_button.setOnClickListener{
-
-            val intent = Intent(this, ProfileActivity::class.java)
-
-  
-
-
+        val loginButton: Button = findViewById(R.id.btnlogin)
         val signUpTextView: TextView = findViewById(R.id.signUpTextView)
 
-        // Create a SpannableString to make "Sign up" a different color and clickable
+        // ✅ Fix: Set click listener properly for login button
+        loginButton.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent) // ✅ Start the new activity
+        }
+
+        // ✅ Move sign-up text configuration outside the button click event
         val text = "Don't have an Account? Sign up"
         val spannableString = SpannableString(text)
 
-        // Change the color of the "Sign up" text to blue (or any color you prefer)
         val startIndex = text.indexOf("Sign up")
         val endIndex = startIndex + "Sign up".length
+
+        // Change text color
         spannableString.setSpan(ForegroundColorSpan(Color.GREEN), startIndex, endIndex, 0)
 
-        // Make "Sign up" clickable
+        // Make it clickable
         spannableString.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                // Navigate to Sign Up Activity when clicked
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 startActivity(intent)
             }
@@ -48,10 +46,6 @@ class LoginActivity : Activity() {
 
         // Set the SpannableString to the TextView
         signUpTextView.text = spannableString
-
-        // Make the TextView clickable
         signUpTextView.movementMethod = LinkMovementMethod.getInstance()
-
-
     }
 }
