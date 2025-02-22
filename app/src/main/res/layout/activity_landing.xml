@@ -15,7 +15,7 @@
 
         <!-- Hamburger Icon (Left) -->
         <ImageView
-            android:id="@+id/editName"
+            android:id="@+id/menu_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/burger_menu"
