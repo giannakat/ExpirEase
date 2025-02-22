@@ -1,35 +1,169 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_centerVertical="true" android:layout_margin="20dp">
-        <LinearLayout android:id="@+id/outer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-            <TextView android:id="@+id/header" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Meet the Team" android:textSize="30dp" android:textStyle="bold" android:layout_marginBottom="20dp" android:layout_gravity="center"/>
-            <LinearLayout android:id="@+id/inner" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                <androidx.cardview.widget.CardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="12dp" app:cardElevation="6dp" android:layout_marginBottom="12dp" android:layout_marginHorizontal="30dp" android:clickable="true" android:focusable="true">
-                    <RelativeLayout android:id="@+id/gianna" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="10dp">
-                        <LinearLayout android:id="@+id/gianabox" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:orientation="vertical">
-                            <ImageView android:id="@+id/giannapic" android:layout_width="130dp" android:layout_height="130dp" android:src="@drawable/gianna" android:scaleType="centerCrop" android:clipToOutline="true" android:layout_margin="10dp" android:background="@drawable/circleborder"/>
-                            <TextView android:id="@+id/giannatext" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Gianna Katrin D. Carreon" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/black" android:layout_gravity="center"/>
-                            <TextView android:id="@+id/giannatext2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="UI/UX Designer" android:textColor="@color/black" android:layout_gravity="center"/>
-                            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/fblogo2" android:layout_margin="5dp" android:layout_gravity="center"/>
-                        </LinearLayout>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_toStartOf="@id/gianabox" android:layout_margin="20dp">
-                            <TextView android:layout_width="160dp" android:layout_height="wrap_content" android:text="lorep ipsum" android:textColor="@color/black"/>
-                        </LinearLayout>
-                    </RelativeLayout>
-                </androidx.cardview.widget.CardView>
-                <androidx.cardview.widget.CardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="12dp" app:cardElevation="6dp" android:layout_marginBottom="12dp" android:layout_marginHorizontal="30dp" android:clickable="true" android:focusable="true">
-                    <RelativeLayout android:id="@+id/jm" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="10dp">
-                        <LinearLayout android:id="@+id/jmbox" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
-                            <ImageView android:id="@+id/jmpic" android:layout_width="130dp" android:layout_height="130dp" android:src="@drawable/jm" android:clipToOutline="true" android:layout_margin="10dp" android:background="@drawable/circleborder"/>
-                            <TextView android:id="@+id/jmtext" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jon Mari A. Casipong" android:textStyle="bold" android:textColor="@color/black" android:layout_gravity="center"/>
-                            <TextView android:id="@+id/jmtext2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Software Developer" android:textColor="@color/black" android:layout_gravity="center"/>
-                            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/fblogo2" android:layout_margin="5dp" android:layout_gravity="center"/>
-                        </LinearLayout>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_toEndOf="@id/jmbox" android:layout_margin="20dp">
-                            <TextView android:layout_width="160dp" android:layout_height="wrap_content" android:text="lorep ipsum" android:textColor="@color/black"/>
-                        </LinearLayout>
-                    </RelativeLayout>
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/arrow"
+        android:layout_margin="20dp"/>
+    <!-- Outer Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginTop="30dp"
+        android:padding="20dp">
+
+
+        <!-- Team Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meet the Team"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@color/green"
+            android:layout_marginBottom="20dp"
+            android:gravity="center" />
+
+        <!-- Team Vision -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Our Vision: To create innovative and user-friendly software that makes everyday tasks easier."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Team Members -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Team Member 1 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                android:layout_margin="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp">
+
+                    <!-- Profile Image -->
+                    <ImageView
+                        android:id="@+id/giannapic"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:src="@drawable/gianna"
+                        android:scaleType="centerCrop"
+                        android:clipToOutline="true"
+                        android:background="@drawable/circleborder" />
+
+                    <!-- Name and Role -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_toEndOf="@id/giannapic"
+                        android:paddingStart="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gianna Katrin D. Carreon"
+                            android:textStyle="bold"
+                            android:textSize="14sp"
+                            android:textColor="@color/black" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="UI/UX Designer"
+                            android:textSize="12sp"
+                            android:textColor="@color/black" />
+
+                        <!-- Skills -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Skills: Wireframing, Prototyping, Figma, User Research"
+                            android:textSize="12sp"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Team Member 2 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                android:layout_margin="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp">
+
+                    <!-- Profile Image -->
+                    <ImageView
+                        android:id="@+id/jmpic"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:src="@drawable/jm"
+                        android:scaleType="centerCrop"
+                        android:clipToOutline="true"
+                        android:background="@drawable/circleborder" />
+
+                    <!-- Name and Role -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_toEndOf="@id/jmpic"
+                        android:paddingStart="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Jon Mari A. Casipong"
+                            android:textStyle="bold"
+                            android:textSize="14sp"
+                            android:textColor="@color/black" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Software Developer"
+                            android:textSize="12sp"
+                            android:textColor="@color/black" />
+
+                        <!-- Skills -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Skills: Java, Android Development, Kotlin, Backend API"
+                            android:textSize="12sp"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

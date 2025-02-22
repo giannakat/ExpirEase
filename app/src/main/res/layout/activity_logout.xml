@@ -1,12 +1,75 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:layout_width="wrap_content" android:layout_height="200dp" android:layout_centerHorizontal="true" android:layout_centerVertical="true" android:background="@drawable/border" android:gravity="center_vertical">
-        <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
-            <EditText android:id="@+id/logout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Come back soon!" android:textSize="20sp" android:textStyle="bold" android:layout_marginBottom="20dp" android:layout_centerHorizontal="true"/>
-            <TextView android:id="@+id/text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Are you sure you want to Log out?" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/black" android:layout_below="@id/logout"/>
-            <LinearLayout android:id="@+id/buttons" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/text" android:layout_centerHorizontal="true" android:layout_marginTop="20dp">
-                <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="#6AA644" android:text="Yes" android:layout_marginRight="10dp"/>
-                <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="#FF0000" android:text="No"/>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/green">
+
+    <!-- CardView for popup with shadow -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="10dp"
+        android:padding="10dp"
+        android:layout_marginHorizontal="30dp">
+
+        <!-- Content inside CardView -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="20dp">
+
+            <!-- "Come back soon!" -->
+            <ImageView
+                android:id="@+id/editName"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/logout"
+                android:layout_margin="30dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <!-- "Are you sure you want to log out?" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Are you sure you want to Log out?"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:layout_marginBottom="15dp"/>
+
+            <!-- Buttons (Yes / No) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/border_button"
+                    android:text="No"
+                    android:textColor="@android:color/black"
+                    android:layout_marginEnd="10dp"/>
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/solid_button"
+                    android:text="Yes"/>
             </LinearLayout>
-        </RelativeLayout>
-    </LinearLayout>
-</RelativeLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
