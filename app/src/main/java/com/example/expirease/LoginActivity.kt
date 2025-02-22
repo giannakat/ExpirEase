@@ -10,7 +10,9 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 
 class LoginActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,11 +21,26 @@ class LoginActivity : Activity() {
 
         val loginButton: Button = findViewById(R.id.btnlogin)
         val signUpTextView: TextView = findViewById(R.id.signUpTextView)
+        val edittext_username : EditText = findViewById<EditText>(R.id.edittext_username)
+        val edittext_password : EditText = findViewById<EditText>(R.id.edittext_password)
 
-        // ✅ Fix: Set click listener properly for login button
+
         loginButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent) // ✅ Start the new activity
+            val username = edittext_username.text.toString()
+            val password = edittext_password.text.toString()
+
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Username or password cannot be empty", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (username == "gianna" && password == "123") {
+                Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent) // ✅ Only start ProfileActivity if login is correct
+            } else {
+                Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
+            }
         }
 
         // ✅ Move sign-up text configuration outside the button click event
