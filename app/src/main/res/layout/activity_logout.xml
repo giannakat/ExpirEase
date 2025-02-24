@@ -53,6 +53,7 @@
                 android:gravity="center">
 
                 <Button
+                    android:id="@+id/reverse_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/border_button"
@@ -62,6 +63,7 @@
 
 
                 <Button
+                    android:id="@+id/yes_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/solid_button"
