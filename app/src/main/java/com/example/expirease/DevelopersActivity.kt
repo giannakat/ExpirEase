@@ -9,21 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-class SettingsActivity : Activity() {
+class DevelopersActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        setContentView(R.layout.activity_developers)
 
         val backButton: ImageView = findViewById(R.id.back_button)
-        val devButton: ImageView = findViewById(R.id.developers_button)
 
         backButton.setOnClickListener {
             val intent = Intent(this, MenuActivity::class.java)
-            startActivity(intent)
-        }
-
-        devButton.setOnClickListener {
-            val intent = Intent(this, DevelopersActivity::class.java)
             startActivity(intent)
         }
     }
