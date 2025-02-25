@@ -80,7 +80,7 @@
 
     <!-- Navigation Options -->
     <LinearLayout
-        android:id="@+id/general_option2"
+        android:id="@+id/home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -197,7 +197,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/logout_option"
+        android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,12 +15,13 @@ class MenuActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
-        val homeButton: ImageView = findViewById(R.id.home_button)
-        val settingsButton: ImageView = findViewById(R.id.settings_button)
-        val logoutButton: ImageView = findViewById(R.id.logout_button)
 
-        homeButton.setOnClickListener {
-            val intent = Intent(this@MenuActivity, HomeActivity::class.java)
+        val homeButton = findViewById<LinearLayout>(R.id.home)  // Ensure ID exists in XML
+        val settingsButton = findViewById<LinearLayout>(R.id.Settings)
+        val logoutButton = findViewById<LinearLayout>(R.id.logout)
+        val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
+       homeButton.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
         }
         settingsButton.setOnClickListener {
@@ -28,6 +30,10 @@ class MenuActivity : Activity() {
         }
         logoutButton.setOnClickListener {
             val intent = Intent(this, LogoutActivity::class.java)
+            startActivity(intent)
+        }
+        profileButton.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
     }
