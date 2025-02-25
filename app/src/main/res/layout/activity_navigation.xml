@@ -80,7 +80,7 @@
 
     <!-- Navigation Options -->
     <LinearLayout
-        android:id="@+id/general_option2"
+        android:id="@+id/home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -89,6 +89,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/home_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@drawable/nav_hom" />
@@ -181,6 +182,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/settings_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@drawable/nav_settings" />
@@ -195,7 +197,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/logout_option"
+        android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -204,6 +206,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/logout_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@drawable/nav_logout" />
