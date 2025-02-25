@@ -7,14 +7,34 @@
     android:layout_height="match_parent"
     tools:context=".SplashScreenActivity"
     android:orientation="vertical"
-    android:gravity="center">
+    android:gravity="center"
+    android:background = "@drawable/fruit">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ExpirEase"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="42sp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stay Fresh, Waste Less"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:layout_marginBottom="6dp"
+        />
 
     <Button
         android:id="@+id/start_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="GET STARTED"
-        android:padding="20dp"
-        android:background="@drawable/button_background"/>
+        android:textStyle="bold"
+        android:paddingHorizontal="60dp"
+        android:background="@drawable/intro"/>
 
 </LinearLayout>

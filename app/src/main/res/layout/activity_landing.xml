@@ -67,7 +67,7 @@
             app:cardElevation="6dp"
             android:layout_marginVertical="5dp"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginEnd="7dp"
             android:layout_weight="1">
 
             <SearchView
@@ -106,17 +106,62 @@
         android:textStyle="bold"
         />
 
-
-
-    <androidx.recyclerview.widget.RecyclerView
-
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:itemCount = "1"
         android:orientation="horizontal"
-        android:layout_marginStart="5dp"
-        tools:listitem="@layout/fresh_category"
-        />
+        android:gravity="center"
+        android:padding="8dp">
+
+        <!-- Box 1 -->
+        <View
+            android:id="@+id/expired_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+
+        <!-- Box 2 -->
+        <View
+            android:id="@+id/expiring_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+
+        <!-- Box 3 -->
+        <View
+            android:id="@+id/fresh_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+
+        <!-- Box 4 -->
+        <View
+            android:id="@+id/addcategory_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+    </LinearLayout>
+
+
+
+
+    <!--    <androidx.recyclerview.widget.RecyclerView-->
+
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        tools:itemCount = "1"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:layout_marginStart="5dp"-->
+<!--        tools:listitem="@layout/fresh_category"-->
+<!--        />-->
 
     <TextView
         android:layout_width="match_parent"
@@ -129,14 +174,60 @@
         />
 
 
-    <androidx.recyclerview.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        tools:itemCount = "1"
         android:orientation="horizontal"
-        tools:listitem="@layout/fresh_category"
-        />
+        android:gravity="center"
+        android:padding="8dp">
+
+        <!-- Box 1 -->
+        <View
+            android:id="@+id/fridge_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+
+        <!-- Box 2 -->
+        <View
+            android:id="@+id/freezer_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+
+        <!-- Box 3 -->
+        <View
+            android:id="@+id/pantry_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+
+        <!-- Box 4 -->
+        <View
+            android:id="@+id/addstorage_box"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:background="@drawable/category_box"
+            android:layout_margin="4dp"/>
+    </LinearLayout>
+
+
+
+    <!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="5dp"-->
+<!--        tools:itemCount = "1"-->
+<!--        android:orientation="horizontal"-->
+<!--        tools:listitem="@layout/fresh_category"-->
+<!--        />-->
 
     <TextView
         android:layout_width="match_parent"
@@ -181,6 +272,50 @@
 
             <TextView
                 android:id="@+id/nameValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fresh"
+                android:textSize="16sp"
+                android:layout_marginEnd="15dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginHorizontal="15dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/category_box"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="15dp"
+                android:text="Egg"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/item2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fresh"

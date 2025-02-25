@@ -5,15 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/green">
+    android:background="#75BF41">
 
     <!-- Header Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:orientation="horizontal"
-        android:background="@color/black"
+        android:background="@color/green"
         android:padding="10dp"
+        android:layout_marginBottom="20dp"
         android:gravity="center_vertical">
 
         <!-- Profile Image -->
@@ -57,9 +58,9 @@
         <!-- Close Button (Slightly Higher) -->
         <ImageView
             android:id="@+id/nav_back"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="20dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="10dp"
             android:layout_gravity="top"
             android:layout_marginTop="10dp"
             android:src="@drawable/close"
@@ -100,7 +101,8 @@
             android:padding="5dp"
             android:text="Home"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
     <LinearLayout
@@ -123,7 +125,8 @@
             android:padding="5dp"
             android:text="Calendar"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
     <LinearLayout
@@ -146,7 +149,8 @@
             android:padding="5dp"
             android:text="Household members"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
     <LinearLayout
@@ -169,7 +173,8 @@
             android:padding="5dp"
             android:text="Categories"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
     <LinearLayout
@@ -193,7 +198,8 @@
             android:padding="5dp"
             android:text="Settings"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
     <LinearLayout
@@ -201,7 +207,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="90dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -217,7 +223,8 @@
             android:padding="5dp"
             android:text="Logout"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#ffffff"/>
     </LinearLayout>
 
 </LinearLayout>
