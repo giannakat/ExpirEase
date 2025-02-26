@@ -9,7 +9,9 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 
 
 class RegisterActivity : Activity() {
@@ -19,6 +21,31 @@ class RegisterActivity : Activity() {
 
 
         val loginTextView: TextView = findViewById(R.id.loginTextView)
+        val signupButton: Button = findViewById<Button>(R.id.signup_button)
+        val nameText: EditText = findViewById<EditText>(R.id.create_name)
+        val emailText : EditText = findViewById<EditText>(R.id.create_email)
+        val passwordField : EditText = findViewById<EditText>(R.id.create_password)
+        val confirmPasswordField : EditText = findViewById<EditText>(R.id.confirm_password)
+
+        signupButton.setOnClickListener {
+            val username = nameText.text.toString()
+            val email = emailText.text.toString()
+            val password = passwordField.text.toString()
+            val confirmPassword = confirmPasswordField.text.toString()
+
+            if (username.isEmpty() || password.isEmpty() || email.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if ((!password.isEmpty() && !confirmPassword.isEmpty()) && password != confirmPassword) {
+                Toast.makeText(this, "Passwords are not the same", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Registered Successfully!", Toast.LENGTH_LONG).show()
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent) // ✅ Only start ProfileActivity if login is correct
+            }
+        }
 
         // Create a SpannableString to make "Sign up" a different color and clickable
         val text = "Already have an account? Sign in"
