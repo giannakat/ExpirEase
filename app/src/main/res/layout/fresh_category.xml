@@ -23,9 +23,9 @@
             <!-- Icon (Takes up available space) -->
             <ImageView
                 android:id="@+id/category_icon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/nav_hom"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/pantry"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
                 android:layout_weight="1"/> <!-- Pushes text to the bottom -->
@@ -35,7 +35,7 @@
                 android:id="@+id/category_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Category"
+                android:text="Pantry"
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -46,46 +46,95 @@
 
 
 
-
-
     <androidx.cardview.widget.CardView
         android:id="@+id/second"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:cardCornerRadius="15dp"
         android:layout_toRightOf="@id/first"
-        app:cardCornerRadius="15dp"
         app:cardElevation="6dp"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:padding="10dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="@drawable/category_box"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="10dp">
 
+            <!-- Icon (Takes up available space) -->
+            <ImageView
+                android:id="@+id/fridge_icon"
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:src="@drawable/fridge"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:layout_weight="1"/> <!-- Pushes text to the bottom -->
+
+            <!-- Text (Always at the bottom) -->
+            <TextView
+                android:id="@+id/fridge_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fridge"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
+
     <androidx.cardview.widget.CardView
-        android:id="@+id/third"
+        android:id="@+id/freezer_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:cardCornerRadius="15dp"
         android:layout_toRightOf="@id/second"
-        app:cardCornerRadius="15dp"
         app:cardElevation="6dp"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:padding="10dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="@drawable/category_box"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="10dp">
 
+            <!-- Icon (Takes up available space) -->
+            <ImageView
+                android:id="@+id/freezer_icon"
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:src="@drawable/freezer"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:layout_weight="1"/> <!-- Pushes text to the bottom -->
+
+            <!-- Text (Always at the bottom) -->
+            <TextView
+                android:id="@+id/freezer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Freezer"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/third"
+        android:layout_toRightOf="@id/freezer_box"
         app:cardCornerRadius="15dp"
         app:cardElevation="6dp"
         android:layout_margin="10dp">
