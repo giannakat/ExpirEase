@@ -19,7 +19,12 @@ class MenuActivity : Activity() {
         val settingsButton = findViewById<LinearLayout>(R.id.Settings)
         val logoutButton = findViewById<LinearLayout>(R.id.logout)
         val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
+        val navBackButton = findViewById<ImageView>(R.id.nav_back)
 
+        navBackButton.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
        homeButton.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
