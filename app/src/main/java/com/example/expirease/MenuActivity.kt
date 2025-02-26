@@ -15,11 +15,11 @@ class MenuActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
-
         val homeButton = findViewById<LinearLayout>(R.id.home)  // Ensure ID exists in XML
         val settingsButton = findViewById<LinearLayout>(R.id.Settings)
         val logoutButton = findViewById<LinearLayout>(R.id.logout)
         val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
+
        homeButton.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
