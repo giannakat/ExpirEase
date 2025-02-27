@@ -3,6 +3,7 @@ package com.example.expirease
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +21,18 @@ class MenuActivity : Activity() {
         val logoutButton = findViewById<LinearLayout>(R.id.logout)
         val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
         val navBackButton = findViewById<ImageView>(R.id.nav_back)
+
+        val edittext_username : EditText = findViewById<EditText>(R.id.nav_name)
+        val edittext_email : EditText = findViewById<EditText>(R.id.nav_email)
+
+        intent?.let{
+            it.getStringExtra("name")?.let {username->
+                edittext_username.setText(username)
+            }
+            it.getStringExtra("email")?.let {email->
+                edittext_email.setText(email)
+            }
+        }
 
         navBackButton.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
