@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import isNotValid
 
 
 class RegisterActivity : Activity() {
@@ -28,22 +29,22 @@ class RegisterActivity : Activity() {
         val confirmPasswordField : EditText = findViewById<EditText>(R.id.confirm_password)
 
         signupButton.setOnClickListener {
-            val username = nameText.text.toString()
-            val email = emailText.text.toString()
-            val password = passwordField.text.toString()
-            val confirmPassword = confirmPasswordField.text.toString()
 
-            if (username.isEmpty() || password.isEmpty() || email.isEmpty() || confirmPassword.isEmpty()) {
+            if (nameText.isNotValid() || passwordField.isNotValid() || emailText.isNotValid() || confirmPasswordField.isNotValid()) {
                 Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if ((!password.isEmpty() && !confirmPassword.isEmpty()) && password != confirmPassword) {
+            if ((!passwordField.isNotValid() && !confirmPasswordField.isNotValid()) && passwordField.getText().toString() != confirmPasswordField.getText().toString()) {
                 Toast.makeText(this, "Passwords are not the same", Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, "Registered Successfully!", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent) // ✅ Only start ProfileActivity if login is correct
+                startActivity(
+                    Intent(this, LoginActivity::class.java).apply{
+                        putExtra("nameText", nameText.text.toString())
+                        putExtra("passwordField", passwordField.text.toString())
+                    }
+                )
             }
         }
 

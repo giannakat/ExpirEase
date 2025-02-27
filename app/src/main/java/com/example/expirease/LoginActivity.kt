@@ -24,6 +24,14 @@ class LoginActivity : Activity() {
         val edittext_username : EditText = findViewById<EditText>(R.id.edittext_username)
         val edittext_password : EditText = findViewById<EditText>(R.id.edittext_password)
 
+        intent?.let{
+            it.getStringExtra("nameText")?.let {username->
+                edittext_username.setText(username)
+            }
+            it.getStringExtra("passwordField")?.let {password->
+                edittext_password.setText(password)
+            }
+        }
 
         loginButton.setOnClickListener {
             val username = edittext_username.text.toString()
