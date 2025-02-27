@@ -9,6 +9,7 @@
         android:layout_height="30dp"
         android:src="@drawable/arrow"
         android:layout_margin="20dp"/>
+
     <!-- Outer Container -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -102,6 +103,16 @@
                             android:textSize="12sp"
                             android:textColor="@color/black"
                             android:layout_marginTop="5dp" />
+
+                        <!-- Quote -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="''Coffee is a Developer’s Fuel''"
+                            android:textSize="15sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:layout_marginTop="5dp" />
                     </LinearLayout>
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
@@ -161,6 +172,16 @@
                             android:text="Skills: Java, Android Development, Kotlin, Backend API"
                             android:textSize="12sp"
                             android:textColor="@color/black"
+                            android:layout_marginTop="5dp" />
+
+                        <!-- Quote -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="''Will code for food.''"
+                            android:textSize="15sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
                             android:layout_marginTop="5dp" />
                     </LinearLayout>
                 </RelativeLayout>

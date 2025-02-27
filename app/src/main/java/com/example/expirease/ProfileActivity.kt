@@ -1,6 +1,7 @@
 package com.example.expirease
 
 import android.app.Activity
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
@@ -66,7 +67,14 @@ class ProfileActivity : Activity() {
         }
 
         // Back button
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            startActivity(
+                Intent(this, MenuActivity::class.java).apply{
+                    putExtra("name", etName.text.toString())
+                    putExtra("email", etEmail.text.toString())
+                }
+            )
+        }
     }
 
     // Load previously saved data

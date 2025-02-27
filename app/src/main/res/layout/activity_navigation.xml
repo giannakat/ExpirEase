@@ -36,23 +36,29 @@
             android:paddingStart="10dp">
 
             <!-- Name -->
-            <TextView
+            <EditText
                 android:id="@+id/nav_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gianna Katrin"
                 android:textColor="@color/white"
                 android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:background="@null"
+                android:focusable="false"
+                android:cursorVisible="false"/>
 
             <!-- Email -->
-            <TextView
+            <EditText
                 android:id="@+id/nav_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="gianna.katrin@example.com"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:background="@null"
+                android:focusable="false"
+                android:cursorVisible="false"/>
         </LinearLayout>
 
         <!-- Close Button (Slightly Higher) -->
