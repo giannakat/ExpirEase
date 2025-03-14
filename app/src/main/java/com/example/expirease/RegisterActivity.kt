@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.example.expirease.app.MyApplication
 import isNotValid
 
 
@@ -39,11 +40,13 @@ class RegisterActivity : Activity() {
                 Toast.makeText(this, "Passwords are not the same", Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, "Registered Successfully!", Toast.LENGTH_LONG).show()
+
+                (application as MyApplication).username = nameText.text.toString()
+                (application as MyApplication).password = passwordField.text.toString()
+                (application as MyApplication).email = emailText.text.toString()
+
                 startActivity(
-                    Intent(this, LoginActivity::class.java).apply{
-                        putExtra("nameText", nameText.text.toString())
-                        putExtra("passwordField", passwordField.text.toString())
-                    }
+                    Intent(this, LoginActivity::class.java)
                 )
             }
         }

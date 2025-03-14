@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.example.expirease.app.MyApplication
 
 class LoginActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,14 +25,8 @@ class LoginActivity : Activity() {
         val edittext_username : EditText = findViewById<EditText>(R.id.edittext_username)
         val edittext_password : EditText = findViewById<EditText>(R.id.edittext_password)
 
-        intent?.let{
-            it.getStringExtra("nameText")?.let {username->
-                edittext_username.setText(username)
-            }
-            it.getStringExtra("passwordField")?.let {password->
-                edittext_password.setText(password)
-            }
-        }
+        edittext_username.setText((application as MyApplication).username)
+        edittext_password.setText((application as MyApplication).password)
 
         loginButton.setOnClickListener {
             val username = edittext_username.text.toString()

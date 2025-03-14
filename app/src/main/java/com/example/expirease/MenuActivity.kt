@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.expirease.app.MyApplication
 
 class MenuActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,17 +23,11 @@ class MenuActivity : Activity() {
         val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
         val navBackButton = findViewById<ImageView>(R.id.nav_back)
 
-        val edittext_username : EditText = findViewById<EditText>(R.id.nav_name)
+        val edittext_name : EditText = findViewById<EditText>(R.id.nav_name)
         val edittext_email : EditText = findViewById<EditText>(R.id.nav_email)
 
-        intent?.let{
-            it.getStringExtra("name")?.let {username->
-                edittext_username.setText(username)
-            }
-            it.getStringExtra("email")?.let {email->
-                edittext_email.setText(email)
-            }
-        }
+        edittext_name.setText((application as MyApplication).name)
+        edittext_email.setText((application as MyApplication).email)
 
         navBackButton.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
