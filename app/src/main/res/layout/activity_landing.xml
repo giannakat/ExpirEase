@@ -24,45 +24,49 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        android:layout_width=""
-        android:layout_height=""
-
-    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_margin="10dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:title = "Home"
+        app:titleTextColor="@android:color/black"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-        <!-- Hamburger Icon (Left) -->
-        <ImageView
-            android:id="@+id/menu_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/burger_menu"
-            android:clickable="true"
-            android:focusable="true"/>
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:layout_margin="10dp">-->
 
-        <!-- App Name (Centered) -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="ExpirEase"
-            android:textColor="@color/green"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            android:layout_weight="1"
-            android:gravity="center"/>
+<!--        &lt;!&ndash; Hamburger Icon (Left) &ndash;&gt;-->
+<!--&lt;!&ndash;        <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;            android:id="@+id/menu_button"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_width="50dp"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_height="50dp"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:src="@drawable/burger_menu"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:clickable="true"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:focusable="true"/>&ndash;&gt;-->
 
-        <ImageView
-            android:id="@+id/notification_button"
-            android:layout_width="45dp"
-            android:layout_height= "45dp"
-            android:src="@drawable/notif_icon"
-            android:clickable="true"
-            android:focusable="true"/>
+<!--        &lt;!&ndash; App Name (Centered) &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="ExpirEase"-->
+<!--            android:textColor="@color/green"-->
+<!--            android:textSize="25sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center"/>-->
 
-    </LinearLayout>
+<!--        <ImageView-->
+<!--            android:id="@+id/notification_button"-->
+<!--            android:layout_width="45dp"-->
+<!--            android:layout_height= "45dp"-->
+<!--            android:src="@drawable/notif_icon"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true"/>-->
+
+<!--    </LinearLayout>-->
 
     <TextView
         android:layout_width="match_parent"
