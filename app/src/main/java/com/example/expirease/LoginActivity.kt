@@ -44,6 +44,15 @@ class LoginActivity : Activity() {
             } else {
                 Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
             }
+
+//            For later
+//            if (username == (application as MyApplication).username && password == (application as MyApplication).password) {
+//                Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
+//                val intent = Intent(this, HomeActivity::class.java)
+//                startActivity(intent) // ✅ Only start ProfileActivity if login is correct
+//            } else {
+//                Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
+//            }
         }
 
         // ✅ Move sign-up text configuration outside the button click event
