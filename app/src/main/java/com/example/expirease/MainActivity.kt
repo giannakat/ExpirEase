@@ -1,6 +1,7 @@
 package com.example.expirease
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -46,6 +47,8 @@ class MainActivity : AppCompatActivity() {
 
             //handle navigation menu item on click
             navView.setNavigationItemSelectedListener { menuItem ->
+                Log.e("nav", "My nav drawer is called Clicked: ${menuItem.title}")
+                Toast.makeText(this, "Clicked: ${menuItem.title}", Toast.LENGTH_SHORT).show()
                 when (menuItem.itemId){
                     R.id.nav_home -> Toast.makeText(this, "home selected", Toast.LENGTH_LONG).show()
                     R.id.nav_calendar -> Toast.makeText(this, "calendar selected", Toast.LENGTH_LONG).show()
