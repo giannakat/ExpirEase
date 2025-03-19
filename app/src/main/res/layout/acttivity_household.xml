@@ -25,10 +25,10 @@
         android:id="@+id/household_container"
         android:layout_centerHorizontal="true"
         android:layout_width="350dp"
-        android:layout_height="400dp"
+        android:layout_height="500dp"
         android:layout_marginTop="120dp"
         android:orientation="vertical"
-        android:background="@color/green">
+        android:background="@drawable/border2">
 
         <RelativeLayout
             android:id="@+id/user1"
