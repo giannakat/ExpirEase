@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import com.example.expirease.app.MyApplication
 
 class ProfileActivity : Activity() {
     private lateinit var etName: EditText
@@ -23,14 +24,10 @@ class ProfileActivity : Activity() {
     private lateinit var editPasswordIcon: ImageView
     private lateinit var btnSave: Button
     private lateinit var btnBack: Button
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
-
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("UserProfile", MODE_PRIVATE)
 
         // Initialize UI elements
         etName = findViewById(R.id.nameValue)
@@ -69,22 +66,17 @@ class ProfileActivity : Activity() {
         // Back button
         btnBack.setOnClickListener {
             startActivity(
-                Intent(this, MenuActivity::class.java).apply{
-                    putExtra("name", etName.text.toString())
-                    putExtra("email", etEmail.text.toString())
-                }
+                Intent(this, MenuActivity::class.java)
             )
         }
     }
 
     // Load previously saved data
     private fun loadProfileData() {
-        etName.setText(sharedPreferences.getString("name", "Gianna Carreon"))
-        etUsername.setText(sharedPreferences.getString("username", "Gianna123"))
-        etEmail.setText(sharedPreferences.getString("email", "gianna@example.com"))
-        etPhone.setText(sharedPreferences.getString("phone", "09123456789"))
-        etPassword.setText(sharedPreferences.getString("password", "****"))
-
+        etName.setText((application as MyApplication).name)
+        etEmail.setText((application as MyApplication).email)
+        etUsername.setText((application as MyApplication).username)
+        etPassword.setText((application as MyApplication).password)
     }
 
     // Enable editing of an EditText field (ALWAYS ALLOW EDITING)
@@ -123,12 +115,9 @@ class ProfileActivity : Activity() {
 
     // Save changes to SharedPreferences
     private fun saveChanges() {
-        val editor = sharedPreferences.edit()
-        editor.putString("name", etName.text.toString())
-        editor.putString("username", etUsername.text.toString())
-        editor.putString("email", etEmail.text.toString())
-        editor.putString("phone", etPhone.text.toString())
-        editor.putString("password", etPassword.text.toString())
-        editor.apply()
+        (application as MyApplication).username = etUsername.text.toString()
+        (application as MyApplication).password = etPassword.text.toString()
+        (application as MyApplication).email = etEmail.text.toString()
+        (application as MyApplication).name = etName.text.toString()
     }
 }

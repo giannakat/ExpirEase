@@ -644,7 +644,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="15dp"
-                android:text="Rice"
+                android:text="Cabbage"
                 android:textSize="22sp"
                 android:textStyle="bold"/>
 

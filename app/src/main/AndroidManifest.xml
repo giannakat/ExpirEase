@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".app.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,7 +14,20 @@
         android:theme="@style/Theme.ExpirEase"
         tools:targetApi="31">
         <activity
+
             android:name=".MainActivity"
+            />
+        <activity
+            android:name=".HouseholdActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CalendarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".util.CalendarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity_calendar"
             android:exported="false" />
         <activity
             android:name=".DevelopersActivity"
