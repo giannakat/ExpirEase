@@ -1,9 +1,11 @@
 package com.example.expirease
 
 import android.app.Activity
+import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.CalendarView
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -16,14 +18,12 @@ class CalendarActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calendarr)
-        calendarView = findViewById(R.id.calendar)
-        calendar = Calendar.getInstance()
 
-        calendarView.date = calendar.timeInMillis
-//        setDate(2023,3,19)
-        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            val date = "$dayOfMonth/${month + 1}/$year"
-            Toast.makeText(this, "Selected Date: $date", Toast.LENGTH_SHORT).show()
+        val backButton: ImageView = findViewById(R.id.back_button)
+
+        backButton.setOnClickListener {
+            val intent = Intent(this, MenuActivity::class.java)
+            startActivity(intent)
         }
     }
 
