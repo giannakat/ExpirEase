@@ -1,5 +1,6 @@
 package com.example.expirease
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -51,9 +52,13 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Clicked: ${menuItem.title}", Toast.LENGTH_SHORT).show()
                 when (menuItem.itemId){
                     R.id.nav_home -> Toast.makeText(this, "home selected", Toast.LENGTH_LONG).show()
-                    R.id.nav_calendar -> Toast.makeText(this, "calendar selected", Toast.LENGTH_LONG).show()
-                    R.id.nav_settings -> Toast.makeText(this, "settings selected", Toast.LENGTH_LONG).show()
-                    R.id.nav_household -> Toast.makeText(this, "household selected", Toast.LENGTH_LONG).show()
+                    R.id.nav_calendar -> startActivity(
+                        Intent(this, CalendarActivity::class.java)
+                    )
+                    R.id.nav_settings -> Toast.makeText(this, "home selected", Toast.LENGTH_LONG).show()
+                    R.id.nav_household -> startActivity(
+                        Intent(this, HouseholdActivity::class.java)
+                    )
                 }
                 drawerLayout.closeDrawers()
                 true
