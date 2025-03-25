@@ -25,8 +25,17 @@
 
             <LinearLayout
                 android:layout_width="150dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/border"/>
+                android:layout_height="wrap_content"
+                android:background="@drawable/border"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="January"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="150dp"
@@ -621,10 +630,10 @@
                 android:layout_gravity="center">
 
                 <ImageView
-                    android:id="@+id/giannapic"
+                    android:id="@+id/cabbage"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/gianna"
+                    android:src="@drawable/cabbage"
                     android:scaleType="centerCrop"
                     android:clipToOutline="true"
                     android:background="@drawable/circleborder"
@@ -660,10 +669,10 @@
                 android:layout_below="@id/item1">
 
                 <ImageView
-                    android:id="@+id/giannapic1"
+                    android:id="@+id/avocado"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/gianna"
+                    android:src="@drawable/avocado"
                     android:scaleType="centerCrop"
                     android:clipToOutline="true"
                     android:background="@drawable/circleborder"
