@@ -17,10 +17,11 @@ class MenuActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
-        val homeButton = findViewById<LinearLayout>(R.id.home)  // Ensure ID exists in XML
+        val homeButton = findViewById<LinearLayout>(R.id.home)
         val settingsButton = findViewById<LinearLayout>(R.id.Settings)
         val logoutButton = findViewById<LinearLayout>(R.id.logout)
         val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
+        val houseHoldButton = findViewById<LinearLayout>(R.id.household)
         val navBackButton = findViewById<ImageView>(R.id.nav_back)
 
         val edittext_name : EditText = findViewById<EditText>(R.id.nav_name)
@@ -47,6 +48,10 @@ class MenuActivity : Activity() {
         }
         profileButton.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+        houseHoldButton.setOnClickListener {
+            val intent = Intent(this, HouseholdActivity::class.java)
             startActivity(intent)
         }
     }
