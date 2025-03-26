@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                     )
                     R.id.nav_settings -> Toast.makeText(this, "home selected", Toast.LENGTH_LONG).show()
                     R.id.nav_household -> startActivity(
-                        Intent(this, HouseholdActivity::class.java)
+                        Intent(this, CustomListViewActivity::class.java)
                     )
                 }
                 drawerLayout.closeDrawers()

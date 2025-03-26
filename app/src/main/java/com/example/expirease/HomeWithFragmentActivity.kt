@@ -40,7 +40,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener { menuItem ->
             if(menuItem.itemId == R.id.nav_household){
                 startActivity(
-                    Intent(this, ListViewActivity::class.java)
+                    Intent(this, CustomListViewActivity::class.java)
                 )
                 return@setNavigationItemSelectedListener true
             }
