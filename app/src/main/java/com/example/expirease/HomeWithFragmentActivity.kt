@@ -38,9 +38,15 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener { menuItem ->
+            if(menuItem.itemId == R.id.nav_household){
+                startActivity(
+                    Intent(this, ListViewActivity::class.java)
+                )
+                return@setNavigationItemSelectedListener true
+            }
             val fragment: Fragment = when (menuItem.itemId){
                 R.id.nav_home -> HomeFragment();
-                R.id.nav_household -> CalendarFragment()
+//                R.id.nav_household -> CalendarFragment()
                 R.id.nav_settings -> CalendarFragment()
                 R.id.nav_calendar -> CalendarFragment()
                 else -> HomeFragment()
