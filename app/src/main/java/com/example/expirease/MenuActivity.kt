@@ -23,6 +23,7 @@ class MenuActivity : Activity() {
         val profileButton = findViewById<ImageView>(R.id.nav_profilepicture)
         val houseHoldButton = findViewById<LinearLayout>(R.id.household)
         val navBackButton = findViewById<ImageView>(R.id.nav_back)
+        val calendarButton = findViewById<LinearLayout>(R.id.Calendar)
 
         val edittext_name : EditText = findViewById<EditText>(R.id.nav_name)
         val edittext_email : EditText = findViewById<EditText>(R.id.nav_email)
@@ -52,6 +53,10 @@ class MenuActivity : Activity() {
         }
         houseHoldButton.setOnClickListener {
             val intent = Intent(this, HouseholdActivity::class.java)
+            startActivity(intent)
+        }
+        calendarButton.setOnClickListener {
+            val intent = Intent(this, CalendarActivity::class.java)
             startActivity(intent)
         }
     }
