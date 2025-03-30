@@ -26,9 +26,11 @@ class LoginActivity : AppCompatActivity() {
         val edittext_username : EditText = findViewById<EditText>(R.id.edittext_username)
         val edittext_password : EditText = findViewById<EditText>(R.id.edittext_password)
 
+        //custom class for passing data
         edittext_username.setText((application as MyApplication).username)
         edittext_password.setText((application as MyApplication).password)
 
+        //login button validation
         loginButton.setOnClickListener {
             val username = edittext_username.text.toString()
             val password = edittext_password.text.toString()
@@ -41,26 +43,20 @@ class LoginActivity : AppCompatActivity() {
             if (username == "gianna" && password == "123") {
                 Toast.makeText(this, "Signed in as an admin", Toast.LENGTH_LONG).show()
                 val intent = Intent(this, HomeWithFragmentActivity::class.java)
-                startActivity(intent) // ✅ Only start ProfileActivity if login is correct
+                startActivity(intent) // Only start ProfileActivity if login is correct
             } else if(username == (application as MyApplication).username && password == (application as MyApplication).password){
                 Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
                 val intent = Intent(this, HomeWithFragmentActivity::class.java)
                 startActivity(intent)
+
+                finish()
             }else{
                 Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
             }
 
-//            For later
-//            if (username == (application as MyApplication).username && password == (application as MyApplication).password) {
-//                Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
-//                val intent = Intent(this, HomeActivity::class.java)
-//                startActivity(intent) // ✅ Only start ProfileActivity if login is correct
-//            } else {
-//                Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
-//            }
         }
 
-        // ✅ Move sign-up text configuration outside the button click event
+        // Move sign-up text configuration outside the button click event
         val text = "Don't have an Account? Sign up"
         val spannableString = SpannableString(text)
 

@@ -17,10 +17,10 @@ class SettingsActivity : Activity() {
         val backButton: ImageView = findViewById(R.id.back_button)
         val devButton: ImageView = findViewById(R.id.developers_button)
 
-        backButton.setOnClickListener {
-            val intent = Intent(this, MenuActivity::class.java)
-            startActivity(intent)
-        }
+//        backButton.setOnClickListener {
+//            val intent = Intent(this, MenuActivity::class.java)
+//            startActivity(intent)
+//        }
 
         devButton.setOnClickListener {
             val intent = Intent(this, DevelopersActivity::class.java)
