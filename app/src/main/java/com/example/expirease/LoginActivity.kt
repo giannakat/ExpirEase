@@ -13,9 +13,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.expirease.app.MyApplication
 
-class LoginActivity : Activity() {
+class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -39,11 +40,11 @@ class LoginActivity : Activity() {
 
             if (username == "gianna" && password == "123") {
                 Toast.makeText(this, "Signed in as an admin", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, HomeWithFragmentActivity::class.java)
                 startActivity(intent) // ✅ Only start ProfileActivity if login is correct
             } else if(username == (application as MyApplication).username && password == (application as MyApplication).password){
                 Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, HomeWithFragmentActivity::class.java)
                 startActivity(intent)
             }else{
                 Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
