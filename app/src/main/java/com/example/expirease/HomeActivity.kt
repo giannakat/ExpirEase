@@ -1,5 +1,6 @@
 package com.example.expirease
 
+
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -25,6 +26,8 @@ class HomeActivity : Activity() {
             val intent = Intent(this, MenuActivity::class.java)
             startActivity(intent)
         }
+
+
 
 
 

@@ -15,7 +15,9 @@ class SplashScreenActivity : Activity() {
         buttonLogin.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
     }
+
 }
