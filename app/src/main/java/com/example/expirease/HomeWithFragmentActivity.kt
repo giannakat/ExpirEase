@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.expirease.fragment.CalendarFragment
+import com.example.expirease.fragment.CategoryFragment
 import com.example.expirease.fragment.HomeFragment
 import com.example.expirease.fragment.HouseholdFragment
 import com.example.expirease.fragment.SettingsFragment
@@ -45,24 +46,47 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
+//        navView.setNavigationItemSelectedListener { menuItem ->
+//            if(menuItem.itemId == R.id.nav_logout){
+//                startActivity(
+//                    Intent(this, LogoutActivity::class.java)
+//                )
+//                return@setNavigationItemSelectedListener true
+//            }
+//            val fragment: Fragment = when (menuItem.itemId){
+//                R.id.nav_home -> HomeFragment();
+//                R.id.nav_household -> HouseholdFragment()
+//                R.id.nav_category -> CategoryFragment()
+//                R.id.nav_settings -> SettingsFragment()
+//                R.id.nav_calendar -> CalendarFragment()
+//                else -> HomeFragment()
+//            }
+//            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+//            drawerLayout.closeDrawers()
+//            true
+//        }
+
         navView.setNavigationItemSelectedListener { menuItem ->
-            if(menuItem.itemId == R.id.nav_logout){
-                startActivity(
-                    Intent(this, LogoutActivity::class.java)
-                )
-                return@setNavigationItemSelectedListener true
-            }
-            val fragment: Fragment = when (menuItem.itemId){
-                R.id.nav_home -> HomeFragment();
+            val newFragment: Fragment = when (menuItem.itemId) {
+                R.id.nav_home -> HomeFragment()
                 R.id.nav_household -> HouseholdFragment()
+                R.id.nav_category -> CategoryFragment()
                 R.id.nav_settings -> SettingsFragment()
                 R.id.nav_calendar -> CalendarFragment()
                 else -> HomeFragment()
             }
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+            if (currentFragment?.javaClass != newFragment.javaClass) { // Prevent unnecessary replacements
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, newFragment)
+                    .commit()
+            }
+
             drawerLayout.closeDrawers()
             true
         }
+
 
     }
 }
