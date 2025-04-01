@@ -3,6 +3,8 @@ package com.example.expirease
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -66,13 +68,21 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 //            true
 //        }
 
+        val notifButton: ImageView = findViewById(R.id.notif_icon)
+
+        notifButton.setOnClickListener{
+            startActivity(Intent(this,NotificationsActivity::class.java))
+
+        }
         navView.setNavigationItemSelectedListener { menuItem ->
+
             val newFragment: Fragment = when (menuItem.itemId) {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_household -> HouseholdFragment()
                 R.id.nav_category -> CategoryFragment()
                 R.id.nav_settings -> SettingsFragment()
                 R.id.nav_calendar -> CalendarFragment()
+
                 else -> HomeFragment()
             }
 
