@@ -44,6 +44,7 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Signed in as an admin", Toast.LENGTH_LONG).show()
                 val intent = Intent(this, HomeWithFragmentActivity::class.java)
                 startActivity(intent) // Only start ProfileActivity if login is correct
+                finish()
             } else if(username == (application as MyApplication).username && password == (application as MyApplication).password){
                 Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
                 val intent = Intent(this, HomeWithFragmentActivity::class.java)

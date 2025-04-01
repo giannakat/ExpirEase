@@ -597,18 +597,18 @@
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:layout_marginRight="30dp"
-                android:background="@drawable/border2"/>
+                android:background="@drawable/border"/>
 
             <LinearLayout
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:layout_marginRight="30dp"
-                android:background="@drawable/border3"/>
+                android:background="@drawable/border"/>
 
             <LinearLayout
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/border4"/>
+                android:background="@drawable/border"/>
 
         </LinearLayout>
 
@@ -643,7 +643,7 @@
                     android:id="@+id/username"
                     android:layout_width="125dp"
                     android:layout_height="wrap_content"
-                    android:text="Cabbage"
+                    android:text="Gianna Carreon"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textAlignment="center"
@@ -682,7 +682,7 @@
                     android:id="@+id/username1"
                     android:layout_width="125dp"
                     android:layout_height="wrap_content"
-                    android:text="Avocado"
+                    android:text="Gianna Carreon"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textAlignment="center"

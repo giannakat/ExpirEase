@@ -66,7 +66,7 @@ class ProfileActivity : Activity() {
         // Back button
         btnBack.setOnClickListener {
             startActivity(
-                Intent(this, MenuActivity::class.java)
+                Intent(this, HomeWithFragmentActivity::class.java)
             )
         }
     }

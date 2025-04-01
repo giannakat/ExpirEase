@@ -19,7 +19,7 @@ class LogoutActivity : Activity() {
         val yesButton: Button = findViewById(R.id.yes_button)
 
         noButton.setOnClickListener {
-            val intent = Intent(this, MenuActivity::class.java)
+            val intent = Intent(this, HomeWithFragmentActivity::class.java)
             startActivity(intent)
         }
 

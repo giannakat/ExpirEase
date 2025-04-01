@@ -17,7 +17,7 @@ class DevelopersActivity : Activity() {
         val backButton: ImageView = findViewById(R.id.back_button)
 
         backButton.setOnClickListener {
-            val intent = Intent(this, MenuActivity::class.java)
+            val intent = Intent(this, HomeWithFragmentActivity::class.java)
             startActivity(intent)
         }
     }

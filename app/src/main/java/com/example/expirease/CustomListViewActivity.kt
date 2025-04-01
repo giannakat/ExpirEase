@@ -13,7 +13,7 @@ import com.example.expirease.helper.ItemsCustomListViewAdapter
 class CustomListViewActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_category)
+        setContentView(R.layout.fragment_category)
 
         //widget
         val listView = findViewById<ListView>(R.id.category_listview)

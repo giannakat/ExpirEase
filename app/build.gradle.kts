@@ -75,4 +75,11 @@ dependencies {
     //navigation
     implementation(libs.material)
     implementation(libs.androidx.appcompat)
-   }
+
+    //recycler view
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+
+    //search view
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+
+}

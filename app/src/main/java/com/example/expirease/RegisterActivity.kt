@@ -52,11 +52,11 @@ class RegisterActivity : Activity() {
         }
 
         // Create a SpannableString to make "Sign up" a different color and clickable
-        val text = "Already have an account? Sign in"
+        val text = "Already have an account? Login"
         val spannableString = SpannableString(text)
 
         // Change the color of the "Sign up" text to blue (or any color you prefer)
-        val startIndex = text.indexOf("Sign in")
+        val startIndex = text.indexOf("Login")
         val endIndex = startIndex + "Sign in".length
         spannableString.setSpan(ForegroundColorSpan(Color.GREEN), startIndex, endIndex, 0)
 

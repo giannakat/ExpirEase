@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 class ListViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_household)
+        setContentView(R.layout.fragment_household)
 
         //create a listview in xml
         //in activity instantiate first the list view
