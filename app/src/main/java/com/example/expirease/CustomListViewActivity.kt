@@ -18,25 +18,25 @@ class CustomListViewActivity : Activity() {
         //widget
         val listView = findViewById<ListView>(R.id.category_listview)
 
-        val listOfItems = listOf(
-            Item("Egg", 2, R.drawable.banana),
-            Item("Milk", 1, R.drawable.banana),
-            Item("Bread", 3, R.drawable.banana),
-            Item("Rice", 5, R.drawable.banana),
-            Item("Apple", 4, R.drawable.banana),
-            Item("Chicken", 2, R.drawable.banana),
-            Item("Fish", 3, R.drawable.banana),
-            Item("Carrot", 6, R.drawable.banana),
-            Item("Potato", 7, R.drawable.banana),
-            Item("Tomato", 3, R.drawable.banana),
-            Item("Onion", 4, R.drawable.banana),
-            Item("Garlic", 2, R.drawable.banana),
-            Item("Cheese", 1, R.drawable.banana),
-            Item("Butter", 2, R.drawable.banana),
-            Item("Yogurt", 3, R.drawable.banana)
-        )
+//        val listOfItems = listOf(
+//            Item("Egg", 2, R.drawable.banana),
+//            Item("Milk", 1, R.drawable.banana),
+//            Item("Bread", 3, R.drawable.banana),
+//            Item("Rice", 5, R.drawable.banana),
+//            Item("Apple", 4, R.drawable.banana),
+//            Item("Chicken", 2, R.drawable.banana),
+//            Item("Fish", 3, R.drawable.banana),
+//            Item("Carrot", 6, R.drawable.banana),
+//            Item("Potato", 7, R.drawable.banana),
+//            Item("Tomato", 3, R.drawable.banana),
+//            Item("Onion", 4, R.drawable.banana),
+//            Item("Garlic", 2, R.drawable.banana),
+//            Item("Cheese", 1, R.drawable.banana),
+//            Item("Butter", 2, R.drawable.banana),
+//            Item("Yogurt", 3, R.drawable.banana)
+//        )
 
-        val adapter: ItemsCustomListViewAdapter = ItemsCustomListViewAdapter(this, listOfItems)
-        listView.adapter = adapter
+//        val adapter: ItemsCustomListViewAdapter = ItemsCustomListViewAdapter(this, listOfItems)
+//        listView.adapter = adapter
     }
 }

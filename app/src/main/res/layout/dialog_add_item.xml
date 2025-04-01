@@ -18,6 +18,18 @@
         android:hint="Quantity"
         android:inputType="number" />
 
+    <TextView
+        android:id="@+id/tv_expiry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Expiry Date"/>
+
+    <Button
+        android:id="@+id/btn_pick_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pick Date"/>
+
     <Button
         android:id="@+id/btn_add_item"
         android:layout_width="match_parent"

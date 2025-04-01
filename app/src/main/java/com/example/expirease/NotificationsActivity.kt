@@ -23,14 +23,14 @@ class NotificationsActivity : AppCompatActivity() {  // Changed to AppCompatActi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notifications)
 
-        listOfItems = mutableListOf(
-            Item("Egg", 2, R.drawable.banana),
-            Item("Milk", 1, R.drawable.banana),
-            Item("Bread", 3, R.drawable.banana),
-            Item("Rice", 5, R.drawable.banana),
-            Item("Apple", 4, R.drawable.banana),
-            Item("Chicken", 2, R.drawable.banana)
-        )
+//        listOfItems = mutableListOf(
+//            Item("Egg", 2, R.drawable.banana),
+//            Item("Milk", 1, R.drawable.banana),
+//            Item("Bread", 3, R.drawable.banana),
+//            Item("Rice", 5, R.drawable.banana),
+//            Item("Apple", 4, R.drawable.banana),
+//            Item("Chicken", 2, R.drawable.banana)
+//        )
 
         filteredList = listOfItems.toMutableList()
 
