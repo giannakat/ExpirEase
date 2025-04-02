@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -74,7 +75,13 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             startActivity(Intent(this,NotificationsActivity::class.java))
 
         }
+
         navView.setNavigationItemSelectedListener { menuItem ->
+
+            if(menuItem.itemId == R.id.nav_logout){
+                showLogoutDialog()
+                return@setNavigationItemSelectedListener true
+            }
 
             val newFragment: Fragment = when (menuItem.itemId) {
                 R.id.nav_home -> HomeFragment()
@@ -98,5 +105,31 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    fun showLogoutDialog(){
+        //create the view itself equivalent to setContent
+        val builder = AlertDialog.Builder(this)  // Create a dialog builder
+        builder.setTitle("Logout")
+        builder.setMessage("Are you sure you want to log out?")
+
+        // Set the "Logout" button
+        builder.setPositiveButton("Logout") { _, _ ->
+            performLogout()  // Call logout function when user clicks "Logout"
+        }
+
+        // Set the "Cancel" button
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()  // Dismiss dialog when user clicks "Cancel"
+        }
+
+        val dialog = builder.create()  // Create the dialog
+        dialog.show()  // Show the dialog
+    }
+
+    private fun performLogout() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

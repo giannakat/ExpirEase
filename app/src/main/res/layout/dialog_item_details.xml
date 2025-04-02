@@ -33,5 +33,21 @@
         android:layout_marginVertical="8dp"
         android:textSize="6sp" />
 
+    <TextView
+        android:id="@+id/item_expiryDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:textSize="6sp" />
+
+    <TextView
+        android:id="@+id/item_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:textSize="6sp" />
+
+
+
 
 </LinearLayout>

@@ -8,15 +8,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
+import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.ItemDetailsDialogFragment
 import com.example.expirease.helper.ItemRecyclerViewAdapter
@@ -30,31 +33,32 @@ class HomeFragment : Fragment(){
     lateinit var itemAdapter : ItemRecyclerViewAdapter
     lateinit var filteredList: MutableList<Item>
     lateinit var searchView: SearchView
+    val categoryList = mutableListOf(*Category.values().map { it.displayName }.toTypedArray())
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                           savedInstanceState: Bundle?
     ): View?{
         //equivalent to setContent
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         listOfItems = mutableListOf(
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, R.drawable.banana),
-            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, R.drawable.banana),
-            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, R.drawable.banana),
-            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, R.drawable.banana),
-            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, R.drawable.banana),
-            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, R.drawable.banana),
-            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, R.drawable.banana),
-            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, R.drawable.banana),
-            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, R.drawable.banana),
-            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, R.drawable.banana),
-            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, R.drawable.banana),
-            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, R.drawable.banana),
-            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, R.drawable.banana),
-            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, R.drawable.banana),
-            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, R.drawable.banana)
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, "Fruit", R.drawable.banana),
+            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, "Fruit", R.drawable.banana),
+            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, "Fruit", R.drawable.banana),
+            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, "Fruit", R.drawable.banana),
+            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, "Fruit", R.drawable.banana),
+            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, "Fruit", R.drawable.banana),
+            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, "Fruit", R.drawable.banana),
+            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, "Fruit", R.drawable.banana),
+            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, "Fruit", R.drawable.banana),
+            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, "Fruit", R.drawable.banana),
+            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, "Fruit", R.drawable.banana),
+            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, "Fruit", R.drawable.banana),
+            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, "Fruit", R.drawable.banana),
+            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, "Fruit", R.drawable.banana),
+            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, "Fruit", R.drawable.banana)
         )
 
         // for searching
@@ -69,11 +73,12 @@ class HomeFragment : Fragment(){
                 putInt("photo", item.photoResource)
                 putString("name", item.name)
                 putInt("quantity", item.quantity)
+                putLong("expiryDate", item.expiryDate)
+                putString("category", item.category)
             }
             dialog.arguments = bundle
             dialog.show(parentFragmentManager, "ItemDetailsDialog")
         })
-
 
         recyclerView.adapter = itemAdapter
 
@@ -121,8 +126,13 @@ class HomeFragment : Fragment(){
         val editItemQuantity = dialogView.findViewById<EditText>(R.id.edit_item_quantity)
         val tvExpiry = dialogView.findViewById<TextView>(R.id.tv_expiry)
         val btnPickDate = dialogView.findViewById<Button>(R.id.btn_pick_date)
-
+        val spinnerCategory = dialogView.findViewById<Spinner>(R.id.spinner_category)
         var selectedExpiryDate: Long = System.currentTimeMillis()
+
+        //set up spinner adapter
+        //TODO create custom spinner_item layout
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryList)
+        spinnerCategory.adapter = spinnerAdapter
 
         btnPickDate.setOnClickListener {
             val calendar = Calendar.getInstance()
@@ -148,16 +158,18 @@ class HomeFragment : Fragment(){
         dialog.setPositiveButton("Add") { _, _ ->
             val name = editItemName.text.toString()
             val quantity = editItemQuantity.text.toString().toIntOrNull() ?: 1  // Default to 1 if empty
+            val selectedCategory = spinnerCategory.selectedItem.toString()
+
             if(!name.isNullOrEmpty()) {
-                addItem(name, quantity, selectedExpiryDate, R.drawable.banana)  // Add new item
+                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.banana)  // Add new item
             }
         }
         dialog.setNegativeButton("Cancel", null)
         dialog.create().show()
     }
 
-    fun addItem(name: String, quantity: Int, expiryDate: Long, img: Int){
-        val newItem = Item(name, quantity, expiryDate, img)
+    fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: String, img: Int){
+        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
         listOfItems.add(newItem)
         itemAdapter.notifyItemInserted(listOfItems.size - 1);
     }
