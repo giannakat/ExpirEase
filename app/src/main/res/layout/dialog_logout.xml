@@ -17,7 +17,7 @@
             android:id="@+id/editName"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/logout"
+            android:src="@drawable/ic_nav_logout"
             android:layout_margin="30dp"
             android:clickable="true"
             android:focusable="true"/>

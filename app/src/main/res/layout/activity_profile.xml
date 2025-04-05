@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="195dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/cover_photo"/> <!-- Change to your cover image -->
+                android:src="@drawable/img_default_cover_photo"/> <!-- Change to your cover image -->
 
             <!-- Profile Picture (Overlapping Cover) -->
             <ImageView
@@ -32,8 +32,8 @@
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal|bottom"
                 android:layout_marginBottom="0dp"
-                android:background="@drawable/profile_icon"
-                android:src="@drawable/default_profile"/>
+                android:background="@drawable/img_default_user"
+                android:src="@drawable/img_placeholder_profile"/>
         </FrameLayout>
 
         <LinearLayout
@@ -109,7 +109,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="12dp"
-                    android:src="@drawable/edit_pen"/>
+                    android:src="@drawable/ic_profile_edit_pen_2"/>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -156,7 +156,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="12dp"
-                    android:src="@drawable/edit_pen"/>
+                    android:src="@drawable/ic_profile_edit_pen_2"/>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -203,7 +203,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="12dp"
-                    android:src="@drawable/edit_pen"
+                    android:src="@drawable/ic_profile_edit_pen_2"
                     android:focusable="false"
                     android:cursorVisible="false"/>
             </LinearLayout>
@@ -252,7 +252,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="12dp"
-                    android:src="@drawable/edit_pen"/>
+                    android:src="@drawable/ic_profile_edit_pen_2"/>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -303,7 +303,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="12dp"
-                    android:src="@drawable/edit_pen"/>
+                    android:src="@drawable/ic_profile_edit_pen_2"/>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>

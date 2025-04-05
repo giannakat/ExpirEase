@@ -13,7 +13,7 @@
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/default_profile"
+        android:src="@drawable/img_placeholder_profile"
         android:padding="8dp"
         />
 

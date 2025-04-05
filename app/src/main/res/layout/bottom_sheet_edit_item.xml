@@ -41,7 +41,7 @@
                 android:id="@+id/editName"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/edit_pen"
+                android:src="@drawable/ic_profile_edit_pen_2"
                 android:layout_gravity="center_vertical"/>
 
         </LinearLayout>
@@ -80,7 +80,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/calendar"
+                android:src="@drawable/img_button_calendar"
                 android:background="@color/bgblue"
                 />
 

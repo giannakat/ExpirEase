@@ -4,8 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.Image
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -15,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.expirease.fragment.CalendarFragment
-import com.example.expirease.fragment.CategoryFragment
+import com.example.expirease.fragment.HistoryFragment
 import com.example.expirease.fragment.HomeFragment
 import com.example.expirease.fragment.HouseholdFragment
 import com.example.expirease.fragment.SettingsFragment
@@ -75,7 +73,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         val notifButton: ImageView = findViewById(R.id.notif_icon)
 
         notifButton.setOnClickListener{
-            startActivity(Intent(this,NotificationsActivity::class.java))
+           // startActivity(Intent(this,NotificationsActivity::class.java))
 
         }
 
@@ -97,7 +95,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             val newFragment: Fragment = when (menuItem.itemId) {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_household -> HouseholdFragment()
-                R.id.nav_category -> CategoryFragment()
+                R.id.nav_category -> HistoryFragment()
                 R.id.nav_settings -> SettingsFragment()
                 R.id.nav_calendar -> CalendarFragment()
 

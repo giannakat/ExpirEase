@@ -3,17 +3,11 @@ package com.example.expirease
 import android.app.Activity
 import android.os.Bundle
 import android.widget.ListView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.expirease.data.Item
-import com.example.expirease.helper.ItemsCustomListViewAdapter
 
 class CustomListViewActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_category)
+        setContentView(R.layout.fragment_history)
 
         //widget
         val listView = findViewById<ListView>(R.id.category_listview)

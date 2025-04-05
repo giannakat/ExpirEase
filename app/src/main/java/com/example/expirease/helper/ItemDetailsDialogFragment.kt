@@ -1,6 +1,5 @@
 package com.example.expirease.helper
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,7 +43,7 @@ class ItemDetailsDialogFragment : DialogFragment() {
 
         // Retrieve data from arguments
         arguments?.let {
-            itemPhoto.setImageResource(it.getInt("photo", R.drawable.banana))
+            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
             itemName.text = it.getString("name", "Unknown Item")
             itemQuantity.text = "Quantity: ${it.getInt("quantity", 0)}"
 
