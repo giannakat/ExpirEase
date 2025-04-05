@@ -29,6 +29,7 @@ import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
 import com.example.expirease.helper.ItemDetailsDialogFragment
 import com.example.expirease.helper.ItemRecyclerViewAdapter
+import com.example.expirease.helper.OnItemUpdatedListener
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -83,6 +84,19 @@ class HomeFragment : Fragment(){
                 putString("category", item.category.toString())
             }
             bottomSheet.arguments = bundle
+
+            bottomSheet.onItemUpdatedListener = object : OnItemUpdatedListener {
+                override fun onItemUpdated(name: String, quantity: Int, expiryDate: Long, category: String) {
+                    // update your list and adapter here
+                    item.name = name
+                    item.quantity = quantity
+                    item.expiryDate = expiryDate
+                    item.category = Category.valueOf(category.uppercase())
+
+                    itemAdapter.notifyDataSetChanged()
+                }
+            }
+
             bottomSheet.show(parentFragmentManager, "EditItemBottomSheet")
         })
 
