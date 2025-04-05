@@ -34,7 +34,7 @@ class NotificationDetailsDialogFragment : DialogFragment() {
         val itemQuantity = view.findViewById<TextView>(R.id.item_quantity)
 
         arguments?.let {
-            itemPhoto.setImageResource(it.getInt("photo", R.drawable.banana))
+            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
             itemName.text = it.getString("name") ?: "Unknown Item"
             itemQuantity.text = "Quantity: ${it.getInt("quantity", 0)}"
         }

@@ -5,5 +5,5 @@ import com.example.expirease.R
 data class Member(
     var firstname: String = "",
     var lastname: String = "",
-    var photoResource: Int = R.drawable.account
+    var photoResource: Int = R.drawable.ic_person
 )

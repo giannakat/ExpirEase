@@ -25,7 +25,7 @@
                 android:id="@+id/category_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/pantry"
+                android:src="@drawable/ic_storage_pantry"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
                 android:layout_weight="1"/> <!-- Pushes text to the bottom -->
@@ -68,7 +68,7 @@
                 android:id="@+id/fridge_icon"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
-                android:src="@drawable/fridge"
+                android:src="@drawable/ic_storage_fridge"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
                 android:layout_weight="1"/> <!-- Pushes text to the bottom -->
@@ -110,7 +110,7 @@
                 android:id="@+id/freezer_icon"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
-                android:src="@drawable/freezer"
+                android:src="@drawable/ic_storage_freezer"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
                 android:layout_weight="1"/> <!-- Pushes text to the bottom -->

@@ -7,7 +7,7 @@
         android:id="@+id/back_button"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/arrow"
+        android:src="@drawable/icon_rounded_back"
         android:layout_margin="20dp"/>
 
     <!-- Outer Container -->
@@ -67,10 +67,10 @@
                         android:id="@+id/giannapic"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:src="@drawable/gianna"
+                        android:src="@drawable/img_developer_giana"
                         android:scaleType="centerCrop"
                         android:clipToOutline="true"
-                        android:background="@drawable/circleborder" />
+                        android:background="@drawable/bg_shape_circle_border" />
 
                     <!-- Name and Role -->
                     <LinearLayout
@@ -137,10 +137,10 @@
                         android:id="@+id/jmpic"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:src="@drawable/jm"
+                        android:src="@drawable/img_developer_jm"
                         android:scaleType="centerCrop"
                         android:clipToOutline="true"
-                        android:background="@drawable/circleborder" />
+                        android:background="@drawable/bg_shape_circle_border" />
 
                     <!-- Name and Role -->
                     <LinearLayout

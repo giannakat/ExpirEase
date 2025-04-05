@@ -25,7 +25,7 @@
             android:id="@+id/item_photo"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:src="@drawable/cabbage"/>
+            android:src="@drawable/img_product_cabbage"/>
 
         <EditText
             android:id="@+id/edit_item_name"
@@ -86,7 +86,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/calendar"
+            android:src="@drawable/img_button_calendar"
             android:contentDescription="Add"
             android:scaleType="fitCenter" />
 

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background"
+    android:background="@drawable/bg_dialog_shape"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:padding="16dp">
@@ -60,7 +60,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
-            android:src="@drawable/edit_pen"/>
+            android:src="@drawable/ic_profile_edit_pen_2"/>
     </LinearLayout>
 
     <TextView

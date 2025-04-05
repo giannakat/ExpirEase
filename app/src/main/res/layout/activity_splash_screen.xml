@@ -8,7 +8,7 @@
     tools:context=".SplashScreenActivity"
     android:orientation="vertical"
     android:gravity="center"
-    android:background = "@drawable/fruit">
+    android:background = "@drawable/bg_splash_screen">
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,6 +35,6 @@
         android:text="GET STARTED"
         android:textStyle="bold"
         android:paddingHorizontal="60dp"
-        android:background="@drawable/intro"/>
+        android:background="@drawable/bg_shape_splash_screen"/>
 
 </LinearLayout>
