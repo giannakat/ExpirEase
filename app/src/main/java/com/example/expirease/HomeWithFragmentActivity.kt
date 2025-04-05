@@ -1,6 +1,7 @@
 package com.example.expirease
 
 import android.content.Intent
+import android.graphics.Color
 import android.media.Image
 import android.os.Bundle
 import android.util.Log
@@ -117,15 +118,15 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
     }
 
-    fun showLogoutDialog(){
-        //create the view itself equivalent to setContent
-        val builder = AlertDialog.Builder(this)  // Create a dialog builder
+    fun showLogoutDialog() {
+        // Create a dialog builder
+        val builder = AlertDialog.Builder(this)
         builder.setTitle("Logout")
         builder.setMessage("Are you sure you want to log out?")
 
         // Set the "Logout" button
         builder.setPositiveButton("Logout") { _, _ ->
-            performLogout()  // Call logout function when user clicks "Logout"
+            performLogout()  // Call the logout function when user clicks "Logout"
         }
 
         // Set the "Cancel" button
@@ -133,8 +134,24 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             dialog.dismiss()  // Dismiss dialog when user clicks "Cancel"
         }
 
-        val dialog = builder.create()  // Create the dialog
-        dialog.show()  // Show the dialog
+        // Create the alert dialog
+        val dialog = builder.create()
+
+        // Show the dialog
+        dialog.show()
+
+        // Find the "Logout" button and change its text color to red
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.setTextColor(Color.RED)  // Change text color to red
+
+        // Position the "Logout" button lower (by adjusting the layout parameters)
+        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
+        layoutParams.topMargin = 50  // Adjust the top margin to push the button lower (you can tweak this value)
+        positiveButton.layoutParams = layoutParams
+
+        // Optionally adjust the "Cancel" button text color to something different if desired
+        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        negativeButton.setTextColor(Color.BLACK)  // Keep the "Cancel" button with default black text
     }
 
     private fun performLogout() {
