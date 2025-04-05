@@ -1,10 +1,12 @@
 package com.example.expirease
 
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -74,6 +76,14 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         notifButton.setOnClickListener{
             startActivity(Intent(this,NotificationsActivity::class.java))
 
+        }
+
+        val headerView = navView.getHeaderView(0)
+        val profileHeader = headerView.findViewById<LinearLayout>(R.id.profile)
+
+        profileHeader.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+            drawerLayout.closeDrawers() // Close the drawer after clicking
         }
 
         navView.setNavigationItemSelectedListener { menuItem ->

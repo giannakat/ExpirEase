@@ -37,6 +37,7 @@
         </FrameLayout>
 
         <LinearLayout
+            android:id="@+id/editPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -327,7 +328,7 @@
                 android:layout_height="match_parent"
                 android:text="Back"
                 android:background="@drawable/border_button"
-                android:textColor="@color/white"/>
+                android:textColor="@color/black"/>
         </LinearLayout>
 
 
