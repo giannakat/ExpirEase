@@ -1,40 +1,37 @@
 package com.example.expirease
 
-import android.app.Activity
+import java.text.SimpleDateFormat
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.expirease.data.Category
 import com.example.expirease.data.Item
-import com.example.expirease.helper.ItemDetailsDialogFragment
-import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helperNotif.NotificationDetailsDialogFragment
 import com.example.expirease.helperNotif.NotificationRecyclerViewAdapter
+import java.util.Locale
 
-class NotificationsActivity : AppCompatActivity() {  // Changed to AppCompatActivity for better compatibility
+class NotificationsActivity : AppCompatActivity() {
     private lateinit var listOfItems: MutableList<Item>
-    private lateinit var itemAdapter: NotificationRecyclerViewAdapter // Use correct adapter
+    private lateinit var itemAdapter: NotificationRecyclerViewAdapter
     private lateinit var filteredList: MutableList<Item>
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notifications)
 
-//        listOfItems = mutableListOf(
-//            Item("Egg", 2, R.drawable.banana),
-//            Item("Milk", 1, R.drawable.banana),
-//            Item("Bread", 3, R.drawable.banana),
-//            Item("Rice", 5, R.drawable.banana),
-//            Item("Apple", 4, R.drawable.banana),
-//            Item("Chicken", 2, R.drawable.banana)
-//        )
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        // ✅ Initialize the list before using it
+        listOfItems = mutableListOf(
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana),
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana)
+        )
 
         filteredList = listOfItems.toMutableList()
 
-        val recyclerView = findViewById<RecyclerView>(R.id.item_recyclerview)
+        val recyclerView = findViewById<RecyclerView>(R.id.notif_recyclerview)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         itemAdapter = NotificationRecyclerViewAdapter(filteredList, onClick = { item ->
@@ -48,6 +45,6 @@ class NotificationsActivity : AppCompatActivity() {  // Changed to AppCompatActi
             dialog.show(supportFragmentManager, "NotificationDetailsDialog")
         })
 
-        recyclerView.adapter = itemAdapter // 🔥 **This was missing**
+        recyclerView.adapter = itemAdapter
     }
 }

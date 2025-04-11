@@ -10,7 +10,6 @@ class MyApplication : Application(){
     var email : String = ""
     var name : String = "Gianna Carreon"
 
-
     override fun onCreate() {
         super.onCreate()
         Log.e("Test", "My application is called")
