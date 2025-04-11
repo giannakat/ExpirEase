@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.TextView
 import com.example.expirease.R
 import com.example.expirease.helper.OnItemUpdatedListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -55,7 +54,7 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
 
         // Retrieve data from arguments
         arguments?.let {
-            itemPhoto.setImageResource(it.getInt("photo", R.drawable.banana))
+            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
             itemName.setText(it.getString("name", "Unknown Item"))
             itemQuantity.setText(it.getInt("quantity", 0).toString())
 

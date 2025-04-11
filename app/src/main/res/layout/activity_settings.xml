@@ -8,14 +8,14 @@
         android:id="@+id/back_button"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:src="@drawable/arrow"
+        android:src="@drawable/icon_rounded_back"
         android:layout_margin="20dp"/>
 
     <ImageView
         android:id="@+id/setting"
         android:layout_width="150dp"
         android:layout_height="100dp"
-        android:src="@drawable/settings_wheel"
+        android:src="@drawable/icon_settings"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"/>
 
@@ -73,7 +73,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/bell"/>
+                        android:src="@drawable/ic_settings_bell"/>
 
                     <TextView
                         android:layout_width="100dp"
@@ -95,7 +95,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/deleteacc"/>
+                            android:src="@drawable/ic_settings_delete_account"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -146,7 +146,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/dark"/>
+                        android:src="@drawable/ic_settings_dark_mode_moon"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -159,7 +159,7 @@
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@drawable/toggle"
+                        android:src="@drawable/ic_settings_toggle"
                         android:layout_marginLeft="150dp"/>
 
                 </LinearLayout>
@@ -175,7 +175,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/calendar"/>
+                        android:src="@drawable/img_button_calendar"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -225,7 +225,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/report"/>
+                        android:src="@drawable/ic_settings_report"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -246,7 +246,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/airplane"/>
+                        android:src="@drawable/ic_settings_send_feedback"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -269,7 +269,7 @@
                         android:id="@+id/developers_button"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/team"/>
+                        android:src="@drawable/ic_settings_team"/>
 
                     <TextView
 

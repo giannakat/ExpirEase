@@ -30,7 +30,7 @@
                 android:id="@+id/editName"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/logout"
+                android:src="@drawable/ic_nav_logout"
                 android:layout_margin="30dp"
                 android:clickable="true"
                 android:focusable="true"/>
@@ -66,7 +66,7 @@
                     android:id="@+id/yes_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/solid_button"
+                    android:background="@drawable/bg_button_solid"
                     android:text="Yes"/>
             </LinearLayout>
 

@@ -1,9 +1,7 @@
 package com.example.expirease.fragment
 
-import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -27,7 +25,6 @@ import com.example.expirease.R
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
-import com.example.expirease.helper.ItemDetailsDialogFragment
 import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helper.OnItemUpdatedListener
 import java.text.SimpleDateFormat
@@ -51,21 +48,21 @@ class HomeFragment : Fragment(){
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         listOfItems = mutableListOf(
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana),
-            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, Category.DAIRY, R.drawable.banana),
-            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, Category.FRUITS, R.drawable.banana),
-            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, Category.FRUITS, R.drawable.banana)
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana),
+            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, Category.DAIRY, R.drawable.img_product_banana),
+            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, Category.FRUITS, R.drawable.img_product_banana),
+            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, Category.FRUITS, R.drawable.img_product_banana)
         )
 
         // for searching
@@ -220,7 +217,7 @@ class HomeFragment : Fragment(){
             val selectedCategory = Category.values().find { it.displayName == selectedCategoryName }
 
             if(!name.isNullOrEmpty() && selectedCategory != null) {
-                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.banana)  // Add new item
+                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)  // Add new item
             }
         }
 

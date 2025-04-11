@@ -84,7 +84,7 @@
             android:id="@+id/add_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/button_add"
+            android:src="@drawable/img_button_add_product"
             android:layout_margin="0dp"
             android:scaleType="fitCenter"
             android:layout_gravity="center_vertical"

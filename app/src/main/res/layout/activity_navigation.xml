@@ -23,7 +23,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/default_profile"
+            android:src="@drawable/img_placeholder_profile"
             android:clickable="true"
             android:focusable="true" />
 
@@ -69,7 +69,7 @@
             android:layout_marginEnd="10dp"
             android:layout_gravity="top"
             android:layout_marginTop="10dp"
-            android:src="@drawable/close"
+            android:src="@drawable/icon_close"
             android:clickable="true"
             android:focusable="true" />
     </LinearLayout>
@@ -99,7 +99,7 @@
             android:id="@+id/home_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/nav_hom" />
+            android:src="@drawable/ic_nav_home" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -123,7 +123,7 @@
         <ImageView
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/nav_calendar" />
+            android:src="@drawable/ic_nav_calendar" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -147,7 +147,7 @@
         <ImageView
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/nav_hom" />
+            android:src="@drawable/ic_nav_home" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -171,7 +171,7 @@
         <ImageView
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/nav_list" />
+            android:src="@drawable/ic_nav_history" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -196,7 +196,7 @@
             android:id="@+id/settings_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/nav_settings" />
+            android:src="@drawable/ic_nav_settings" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -221,7 +221,7 @@
             android:id="@+id/logout_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/nav_logout" />
+            android:src="@drawable/ic_nav_logout_2" />
 
         <TextView
             android:layout_width="wrap_content"
