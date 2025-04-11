@@ -73,7 +73,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         val notifButton: ImageView = findViewById(R.id.notif_icon)
 
         notifButton.setOnClickListener{
-           // startActivity(Intent(this,NotificationsActivity::class.java))
+            startActivity(Intent(this,NotificationsActivity::class.java))
 
         }
 
