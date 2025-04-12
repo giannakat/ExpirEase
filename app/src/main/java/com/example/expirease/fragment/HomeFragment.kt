@@ -9,17 +9,15 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
+import com.example.expirease.app.MyApplication
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
 import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helper.OnItemUpdatedListener
-import com.example.expirease.viewmodel.SharedViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,15 +26,14 @@ class HomeFragment : Fragment() {
     lateinit var filteredList: MutableList<Item>
     lateinit var itemAdapter: ItemRecyclerViewAdapter
     lateinit var searchView: SearchView
-    private lateinit var sharedViewModel: SharedViewModel
     val categoryList = Category.values().toMutableList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Initialize lists first
-        listOfItems = mutableListOf()
-        filteredList = mutableListOf()
+        val app = requireActivity().application as MyApplication
 
-        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+        // Initialize lists
+        listOfItems = app.listOfItems
+        filteredList = listOfItems.toMutableList()
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
@@ -61,13 +58,6 @@ class HomeFragment : Fragment() {
                     item.expiryDate = expiryDate
                     item.category = Category.valueOf(category.uppercase())
 
-                    val updatedList = sharedViewModel.items.value ?: mutableListOf()
-                    val index = updatedList.indexOf(item)
-                    if (index >= 0) {
-                        updatedList[index] = item
-                        sharedViewModel.items.value = updatedList
-                    }
-
                     itemAdapter.notifyDataSetChanged()
                 }
             }
@@ -76,21 +66,15 @@ class HomeFragment : Fragment() {
         })
         itemRecyclerView.adapter = itemAdapter
 
-        // LiveData observer
-        sharedViewModel.items.observe(viewLifecycleOwner) { items ->
-            listOfItems.clear()
-            listOfItems.addAll(items)
-
-            filteredList.clear()
-            filteredList.addAll(items)
-
-            itemAdapter.notifyDataSetChanged()
-        }
-
         // Example item (for testing)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val newItem = Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana)
-        sharedViewModel.addItem(newItem)
+        val testItem = Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana)
+        if (!listOfItems.contains(testItem)) {
+            app.listOfItems.add(testItem)
+            filteredList.add(testItem)
+        }
+
+        itemAdapter.notifyDataSetChanged()
 
         // SearchView setup
         searchView = view.findViewById(R.id.search_bar)
@@ -210,10 +194,12 @@ class HomeFragment : Fragment() {
 
     private fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int) {
         val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
+
+        val app = requireActivity().application as MyApplication
+        app.listOfItems.add(newItem)
+
         listOfItems.add(newItem)
         filteredList.add(newItem)
-
-        sharedViewModel.addItem(newItem)
         itemAdapter.notifyItemInserted(filteredList.size - 1)
     }
 
