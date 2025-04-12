@@ -128,14 +128,14 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_margin="16dp"
-            android:src="@drawable/fb_logo"/>
+            android:src="@drawable/img_logo_fb"/>
 
         <ImageView
             android:id="@+id/google_btn"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="16dp"
-            android:src="@drawable/google_logo"/>
+            android:src="@drawable/img_logo_google"/>
 
     </LinearLayout>
 

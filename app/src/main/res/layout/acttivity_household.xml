@@ -7,7 +7,7 @@
         android:id="@+id/back_button"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/arrow"
+        android:src="@drawable/icon_rounded_back"
         android:layout_margin="20dp"/>
 
     <TextView
@@ -44,10 +44,10 @@
                 android:id="@+id/giannapic"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/gianna"
+                android:src="@drawable/img_developer_giana"
                 android:scaleType="centerCrop"
                 android:clipToOutline="true"
-                android:background="@drawable/circleborder"
+                android:background="@drawable/bg_shape_circle_border"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -64,7 +64,7 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/hearthollow"
+                android:src="@drawable/icon_heart_hollow"
                 android:layout_toRightOf="@id/username"
                 android:layout_marginStart="40dp"
                 android:layout_centerVertical="true"/>
@@ -85,10 +85,10 @@
                 android:id="@+id/jmpic"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/jm"
+                android:src="@drawable/img_developer_jm"
                 android:scaleType="centerCrop"
                 android:clipToOutline="true"
-                android:background="@drawable/circleborder"
+                android:background="@drawable/bg_shape_circle_border"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -105,7 +105,7 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/hearthollow"
+                android:src="@drawable/icon_heart_hollow"
                 android:layout_toRightOf="@id/username2"
                 android:layout_marginStart="40dp"
                 android:layout_centerVertical="true"/>
@@ -125,7 +125,7 @@
                 android:id="@+id/insertuser"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/plus"
+                android:src="@drawable/ic_category_plus"
                 android:layout_centerHorizontal="true"/>
 
 

@@ -1,6 +1,5 @@
 package com.example.expirease.helper
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.expirease.R
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ItemDetailsDialogFragment : DialogFragment() {
 
@@ -36,12 +38,20 @@ class ItemDetailsDialogFragment : DialogFragment() {
         val itemPhoto = view.findViewById<ImageView>(R.id.item_photo)
         val itemName = view.findViewById<TextView>(R.id.item_name)
         val itemQuantity = view.findViewById<TextView>(R.id.item_quantity)
+        val itemExpiryDate = view.findViewById<TextView>(R.id.item_expiryDate)
+        val itemCategory = view.findViewById<TextView>(R.id.item_category)
 
         // Retrieve data from arguments
         arguments?.let {
-            itemPhoto.setImageResource(it.getInt("photo", R.drawable.banana))
+            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
             itemName.text = it.getString("name", "Unknown Item")
             itemQuantity.text = "Quantity: ${it.getInt("quantity", 0)}"
+
+            val expiryMillis = it.getLong("expiryDate", System.currentTimeMillis())  // Get expiry date
+            val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(expiryMillis))
+            itemExpiryDate.text = "Expiry Date: $formattedDate"
+
+            itemCategory.text = "Category: ${it.getString("category", "Others")}"
         }
     }
 }

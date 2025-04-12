@@ -2,6 +2,7 @@
 <resources>
 
 <!--    <style name="Theme.ExpirEase" parent="android:Theme.Material.Light.NoActionBar" />-->
-    <style name="Theme.ExpirEase" parent="Theme.MaterialComponents.Light.NoActionBar" />
-
+<!--    <style name="Theme.ExpirEase" parent="Theme.MaterialComponents.Light.NoActionBar" />-->
+    <style name="Theme.ExpirEase" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
 </resources>

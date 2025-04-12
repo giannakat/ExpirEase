@@ -1,15 +1,19 @@
 package com.example.expirease
 
 import android.content.Intent
+import android.graphics.Color
+import android.media.Image
 import android.os.Bundle
-import android.util.Log
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.expirease.fragment.CalendarFragment
-import com.example.expirease.fragment.CategoryFragment
+import com.example.expirease.fragment.HistoryFragment
 import com.example.expirease.fragment.HomeFragment
 import com.example.expirease.fragment.HouseholdFragment
 import com.example.expirease.fragment.SettingsFragment
@@ -66,13 +70,35 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 //            true
 //        }
 
+        val notifButton: ImageView = findViewById(R.id.notif_icon)
+
+        notifButton.setOnClickListener{
+            startActivity(Intent(this,NotificationsActivity::class.java))
+
+        }
+
+        val headerView = navView.getHeaderView(0)
+        val profileHeader = headerView.findViewById<LinearLayout>(R.id.profile)
+
+        profileHeader.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+            drawerLayout.closeDrawers() // Close the drawer after clicking
+        }
+
         navView.setNavigationItemSelectedListener { menuItem ->
+
+            if(menuItem.itemId == R.id.nav_logout){
+                showLogoutDialog()
+                return@setNavigationItemSelectedListener true
+            }
+
             val newFragment: Fragment = when (menuItem.itemId) {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_household -> HouseholdFragment()
-                R.id.nav_category -> CategoryFragment()
+                R.id.nav_category -> HistoryFragment()
                 R.id.nav_settings -> SettingsFragment()
                 R.id.nav_calendar -> CalendarFragment()
+
                 else -> HomeFragment()
             }
 
@@ -88,5 +114,47 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    fun showLogoutDialog() {
+        // Create a dialog builder
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Logout")
+        builder.setMessage("Are you sure you want to log out?")
+
+        // Set the "Logout" button
+        builder.setPositiveButton("Logout") { _, _ ->
+            performLogout()  // Call the logout function when user clicks "Logout"
+        }
+
+        // Set the "Cancel" button
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()  // Dismiss dialog when user clicks "Cancel"
+        }
+
+        // Create the alert dialog
+        val dialog = builder.create()
+
+        // Show the dialog
+        dialog.show()
+
+        // Find the "Logout" button and change its text color to red
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.setTextColor(Color.RED)  // Change text color to red
+
+        // Position the "Logout" button lower (by adjusting the layout parameters)
+        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
+        layoutParams.topMargin = 50  // Adjust the top margin to push the button lower (you can tweak this value)
+        positiveButton.layoutParams = layoutParams
+
+        // Optionally adjust the "Cancel" button text color to something different if desired
+        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        negativeButton.setTextColor(Color.BLACK)  // Keep the "Cancel" button with default black text
+    }
+
+    private fun performLogout() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

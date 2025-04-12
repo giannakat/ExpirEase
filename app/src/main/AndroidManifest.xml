@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".app.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/e_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/e_launcher_foreground"
         android:supportsRtl="true"
         android:theme="@style/Theme.ExpirEase"
         tools:targetApi="31">
         <activity
-            android:name=".helper.ItemDetailsDialogActivity"
+            android:name=".NotificationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".helperNotif.NotificationCustomListViewAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".helperNotif.NotificationRecyclerViewAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".helperNotif.NotificationDetailsDialogFragment"
             android:exported="false" />
         <activity
             android:name=".helper.ItemDetailsActivity"
@@ -27,20 +37,8 @@
             android:exported="false" />
         <activity
             android:name=".HomeWithFragmentActivity"
-            android:exported="false" />
-        <activity android:name=".MainActivity" />
-        <activity
-            android:name=".HouseholdActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CalendarActivity"
-            android:exported="false" />
-        <activity
-            android:name=".util.CalendarActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity_calendar"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.ExpirEase"/>
         <activity
             android:name=".DevelopersActivity"
             android:exported="false" />
@@ -51,30 +49,22 @@
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".MenuActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".SplashScreenActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false"/>
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
