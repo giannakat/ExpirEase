@@ -82,4 +82,10 @@ dependencies {
     //search view
     implementation ("androidx.appcompat:appcompat:1.6.1")
 
+    //viewpager and tab
+    implementation ("com.google.android.material:material:1.11.0")
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+
+    implementation ("com.kizitonwose.calendar:view:2.4.0")
+
 }
