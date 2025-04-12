@@ -39,7 +39,7 @@ class NotificationsActivity : AppCompatActivity() {
             val bundle = Bundle().apply {
                 putInt("photo", item.photoResource)
                 putString("name", item.name)
-                putInt("quantity", item.quantity)
+                putLong("expiry", item.expiryDate)
             }
             dialog.arguments = bundle
             dialog.show(supportFragmentManager, "NotificationDetailsDialog")

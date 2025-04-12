@@ -17,19 +17,19 @@ class NotificationRecyclerViewAdapter(
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val photo: ImageView = view.findViewById(R.id.item_photo)
         val name: TextView = view.findViewById(R.id.item_name)
-        val quantity: TextView = view.findViewById(R.id.item_quantity)
+        val expiry: TextView = view.findViewById(R.id.item_expiryDate)
 
         fun bind(item: Item, onClick: (Item) -> Unit) {
             photo.setImageResource(item.photoResource)
             name.text = item.name
-            quantity.text = "Quantity: ${item.quantity}"
+            expiry.text = "Expiry: ${item.expiryDate}"
             itemView.setOnClickListener { onClick(item) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.household_recycler_view, parent, false)
+            .inflate(R.layout.notif_recycler_view, parent, false)
         return ItemViewHolder(view)
     }
 

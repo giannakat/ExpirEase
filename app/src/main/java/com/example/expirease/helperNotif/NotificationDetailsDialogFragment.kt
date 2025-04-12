@@ -31,12 +31,12 @@ class NotificationDetailsDialogFragment : DialogFragment() {
 
         val itemPhoto = view.findViewById<ImageView>(R.id.item_photo)
         val itemName = view.findViewById<TextView>(R.id.item_name)
-        val itemQuantity = view.findViewById<TextView>(R.id.item_quantity)
+        val itemExpiry = view.findViewById<TextView>(R.id.item_expiryDate)
 
         arguments?.let {
             itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
             itemName.text = it.getString("name") ?: "Unknown Item"
-            itemQuantity.text = "Quantity: ${it.getInt("quantity", 0)}"
+            itemExpiry.text = "Expiry: ${it.getLong("expiry", 0)}"
         }
     }
 }
