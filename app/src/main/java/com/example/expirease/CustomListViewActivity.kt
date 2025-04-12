@@ -10,7 +10,7 @@ class CustomListViewActivity : Activity() {
         setContentView(R.layout.fragment_history)
 
         //widget
-        val listView = findViewById<ListView>(R.id.category_listview)
+ //       val listView = findViewById<ListView>(R.id.category_listview)
 
 //        val listOfItems = listOf(
 //            Item("Egg", 2, R.drawable.banana),
