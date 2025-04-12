@@ -1,22 +1,23 @@
 package com.example.expirease
 
-import SharedViewModel
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.data.Item
 import com.example.expirease.helperNotif.NotificationDetailsDialogFragment
 import com.example.expirease.helperNotif.NotificationRecyclerViewAdapter
+import com.example.expirease.viewmodel.SharedViewModel
+import java.text.SimpleDateFormat
 import java.util.*
 
 class NotificationsActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var allItems: MutableList<Item>
-    private lateinit var expiringSoonList: MutableList<Item>
-    private lateinit var expiredList: MutableList<Item>
+    private var expiringSoonList: MutableList<Item> = mutableListOf()
+    private var expiredList: MutableList<Item> = mutableListOf()
 
     private lateinit var expiringSoonAdapter: NotificationRecyclerViewAdapter
     private lateinit var expiredAdapter: NotificationRecyclerViewAdapter
@@ -27,13 +28,19 @@ class NotificationsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_notifications)
 
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
-        allItems = sharedViewModel.listOfItems
 
+        // 🔄 LiveData observer (after adapters are ready)
+        sharedViewModel.items.observe(this) { allItems ->
+            val now = System.currentTimeMillis()
+            expiringSoonList.clear()
+            expiredList.clear()
 
-        // ✅ Split to expiring vs expired
-        val now = System.currentTimeMillis()
-        expiringSoonList = allItems.filter { it.expiryDate >= now }.toMutableList()
-        expiredList = allItems.filter { it.expiryDate < now }.toMutableList()
+            expiringSoonList.addAll(allItems.filter { it.expiryDate >= now })
+            expiredList.addAll(allItems.filter { it.expiryDate < now })
+
+            expiringSoonAdapter.notifyDataSetChanged()
+            expiredAdapter.notifyDataSetChanged()
+        }
 
         // ✅ RecyclerView for Expiring Soon
         val recyclerView1 = findViewById<RecyclerView>(R.id.notif_recyclerview1)
@@ -66,5 +73,7 @@ class NotificationsActivity : AppCompatActivity() {
             dialog.show(supportFragmentManager, "NotificationDetailsDialog")
         })
         recyclerView2.adapter = expiredAdapter
+
+
     }
 }

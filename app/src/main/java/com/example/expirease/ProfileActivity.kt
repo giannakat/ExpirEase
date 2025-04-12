@@ -27,27 +27,27 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var btnBack: Button
     private lateinit var accountIcon: ImageView
 
-    private lateinit var sharedPrefs: SharedPreferences
+//    private lateinit var sharedPrefs: SharedPreferences
 
-    private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            accountIcon.setImageURI(it)
-            saveImageUri(it.toString())
-        }
-    }
+//    private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+//        uri?.let {
+//            accountIcon.setImageURI(it)
+//            saveImageUri(it.toString())
+//        }
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
-
-        // UI
-        accountIcon = findViewById(R.id.accountIcon)
-        val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
-        editPhotoLayout.setOnClickListener {
-            pickImage.launch("image/*")
-        }
+//        sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
+//
+//        // UI
+//        accountIcon = findViewById(R.id.accountIcon)
+//        val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
+//        editPhotoLayout.setOnClickListener {
+//            pickImage.launch("image/*")
+//        }
 
         etName = findViewById(R.id.nameValue)
         etUsername = findViewById(R.id.usernameValue)
@@ -92,12 +92,12 @@ class ProfileActivity : AppCompatActivity() {
         etEmail.setText(app.email)
         etUsername.setText(app.username)
         etPassword.setText(app.password)
-        etPhone.setText(sharedPrefs.getString("phone", ""))
+//        etPhone.setText(sharedPrefs.getString("phone", ""))
 
-        // Load saved image
-        sharedPrefs.getString("imageUri", null)?.let {
-            accountIcon.setImageURI(Uri.parse(it))
-        }
+//        // Load saved image
+//        sharedPrefs.getString("imageUri", null)?.let {
+//            accountIcon.setImageURI(Uri.parse(it))
+//        }
     }
 
     private fun enableEditing(editText: EditText) {
@@ -135,13 +135,13 @@ class ProfileActivity : AppCompatActivity() {
         app.name = etName.text.toString()
 
         // Save phone and image URI in SharedPreferences
-        with(sharedPrefs.edit()) {
-            putString("phone", etPhone.text.toString())
-            apply()
-        }
+//        with(sharedPrefs.edit()) {
+//            putString("phone", etPhone.text.toString())
+//            apply()
+//        }
     }
 
-    private fun saveImageUri(uri: String) {
-        sharedPrefs.edit().putString("imageUri", uri).apply()
-    }
+//    private fun saveImageUri(uri: String) {
+//        sharedPrefs.edit().putString("imageUri", uri).apply()
+//    }
 }
