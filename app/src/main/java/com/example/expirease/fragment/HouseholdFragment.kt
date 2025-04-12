@@ -28,8 +28,8 @@ class HouseholdFragment : Fragment() {
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         listOfItems = mutableListOf(
-            Item("Dish Soap", 1, dateFormat.parse("2025-04-20")!!.time, Category.BAKERY, R.drawable.banana),
-            Item("Toilet Paper", 3, dateFormat.parse("2025-04-18")!!.time, Category.BAKERY, R.drawable.banana)
+            Item("Dish Soap", 1, dateFormat.parse("2025-04-20")!!.time, Category.BAKERY, R.drawable.img_product_banana),
+            Item("Toilet Paper", 3, dateFormat.parse("2025-04-18")!!.time, Category.BAKERY, R.drawable.img_product_banana)
         )
 
         filteredList = listOfItems.toMutableList()

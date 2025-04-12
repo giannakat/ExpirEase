@@ -27,27 +27,9 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var btnBack: Button
     private lateinit var accountIcon: ImageView
 
-    private lateinit var sharedPrefs: SharedPreferences
-
-    private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            accountIcon.setImageURI(it)
-            saveImageUri(it.toString())
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
-
-        sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
-
-        // UI
-        accountIcon = findViewById(R.id.accountIcon)
-        val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
-        editPhotoLayout.setOnClickListener {
-            pickImage.launch("image/*")
-        }
 
         etName = findViewById(R.id.nameValue)
         etUsername = findViewById(R.id.usernameValue)
@@ -64,8 +46,6 @@ class ProfileActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.saveProfileButton)
         btnBack = findViewById(R.id.back_button)
 
-        // Load data
-        loadProfileData()
 
         // Enable editing
         editNameIcon.setOnClickListener { enableEditing(etName) }
@@ -86,19 +66,6 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadProfileData() {
-        val app = application as MyApplication
-        etName.setText(app.name)
-        etEmail.setText(app.email)
-        etUsername.setText(app.username)
-        etPassword.setText(app.password)
-        etPhone.setText(sharedPrefs.getString("phone", ""))
-
-        // Load saved image
-        sharedPrefs.getString("imageUri", null)?.let {
-            accountIcon.setImageURI(Uri.parse(it))
-        }
-    }
 
     private fun enableEditing(editText: EditText) {
         editText.isFocusableInTouchMode = true
@@ -133,15 +100,7 @@ class ProfileActivity : AppCompatActivity() {
         app.password = etPassword.text.toString()
         app.email = etEmail.text.toString()
         app.name = etName.text.toString()
-
-        // Save phone and image URI in SharedPreferences
-        with(sharedPrefs.edit()) {
-            putString("phone", etPhone.text.toString())
-            apply()
-        }
+        
     }
 
-    private fun saveImageUri(uri: String) {
-        sharedPrefs.edit().putString("imageUri", uri).apply()
-    }
 }

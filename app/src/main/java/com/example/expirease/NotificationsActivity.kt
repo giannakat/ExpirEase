@@ -17,7 +17,6 @@ class NotificationsActivity : AppCompatActivity() {
     private lateinit var itemAdapter: NotificationRecyclerViewAdapter
     private lateinit var filteredList: MutableList<Item>
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notifications)
@@ -25,8 +24,8 @@ class NotificationsActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         // ✅ Initialize the list before using it
         listOfItems = mutableListOf(
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana),
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana)
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana),
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana)
         )
 
         filteredList = listOfItems.toMutableList()
