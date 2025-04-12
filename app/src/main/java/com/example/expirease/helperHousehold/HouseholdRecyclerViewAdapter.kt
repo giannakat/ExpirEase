@@ -1,4 +1,4 @@
-package com.example.expirease.helperNotif
+package com.example.expirease.helperHousehold
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Item
 
-class NotificationRecyclerViewAdapter(
+class HouseholdRecyclerViewAdapter(
     private val listOfItems: MutableList<Item>,
     private val onClick: (Item) -> Unit
-) : RecyclerView.Adapter<NotificationRecyclerViewAdapter.ItemViewHolder>() {
+) : RecyclerView.Adapter<HouseholdRecyclerViewAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val photo: ImageView = view.findViewById(R.id.item_photo)
@@ -29,7 +29,7 @@ class NotificationRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.household_recycler_view, parent, false)
+            .inflate(R.layout.notif_recycler_view, parent, false)
         return ItemViewHolder(view)
     }
 
