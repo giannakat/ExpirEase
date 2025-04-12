@@ -1,50 +1,70 @@
 package com.example.expirease
 
-import java.text.SimpleDateFormat
+import SharedViewModel
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helperNotif.NotificationDetailsDialogFragment
 import com.example.expirease.helperNotif.NotificationRecyclerViewAdapter
-import java.util.Locale
+import java.util.*
 
 class NotificationsActivity : AppCompatActivity() {
-    private lateinit var listOfItems: MutableList<Item>
-    private lateinit var itemAdapter: NotificationRecyclerViewAdapter
-    private lateinit var filteredList: MutableList<Item>
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var allItems: MutableList<Item>
+    private lateinit var expiringSoonList: MutableList<Item>
+    private lateinit var expiredList: MutableList<Item>
+
+    private lateinit var expiringSoonAdapter: NotificationRecyclerViewAdapter
+    private lateinit var expiredAdapter: NotificationRecyclerViewAdapter
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notifications)
 
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        // ✅ Initialize the list before using it
-        listOfItems = mutableListOf(
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana),
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.banana)
-        )
+        sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
+        allItems = sharedViewModel.listOfItems
 
-        filteredList = listOfItems.toMutableList()
 
-        val recyclerView = findViewById<RecyclerView>(R.id.notif_recyclerview)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        // ✅ Split to expiring vs expired
+        val now = System.currentTimeMillis()
+        expiringSoonList = allItems.filter { it.expiryDate >= now }.toMutableList()
+        expiredList = allItems.filter { it.expiryDate < now }.toMutableList()
 
-        itemAdapter = NotificationRecyclerViewAdapter(filteredList, onClick = { item ->
+        // ✅ RecyclerView for Expiring Soon
+        val recyclerView1 = findViewById<RecyclerView>(R.id.notif_recyclerview1)
+        recyclerView1.layoutManager = LinearLayoutManager(this)
+        expiringSoonAdapter = NotificationRecyclerViewAdapter(expiringSoonList, onClick = { item ->
             val dialog = NotificationDetailsDialogFragment()
-            val bundle = Bundle().apply {
-                putInt("photo", item.photoResource)
-                putString("name", item.name)
-                putLong("expiry", item.expiryDate)
+            dialog.setItemData(item) { itemToRemove ->
+                val index = expiringSoonList.indexOf(itemToRemove)
+                if (index != -1) {
+                    expiringSoonList.removeAt(index)
+                    expiringSoonAdapter.notifyItemRemoved(index)
+                }
             }
-            dialog.arguments = bundle
             dialog.show(supportFragmentManager, "NotificationDetailsDialog")
         })
+        recyclerView1.adapter = expiringSoonAdapter
 
-        recyclerView.adapter = itemAdapter
+        // ✅ RecyclerView for Expired
+        val recyclerView2 = findViewById<RecyclerView>(R.id.notif_recyclerview2)
+        recyclerView2.layoutManager = LinearLayoutManager(this)
+        expiredAdapter = NotificationRecyclerViewAdapter(expiredList, onClick = { item ->
+            val dialog = NotificationDetailsDialogFragment()
+            dialog.setItemData(item) { itemToRemove ->
+                val index = expiredList.indexOf(itemToRemove)
+                if (index != -1) {
+                    expiredList.removeAt(index)
+                    expiredAdapter.notifyItemRemoved(index)
+                }
+            }
+            dialog.show(supportFragmentManager, "NotificationDetailsDialog")
+        })
+        recyclerView2.adapter = expiredAdapter
     }
 }

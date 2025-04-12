@@ -1,7 +1,9 @@
 package com.example.expirease.fragment
 
+import SharedViewModel
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -19,8 +21,10 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.expirease.NotificationsActivity
 import com.example.expirease.R
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
@@ -33,6 +37,7 @@ import java.util.Date
 import java.util.Locale
 
 class HomeFragment : Fragment(){
+    private lateinit var sharedViewModel: SharedViewModel
     lateinit var listOfItems : MutableList<Item>
     lateinit var itemAdapter : ItemRecyclerViewAdapter
     lateinit var filteredList: MutableList<Item>
@@ -43,6 +48,8 @@ class HomeFragment : Fragment(){
                           savedInstanceState: Bundle?
     ): View?{
         //equivalent to setContent
+        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -64,6 +71,12 @@ class HomeFragment : Fragment(){
             Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, Category.FRUITS, R.drawable.img_product_banana),
             Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, Category.FRUITS, R.drawable.img_product_banana)
         )
+
+        val intent = Intent(requireContext(), NotificationsActivity::class.java)
+        intent.putParcelableArrayListExtra("items", ArrayList(listOfItems))
+        startActivity(intent)
+
+
 
         // for searching
         filteredList = listOfItems.toMutableList() // initialize filtered list to the current list
@@ -231,9 +244,12 @@ class HomeFragment : Fragment(){
     fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int){
         val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
         listOfItems.add(newItem)
-
         filteredList.add(newItem)
-        itemAdapter.notifyItemInserted(filteredList.size - 1);
+
+        // Add to ViewModel too
+        sharedViewModel.listOfItems.add(newItem)
+
+        itemAdapter.notifyItemInserted(filteredList.size - 1)
     }
 
     fun isExpired(expiryDate: Long): Boolean{
