@@ -22,6 +22,27 @@
         android:title="Settings"
         android:icon="@drawable/ic_nav_settings"/>
 
+        <item
+            android:id="@+id/nav_spacer"
+            android:title=""
+            android:enabled="false"
+            android:visible="true" />
+
+
+        <item
+            android:id="@+id/nav_spacer1"
+            android:title=""
+            android:enabled="false"
+            android:visible="true" />
+
+        <item
+            android:id="@+id/nav_spacer2"
+            android:title=""
+            android:enabled="false"
+            android:visible="true" />
+
+
+
     <item
         android:id="@+id/nav_logout"
         android:title="logout"

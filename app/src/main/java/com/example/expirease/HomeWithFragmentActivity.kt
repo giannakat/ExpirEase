@@ -4,6 +4,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.Image
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -18,6 +20,7 @@ import com.example.expirease.fragment.HomeFragment
 import com.example.expirease.fragment.HouseholdFragment
 import com.example.expirease.fragment.SettingsFragment
 import com.google.android.material.navigation.NavigationView
+import androidx.core.graphics.drawable.DrawableCompat
 
 
 class HomeWithFragmentActivity : AppCompatActivity() {
@@ -49,6 +52,21 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+
+        val navView: NavigationView = findViewById(R.id.nav_view)
+        val menu = navView.menu
+        val logoutItem = menu.findItem(R.id.nav_logout)
+        val spanString = SpannableString(logoutItem.title)
+        spanString.setSpan(ForegroundColorSpan(Color.RED), 0, spanString.length, 0)
+        logoutItem.title = spanString
+
+        val icon = logoutItem.icon
+        icon?.let {
+            val wrapped = DrawableCompat.wrap(it)
+            DrawableCompat.setTint(wrapped, Color.RED)
+            logoutItem.icon = wrapped
+        }
+
 
 //        navView.setNavigationItemSelectedListener { menuItem ->
 //            if(menuItem.itemId == R.id.nav_logout){
