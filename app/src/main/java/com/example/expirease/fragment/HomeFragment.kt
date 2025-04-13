@@ -48,21 +48,21 @@ class HomeFragment : Fragment(){
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         listOfItems = mutableListOf(
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana),
-            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, Category.DAIRY, R.drawable.img_product_banana),
-            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, Category.FRUITS, R.drawable.img_product_banana),
-            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, Category.FRUITS, R.drawable.img_product_banana)
+            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_placeholder_product),
+            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, Category.DAIRY, R.drawable.img_placeholder_product),
+            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
+            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, Category.FRUITS, R.drawable.img_placeholder_product)
         )
 
         // for searching

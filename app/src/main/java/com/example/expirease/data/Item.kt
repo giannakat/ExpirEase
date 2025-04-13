@@ -7,5 +7,5 @@ data class Item(
     var quantity: Int = 0,
     var expiryDate: Long,
     var category: Category,
-    var photoResource: Int = R.drawable.img_product_banana
+    var photoResource: Int = R.drawable.img_default_product
 )
