@@ -32,8 +32,7 @@
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal|bottom"
                 android:layout_marginBottom="0dp"
-                android:background="@drawable/img_default_user"
-                android:src="@drawable/img_placeholder_profile"/>
+                android:src="@drawable/img_placeholder_user"/>
         </FrameLayout>
 
         <LinearLayout
