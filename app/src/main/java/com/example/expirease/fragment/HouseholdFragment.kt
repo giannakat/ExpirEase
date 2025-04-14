@@ -28,8 +28,8 @@ class HouseholdFragment : Fragment() {
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         listOfItems = mutableListOf(
-            Member("JM", "Casipong", R.drawable.banana),
-            Member("JM", "Casipong", R.drawable.banana)
+            Member("JM", "Casipong", R.drawable.img_product_banana),
+            Member("JM", "Casipong", R.drawable.img_product_banana)
         )
 
         filteredList = listOfItems.toMutableList()
@@ -70,7 +70,7 @@ class HouseholdFragment : Fragment() {
             val addDialog = AddMemberDialogFragment()
             addDialog.setOnMemberAddedListener(object : AddMemberDialogFragment.OnMemberAddedListener {
                 override fun onMemberAdded(firstname: String, lastname: String) {
-                    val newMember = Member(firstname, lastname, R.drawable.banana) // default image
+                    val newMember = Member(firstname, lastname, R.drawable.img_product_banana) // default image
                     listOfItems.add(newMember)
                     filteredList.add(newMember)
                     itemAdapter.notifyDataSetChanged()
