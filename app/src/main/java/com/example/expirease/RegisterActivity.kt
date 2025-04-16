@@ -40,6 +40,8 @@ class RegisterActivity : Activity() {
         val confirmPasswordField = binding.confirmPassword
 
         signupButton.setOnClickListener {
+            val username = nameText.text.toString()
+            val email = emailText.text.toString()
             val password = passwordField.text.toString()
             val confirmPassword = confirmPasswordField.text.toString()
 
@@ -58,23 +60,51 @@ class RegisterActivity : Activity() {
                 return@setOnClickListener
             }
 
-            // Add user to Firebase
-            val userId = reference.push().key
-            val user = Users(nameText.text.toString(), emailText.text.toString(), password)
+            // Check for duplicate username or email
+            reference.orderByChild("email").equalTo(email)
+                .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                    override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                        if (snapshot.exists()) {
+                            Toast.makeText(this@RegisterActivity, "Email is already registered", Toast.LENGTH_LONG).show()
+                        } else {
+                            // Now check username
+                            reference.orderByChild("username").equalTo(username)
+                                .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                                    override fun onDataChange(usernameSnapshot: com.google.firebase.database.DataSnapshot) {
+                                        if (usernameSnapshot.exists()) {
+                                            Toast.makeText(this@RegisterActivity, "Username is already taken", Toast.LENGTH_LONG).show()
+                                        } else {
+                                            // Safe to register
+                                            val userId = reference.push().key
+                                            val user = Users(username, email, password)
 
-            if (userId != null) {
-                reference.child(userId).setValue(user).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        Toast.makeText(this, "Registered Successfully!", Toast.LENGTH_LONG).show()
-                        (application as MyApplication).username = nameText.text.toString()
-                        (application as MyApplication).password = password
-                        (application as MyApplication).email = emailText.text.toString()
-                        startActivity(Intent(this, LoginActivity::class.java))
-                    } else {
-                        Toast.makeText(this, "Failed to register in Firebase", Toast.LENGTH_LONG).show()
+                                            if (userId != null) {
+                                                reference.child(userId).setValue(user).addOnCompleteListener {
+                                                    if (it.isSuccessful) {
+                                                        Toast.makeText(this@RegisterActivity, "Registered Successfully!", Toast.LENGTH_LONG).show()
+                                                        (application as MyApplication).username = username
+                                                        (application as MyApplication).password = password
+                                                        (application as MyApplication).email = email
+                                                        startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
+                                                    } else {
+                                                        Toast.makeText(this@RegisterActivity, "Failed to register in Firebase", Toast.LENGTH_LONG).show()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                                        Toast.makeText(this@RegisterActivity, "Database error: ${error.message}", Toast.LENGTH_LONG).show()
+                                    }
+                                })
+                        }
                     }
-                }
-            }
+
+                    override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                        Toast.makeText(this@RegisterActivity, "Database error: ${error.message}", Toast.LENGTH_LONG).show()
+                    }
+                })
         }
 
         // Create a SpannableString to make "Login" clickable
