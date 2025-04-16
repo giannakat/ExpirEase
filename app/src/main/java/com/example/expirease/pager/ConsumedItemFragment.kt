@@ -10,12 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.HistoryItem
+import com.example.expirease.data.Item
 import com.example.expirease.helper.HistoryAdapter
 
 class ConsumedItemFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var historyAdapter: HistoryAdapter
-    private val historyList = mutableListOf<HistoryItem>()
+    private val historyList = mutableListOf<Item>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,10 +38,10 @@ class ConsumedItemFragment : Fragment() {
     }
 
     private fun loadMockData() {
-        historyList.add(HistoryItem("Banana", "Expired", "2025-04-01"))
-        historyList.add(HistoryItem("Milk", "Deleted", "2025-04-02"))
-        historyList.add(HistoryItem("Rice", "Consumed", "2025-04-03"))
-        historyAdapter.notifyDataSetChanged()
+        //historyList.add(HistoryItem("Banana", "Expired", "2025-04-01"))
+        //historyList.add(HistoryItem("Milk", "Deleted", "2025-04-02"))
+        //historyList.add(HistoryItem("Rice", "Consumed", "2025-04-03"))
+        //historyAdapter.notifyDataSetChanged()
     }
 
 

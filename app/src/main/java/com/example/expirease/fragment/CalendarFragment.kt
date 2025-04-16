@@ -11,12 +11,15 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.util.Log
 import android.widget.FrameLayout
+import android.widget.ImageButton
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.ItemRecyclerViewAdapter
+import com.example.expirease.manager.SharedItemViewModel
 import com.kizitonwose.calendar.view.*
 import com.kizitonwose.calendar.core.*
 import java.time.DayOfWeek
@@ -25,6 +28,7 @@ import java.time.YearMonth
 
 
 class CalendarFragment : Fragment() {
+    private val sharedItemViewModel: SharedItemViewModel by activityViewModels()
 
     private lateinit var calendarView: CalendarView
     private lateinit var recyclerView: RecyclerView
@@ -46,8 +50,8 @@ class CalendarFragment : Fragment() {
         calendarView = view.findViewById(R.id.calendarView)
         recyclerView = view.findViewById(R.id.itemsRecyclerView)
         val monthTextView = view.findViewById<TextView>(R.id.monthTextView)
-        val prevButton = view.findViewById<Button>(R.id.previousMonthButton)
-        val nextButton = view.findViewById<Button>(R.id.nextMonthButton)
+        val prevButton = view.findViewById<ImageButton>(R.id.previousMonthButton)
+        val nextButton = view.findViewById<ImageButton>(R.id.nextMonthButton)
 
         adapter = ItemRecyclerViewAdapter(mutableListOf()) {}
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -130,9 +134,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun filterItemsForDate(date: LocalDate) {
-        val filtered = allItems.filter {
-            LocalDate.ofEpochDay(it.expiryDate) == date
-        }
+        val filtered = sharedItemViewModel.getItemsForDate(date)
         adapter.updateData(filtered.toMutableList())
     }
 

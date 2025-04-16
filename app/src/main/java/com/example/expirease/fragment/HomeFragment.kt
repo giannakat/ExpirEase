@@ -27,25 +27,32 @@ import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
 import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helper.OnItemUpdatedListener
+import com.example.expirease.manager.SharedItemViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import androidx.fragment.app.activityViewModels
+import com.example.expirease.data.HistoryItem
+
 
 class HomeFragment : Fragment(){
-    lateinit var listOfItems : MutableList<Item>
+    private val sharedItemViewModel: SharedItemViewModel by activityViewModels()
+
     lateinit var itemAdapter : ItemRecyclerViewAdapter
     lateinit var filteredList: MutableList<Item>
+    lateinit var listOfItems : MutableList<Item>
     lateinit var searchView: SearchView
+
+
     val categoryList = Category.values().toMutableList()
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                           savedInstanceState: Bundle?
     ): View?{
         //equivalent to setContent
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         listOfItems = mutableListOf(
             Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_placeholder_product),
@@ -125,6 +132,57 @@ class HomeFragment : Fragment(){
 
         return view
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Example usage of SharedItemViewModel: pushing initial data
+        //sharedItemViewModel.setItems(listOfItems)
+
+        // If you want to observe LiveData later
+        sharedItemViewModel.allItems.observe(viewLifecycleOwner) { updatedList ->
+            // Do something with the updated list, like update UI
+            filteredList.clear()
+            filteredList.addAll(updatedList)
+            itemAdapter.notifyDataSetChanged()
+            updateUI(updatedList)
+        }
+    }
+
+    private fun updateUI(itemList: List<Item>) {
+        val textViewNoItems = view?.findViewById<TextView>(R.id.textViewNoItems)
+        val recyclerViewItems = view?.findViewById<RecyclerView>(R.id.item_recyclerview)
+
+        if (itemList.isEmpty()) {
+            textViewNoItems?.visibility = View.VISIBLE
+            recyclerViewItems?.visibility = View.GONE
+        } else {
+            textViewNoItems?.visibility = View.GONE
+            recyclerViewItems?.visibility = View.VISIBLE
+            itemAdapter.notifyDataSetChanged()
+        }
+    }
+
+
+    fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int){
+        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
+        listOfItems.add(newItem)
+        filteredList.add(newItem)
+        itemAdapter.notifyItemInserted(filteredList.size - 1)
+
+        val historyItem = HistoryItem(
+            name = newItem.name,
+            action = "Added",
+            date = expiryDate
+        )
+        sharedItemViewModel.addItem(newItem)
+//        sharedItemViewModel.addToHistory(historyItem)
+//        // Update shared view model too
+//        sharedItemViewModel.setItems(listOfItems)
+    }
+
+
+
 
     private fun setupSearchView() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -218,6 +276,7 @@ class HomeFragment : Fragment(){
 
             if(!name.isNullOrEmpty() && selectedCategory != null) {
                 addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)  // Add new item
+                dialog.dismiss()
             }
         }
 
@@ -228,13 +287,7 @@ class HomeFragment : Fragment(){
         dialog.show()
     }
 
-    fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int){
-        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
-        listOfItems.add(newItem)
 
-        filteredList.add(newItem)
-        itemAdapter.notifyItemInserted(filteredList.size - 1);
-    }
 
     fun isExpired(expiryDate: Long): Boolean{
         val today = System.currentTimeMillis()

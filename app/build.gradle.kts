@@ -88,4 +88,8 @@ dependencies {
 
     implementation ("com.kizitonwose.calendar:view:2.4.0")
 
+
+    //shared model
+    implementation ("androidx.fragment:fragment-ktx:1.6.1") // or latest version
+
 }
