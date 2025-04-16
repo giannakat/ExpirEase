@@ -9,28 +9,45 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.expirease.app.MyApplication
+import com.example.expirease.data.Users
+import com.example.expirease.databinding.ActivityLoginBinding // Import the generated binding class
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+
 
 class LoginActivity : AppCompatActivity() {
+
+    private lateinit var db: FirebaseDatabase
+    private lateinit var reference: DatabaseReference
+    private lateinit var auth: FirebaseAuth // Firebase Auth instance
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
-        val loginButton: Button = findViewById(R.id.btnlogin)
-        val signUpTextView: TextView = findViewById(R.id.signUpTextView)
-        val edittext_username : EditText = findViewById<EditText>(R.id.edittext_username)
-        val edittext_password : EditText = findViewById<EditText>(R.id.edittext_password)
+        // Initialize View Binding
+        val binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)  // Set the content view to the root of the binding object
 
-        //custom class for passing data
+        // Initialize Firebase instances
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseDatabase.getInstance()
+        reference = FirebaseDatabase.getInstance().getReference("Users")
+
+        // Access views via binding object
+        val loginButton = binding.btnlogin
+        val signUpTextView = binding.signUpTextView
+        val edittext_username = binding.edittextUsername
+        val edittext_password = binding.edittextPassword
+
+        // Custom class for passing data (if using shared app-level data)
         edittext_username.setText((application as MyApplication).username)
         edittext_password.setText((application as MyApplication).password)
 
-        //login button validation
+        // Login button validation
         loginButton.setOnClickListener {
             val username = edittext_username.text.toString()
             val password = edittext_password.text.toString()
@@ -40,21 +57,8 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (username == "gianna" && password == "123") {
-                Toast.makeText(this, "Signed in as an admin", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeWithFragmentActivity::class.java)
-                startActivity(intent) // Only start ProfileActivity if login is correct
-                finish()
-            } else if(username == (application as MyApplication).username && password == (application as MyApplication).password){
-                Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeWithFragmentActivity::class.java)
-                startActivity(intent)
-
-                finish()
-            }else{
-                Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
-            }
-
+            // Check if username and password match Firebase credentials
+            authenticateUser(username, password)
         }
 
         // Move sign-up text configuration outside the button click event
@@ -79,4 +83,31 @@ class LoginActivity : AppCompatActivity() {
         signUpTextView.text = spannableString
         signUpTextView.movementMethod = LinkMovementMethod.getInstance()
     }
+
+    private fun authenticateUser(username: String, password: String) {
+        // Retrieve user data from Firebase Realtime Database
+        reference.orderByChild("username").equalTo(username).get().addOnSuccessListener { dataSnapshot ->
+            if (dataSnapshot.exists()) {
+                val user = dataSnapshot.children.first().getValue(Users::class.java)
+                if (user != null && user.password == password) {
+                    // Credentials match, proceed to the home activity
+                    Toast.makeText(this, "Login Successful!", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this, HomeWithFragmentActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    // Incorrect password
+                    Toast.makeText(this, "Incorrect username or password", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                // No such username found
+                Toast.makeText(this, "User not found", Toast.LENGTH_LONG).show()
+            }
+        }.addOnFailureListener { exception ->
+            // Handle any errors that occur while querying the database
+            Toast.makeText(this, "Error fetching data from Firebase", Toast.LENGTH_LONG).show()
+            exception.printStackTrace()
+        }
+    }
+
 }
