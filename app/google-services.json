@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "923775074759",
+    "firebase_url": "https://expirease-default-rtdb.firebaseio.com",
+    "project_id": "expirease",
+    "storage_bucket": "expirease.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923775074759:android:6a7788441677990c0359e2",
+        "android_client_info": {
+          "package_name": "com.example.expirease"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-pFiWLtyPDRDgWzbI60XpxCDguroR6A4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

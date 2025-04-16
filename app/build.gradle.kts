@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.googleServices) // Ensure this alias exists in libs.versions.toml
 }
 
 android {
@@ -50,22 +51,43 @@ android {
 }
 
 dependencies {
-
-
+    // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // UI components
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.viewmodel.android)
+
+    // RecyclerView, Fragments, ViewModels, LiveData
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
+
+    // Navigation / Tabs
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    // Calendar
+    implementation("com.kizitonwose.calendar:view:2.4.0")
+
+    // Firebase Auth (make sure this alias exists in TOML)
+    implementation(libs.firebase.auth)
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,24 +95,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    //navigation
-    implementation(libs.material)
-    implementation(libs.androidx.appcompat)
-
-    //recycler view
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
-
-    //search view
-    implementation ("androidx.appcompat:appcompat:1.6.1")
-
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
-
-    //viewpager and tab
-    implementation ("com.google.android.material:material:1.11.0")
-    implementation ("androidx.viewpager2:viewpager2:1.0.0")
-
-    implementation ("com.kizitonwose.calendar:view:2.4.0")
 }

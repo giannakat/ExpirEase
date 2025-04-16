@@ -14,8 +14,12 @@ activity = "1.8.0"
 constraintlayout = "2.2.0"
 cardview = "1.0.0"
 lifecycleViewmodelAndroid = "2.8.7"
+firebaseAuth = "22.3.0"  # Add the version of Firebase Auth
+googleServices = "4.3.15"  # Version of the Google Services plugin
 
 [libraries]
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -38,6 +42,7 @@ androidx-cardview = { group = "androidx.cardview", name = "cardview", version.re
 androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
 
 [plugins]
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
