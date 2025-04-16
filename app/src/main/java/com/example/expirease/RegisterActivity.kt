@@ -9,54 +9,72 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import com.example.expirease.app.MyApplication
+import com.example.expirease.data.Users
+import com.example.expirease.databinding.ActivityRegisterBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import isNotValid
 
 class RegisterActivity : Activity() {
+
+    private lateinit var binding: ActivityRegisterBinding
+    private lateinit var db: FirebaseDatabase
+    private lateinit var reference: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
 
-        val loginTextView: TextView = findViewById(R.id.loginTextView)
-        val signupButton: Button = findViewById(R.id.signup_button)
-        val nameText: EditText = findViewById(R.id.create_name)
-        val emailText: EditText = findViewById(R.id.create_email)
-        val passwordField: EditText = findViewById(R.id.create_password)
-        val confirmPasswordField: EditText = findViewById(R.id.confirm_password)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        db = FirebaseDatabase.getInstance()
+        reference = db.getReference("Users")
+
+        val loginTextView = binding.loginTextView
+        val signupButton = binding.signupButton
+        val nameText = binding.createName
+        val emailText = binding.createEmail
+        val passwordField = binding.createPassword
+        val confirmPasswordField = binding.confirmPassword
 
         signupButton.setOnClickListener {
             val password = passwordField.text.toString()
             val confirmPassword = confirmPasswordField.text.toString()
 
-            // Check if any field is empty
             if (nameText.isNotValid() || passwordField.isNotValid() || emailText.isNotValid() || confirmPasswordField.isNotValid()) {
                 Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            // Check password length
             if (password.length < 8) {
                 Toast.makeText(this, "Password must be at least 8 characters long", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            // Check if passwords match
             if (password != confirmPassword) {
                 Toast.makeText(this, "Passwords are not the same", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            // Successful registration
-            Toast.makeText(this, "Registered Successfully!", Toast.LENGTH_LONG).show()
-            (application as MyApplication).username = nameText.text.toString()
-            (application as MyApplication).password = password
-            (application as MyApplication).email = emailText.text.toString()
+            // Add user to Firebase
+            val userId = reference.push().key
+            val user = Users(nameText.text.toString(), emailText.text.toString(), password)
 
-            startActivity(Intent(this, LoginActivity::class.java))
+            if (userId != null) {
+                reference.child(userId).setValue(user).addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Toast.makeText(this, "Registered Successfully!", Toast.LENGTH_LONG).show()
+                        (application as MyApplication).username = nameText.text.toString()
+                        (application as MyApplication).password = password
+                        (application as MyApplication).email = emailText.text.toString()
+                        startActivity(Intent(this, LoginActivity::class.java))
+                    } else {
+                        Toast.makeText(this, "Failed to register in Firebase", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
         }
 
         // Create a SpannableString to make "Login" clickable
@@ -64,7 +82,7 @@ class RegisterActivity : Activity() {
         val spannableString = SpannableString(text)
 
         val startIndex = text.indexOf("Login")
-        val endIndex = startIndex + "Login".length // Fix typo: "Sign in" → "Login"
+        val endIndex = startIndex + "Login".length
         spannableString.setSpan(ForegroundColorSpan(Color.GREEN), startIndex, endIndex, 0)
 
         spannableString.setSpan(object : ClickableSpan() {

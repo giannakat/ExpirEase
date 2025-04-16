@@ -86,6 +86,7 @@ dependencies {
     // Firebase Auth (make sure this alias exists in TOML)
     implementation(libs.firebase.auth)
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    implementation(libs.firebase.database.ktx)
 
     // Testing
     testImplementation(libs.junit)
