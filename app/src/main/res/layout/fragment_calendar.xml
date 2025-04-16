@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:background="#5090EE90"
     android:orientation="vertical">
 
     <!-- Boxed calendar using MaterialCardView -->
@@ -15,7 +16,7 @@
         android:layout_marginBottom="12dp"
         app:cardElevation="4dp"
         app:cardCornerRadius="15dp"
-        app:cardBackgroundColor="@color/bgpink"
+        app:cardBackgroundColor="@color/white"
         app:strokeColor="#DADADA">
 
         <!-- Inner container for calendar parts -->
@@ -47,7 +48,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:textAlignment="center"
                     android:text="April 2025"
@@ -68,7 +69,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingBottom="4dp">
+                android:paddingVertical="3dp"
+                android:paddingHorizontal="3dp">
 
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sun"/>
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Mon"/>

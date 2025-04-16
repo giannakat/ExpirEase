@@ -4,6 +4,7 @@ import com.example.expirease.R
 
 enum class ItemStatus {
     ACTIVE,
+    CONSUMED,
     EXPIRED,
     DELETED
 }

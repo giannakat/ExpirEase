@@ -18,17 +18,17 @@ class SharedItemViewModel : ViewModel() {
     private val _allItems = MutableLiveData<List<Item>>()
     val allItems: LiveData<List<Item>> get() = _allItems
 
+    //TODO connect to the user
    // private val app = application as MyApplication
 
-    fun addItem(item : Item){
-        val currentList = _allItems.value?.toMutableList() ?: mutableListOf()
-        currentList.add(item)
-        _allItems.value = currentList
-    }
 
     // Initialize the list
     init {
-        _allItems.value = getAllItems()// Assuming `allItems` includes both shared and non-shared
+       _allItems.value = getAllItems()// Assuming `allItems` includes both shared and non-shared
+   }
+
+    private fun getAllItems(): List<Item> {
+        return listOf() // start empty
     }
 
     fun getItemsByStatus(status: ItemStatus): LiveData<List<Item>> {
@@ -37,8 +37,6 @@ class SharedItemViewModel : ViewModel() {
         liveData.value = filteredItems
         return liveData
     }
-
-
 
     // Function to filter items based on their status
     fun getFilteredItems(status: ItemStatus): LiveData<List<Item>> {
@@ -54,9 +52,6 @@ class SharedItemViewModel : ViewModel() {
             if (it.name == updated.name && it.expiryDate == updated.expiryDate) updated else it
         }
     }
-
-
-
 
     fun getItemsByCategory(category: Category): LiveData<List<Item>> {
         val filteredItems = _allItems.value?.filter { it.category == category } ?: listOf()
@@ -92,10 +87,20 @@ class SharedItemViewModel : ViewModel() {
         } ?: emptyList()
     }
 
-    // Simulated function — replace with actual logic if needed
-    private fun getAllItems(): List<Item> {
-        return listOf() // start empty
+    fun addItem(item : Item){
+        val currentList = _allItems.value?.toMutableList() ?: mutableListOf()
+        currentList.add(item)
+        _allItems.value = currentList
     }
+
+    fun restoreItem(item: Item) {
+        item.status = ItemStatus.ACTIVE
+        updateItem(item) // Assuming this will update LiveData and notify observers
+    }
+
+
+    // Simulated function — replace with actual logic if needed
+
 
 
 //    val items: LiveData<List<Item>>  get() = _items
