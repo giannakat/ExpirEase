@@ -6,23 +6,15 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
+import android.util.Log
+import android.view.*
+import android.widget.*
 import androidx.appcompat.widget.SearchView
-import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
+import com.example.expirease.app.MyApplication
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
@@ -36,6 +28,10 @@ import java.util.Locale
 import androidx.fragment.app.activityViewModels
 import com.example.expirease.data.HistoryItem
 import com.example.expirease.data.ItemStatus
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class HomeFragment : Fragment(){
@@ -44,16 +40,22 @@ class HomeFragment : Fragment(){
     lateinit var itemAdapter : ItemRecyclerViewAdapter
     lateinit var filteredList: MutableList<Item>
     lateinit var listOfItems : MutableList<Item>
+
     lateinit var searchView: SearchView
-
-
     val categoryList = Category.values().toMutableList()
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                          savedInstanceState: Bundle?
-    ): View?{
-        //equivalent to setContent
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val app = requireActivity().application as MyApplication
+
+        // Initialize lists
+        listOfItems = app.listOfItems
+        filteredList = listOfItems.toMutableList()
+
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         listOfItems = mutableListOf(
@@ -81,6 +83,25 @@ class HomeFragment : Fragment(){
         setupSearchView(view)
         setupAddButton(view)
         setupCategoryRecyclerView(view)
+//
+//        // Test item (can be removed later)
+//        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+//        val testItem = Item(
+//            "Egg",
+//            2,
+//            dateFormat.parse("2025-04-05")!!.time,
+//            Category.BAKERY,
+//            R.drawable.img_product_banana
+//        )
+//        if (!listOfItems.contains(testItem)) {
+//            app.listOfItems.add(testItem)
+//            filteredList.add(testItem)
+//        }
+//
+//        itemAdapter.notifyDataSetChanged()
+
+        // Fetch Firebase data after adapter is ready
+        fetchItemsFromFirebase()
 
         return view
     }
@@ -153,10 +174,7 @@ class HomeFragment : Fragment(){
         searchView = view.findViewById<SearchView>(R.id.search_bar)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false // No action needed on submit
-            }
-
+            override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterList(newText ?: "")
                 return true
@@ -190,14 +208,15 @@ class HomeFragment : Fragment(){
         if (query.isEmpty()) {
             filteredList.addAll(listOfItems)
         } else {
-            val lowerCaseQuery = query.lowercase()
-            filteredList.addAll(listOfItems.filter { it.name.lowercase().contains(lowerCaseQuery) })
+            val lowerQuery = query.lowercase()
+            filteredList.addAll(listOfItems.filter { it.name.lowercase().contains(lowerQuery) })
         }
         itemAdapter.notifyDataSetChanged()
     }
 
     private fun showAddItemDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_item, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_item, null)
         val editItemName = dialogView.findViewById<EditText>(R.id.edit_item_name)
         val editItemQuantity = dialogView.findViewById<EditText>(R.id.edit_item_quantity)
         val btnIncrease = dialogView.findViewById<Button>(R.id.btn_increase)
@@ -210,18 +229,16 @@ class HomeFragment : Fragment(){
         val btnAdd = dialogView.findViewById<Button>(R.id.btn_add_item)
         val btnCancel = dialogView.findViewById<Button>(R.id.btn_cancel)
 
-//        val dialog = AlertDialog.Builder(requireContext()).setView(dialogView).create()
-
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(dialogView)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) // super important!
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setCancelable(true)
 
-
-        //set up spinner adapter
-        //TODO create custom spinner_item layout
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryList.map {it.displayName})
+        val spinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            categoryList.map { it.displayName })
         spinnerCategory.adapter = spinnerAdapter
 
         btnIncrease.setOnClickListener {
@@ -242,11 +259,9 @@ class HomeFragment : Fragment(){
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-            //box of the date picker
             val datePicker = DatePickerDialog(requireContext(), { _, y, m, d ->
                 calendar.set(y, m, d)
                 selectedExpiryDate = calendar.timeInMillis
-
                 val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                 tvExpiry.text = dateFormat.format(Date(selectedExpiryDate))
             }, year, month, day)
@@ -254,18 +269,16 @@ class HomeFragment : Fragment(){
             datePicker.show()
         }
 
-
         btnAdd.setOnClickListener {
             val name = editItemName.text.toString()
-            val quantity = editItemQuantity.text.toString().toIntOrNull() ?: 1  // Default to 1 if empty
+            val quantity = editItemQuantity.text.toString().toIntOrNull() ?: 1
             val selectedCategoryName = spinnerCategory.selectedItem.toString()
-
             val selectedCategory = Category.values().find { it.displayName == selectedCategoryName }
 
             if(!name.isNullOrEmpty() && selectedCategory != null ) {
 
                 addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)  // Add new item
-                dialog.dismiss()
+
             }
         }
 
@@ -287,6 +300,22 @@ class HomeFragment : Fragment(){
         val today = System.currentTimeMillis()
         val threeDaysLater = today + (3*24*60*60*1000)
         return expiryDate in today..threeDaysLater
+
+    private fun addItem(
+        name: String,
+        quantity: Int,
+        expiryDate: Long,
+        selectedCategory: Category,
+        img: Int
+    ) {
+        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
+
+        val app = requireActivity().application as MyApplication
+        app.listOfItems.add(newItem)
+
+        listOfItems.add(newItem)
+        filteredList.add(newItem)
+        itemAdapter.notifyItemInserted(filteredList.size - 1)
     }
 
     private fun filterItemsByCategory(category: Category) {
@@ -374,4 +403,42 @@ class HomeFragment : Fragment(){
     }
 
 
+}
+    private fun fetchItemsFromFirebase() {
+        val firebaseDatabase = FirebaseDatabase.getInstance()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val databaseReference: DatabaseReference = firebaseDatabase
+                .getReference("Users")
+                .child(userId)
+                .child("items")
+
+            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    listOfItems.clear()
+                    filteredList.clear()
+
+                    for (itemSnapshot in snapshot.children) {
+                        val item = itemSnapshot.getValue(Item::class.java)
+                        if (item != null) {
+                            listOfItems.add(item)
+                        }
+                    }
+
+                    filteredList.addAll(listOfItems)
+                    itemAdapter.notifyDataSetChanged()
+
+                    Log.d("FirebaseItems", "Loaded ${listOfItems.size} items")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Error fetching items: ${error.message}")
+                }
+            })
+        } else {
+            Log.e("AuthError", "User not authenticated")
+        }
+    }
 }

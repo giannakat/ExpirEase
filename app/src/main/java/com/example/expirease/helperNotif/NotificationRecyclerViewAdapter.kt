@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Item
+import com.example.expirease.data.Member
 
 class NotificationRecyclerViewAdapter(
     private val listOfItems: MutableList<Item>,
