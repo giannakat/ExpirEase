@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Item
 
-class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, private val onClick : (Item) -> Unit ): RecyclerView.Adapter<ItemRecyclerViewAdapter.ItemViewHolder>() {
+class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, private val onClick : (Item) -> Unit, private val onLongClick : (Item) -> Unit ): RecyclerView.Adapter<ItemRecyclerViewAdapter.ItemViewHolder>() {
     class ItemViewHolder(view : View) : RecyclerView.ViewHolder(view){
         val photo = view.findViewById<ImageView>(R.id.item_photo)
         val name = view.findViewById<TextView>(R.id.item_name)
@@ -34,6 +34,11 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
 
         holder.itemView.setOnClickListener {
             onClick(item)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            onLongClick(item)
+            true
         }
     }
 

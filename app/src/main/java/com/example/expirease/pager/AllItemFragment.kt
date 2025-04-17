@@ -6,17 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.HistoryItem
+import com.example.expirease.data.ItemStatus
 import com.example.expirease.helper.HistoryAdapter
+import com.example.expirease.manager.SharedItemViewModel
 
 class AllItemFragment : Fragment() {
+    private val sharedItemViewModel: SharedItemViewModel by activityViewModels()
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var historyAdapter: HistoryAdapter
-    private val historyList = mutableListOf<HistoryItem>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,19 +32,27 @@ class AllItemFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view_history)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        historyAdapter = HistoryAdapter(historyList) { item ->
-            Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
-            // You can also call a restore function here if needed
+        historyAdapter = HistoryAdapter(mutableListOf()) { item ->
+            if (item.status != ItemStatus.ACTIVE) {
+                sharedItemViewModel.restoreItem(item)
+                Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Cannot restore expired item!", Toast.LENGTH_SHORT).show()
+            }
         }
 
         recyclerView.adapter = historyAdapter
-        loadMockData()
+
+        sharedItemViewModel.allItems.observe(viewLifecycleOwner) { items ->
+            val filteredItems = items.filter {
+                it.status == ItemStatus.DELETED ||
+                it.status == ItemStatus.CONSUMED ||
+                it.status == ItemStatus.EXPIRED
+            }
+            // Pass the original items directly to the adapter
+            historyAdapter.submitList(filteredItems)
+        }
+
     }
 
-    private fun loadMockData() {
-        historyList.add(HistoryItem("Banana", "Expired", "2025-04-01"))
-        historyList.add(HistoryItem("Milk", "Deleted", "2025-04-02"))
-        historyList.add(HistoryItem("Rice", "Consumed", "2025-04-03"))
-        historyAdapter.notifyDataSetChanged()
-    }
 }

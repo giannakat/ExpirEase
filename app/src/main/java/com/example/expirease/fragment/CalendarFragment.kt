@@ -11,12 +11,15 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.util.Log
 import android.widget.FrameLayout
+import android.widget.ImageButton
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.ItemRecyclerViewAdapter
+import com.example.expirease.manager.SharedItemViewModel
 import com.kizitonwose.calendar.view.*
 import com.kizitonwose.calendar.core.*
 import java.time.DayOfWeek
@@ -25,12 +28,12 @@ import java.time.YearMonth
 
 
 class CalendarFragment : Fragment() {
+    private val sharedItemViewModel: SharedItemViewModel by activityViewModels()
 
     private lateinit var calendarView: CalendarView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ItemRecyclerViewAdapter
 
-    private val allItems = mutableListOf<Item>()
     private var selectedDate: LocalDate = LocalDate.now()
 
     override fun onCreateView(
@@ -46,24 +49,14 @@ class CalendarFragment : Fragment() {
         calendarView = view.findViewById(R.id.calendarView)
         recyclerView = view.findViewById(R.id.itemsRecyclerView)
         val monthTextView = view.findViewById<TextView>(R.id.monthTextView)
-        val prevButton = view.findViewById<Button>(R.id.previousMonthButton)
-        val nextButton = view.findViewById<Button>(R.id.nextMonthButton)
+        val prevButton = view.findViewById<ImageButton>(R.id.previousMonthButton)
+        val nextButton = view.findViewById<ImageButton>(R.id.nextMonthButton)
 
-        adapter = ItemRecyclerViewAdapter(mutableListOf()) {}
+        adapter = ItemRecyclerViewAdapter(mutableListOf(), {}, {})
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-        allItems.addAll(
-            listOf(
-                Item("Milk", 2, LocalDate.now().toEpochDay(), Category.DAIRY),
-                Item("Bread", 1, LocalDate.now().plusDays(1).toEpochDay(), Category.BAKERY),
-                Item("Cheese", 3, LocalDate.now().toEpochDay(), Category.DAIRY),
-                Item("Yogurt", 4, LocalDate.now().minusDays(1).toEpochDay(), Category.DAIRY),
-                Item("Butter", 1, LocalDate.now().plusDays(3).toEpochDay(), Category.DAIRY)
-            )
-        )
-
-
+        //set up calendar from 1 year before to one year ahead
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusMonths(12)
         val endMonth = currentMonth.plusMonths(12)
@@ -74,6 +67,7 @@ class CalendarFragment : Fragment() {
 
         filterItemsForDate(selectedDate)
 
+        // calendar header
         calendarView.monthScrollListener = { month ->
             val monthName = month.yearMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }
             monthTextView.text = "$monthName ${month.yearMonth.year}"
@@ -91,7 +85,7 @@ class CalendarFragment : Fragment() {
             }
         }
 
-        // ✅ Correct way to inflate calendar day layout
+        //inflate calendar day layout
         calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View): DayViewContainer {
                 return DayViewContainer(view)
@@ -99,10 +93,8 @@ class CalendarFragment : Fragment() {
 
 
             override fun bind(container: DayViewContainer, data: CalendarDay) {
-                Log.d("CalendarDebug", "Binding day: ${data.date}")
                 container.dayText.text = data.date.dayOfMonth.toString()
                 container.dayText.setTextSize(20f)
-                container.dayText.setTypeface(null, Typeface.BOLD)
 
                 val today = LocalDate.now()
                 if (data.position == DayPosition.MonthDate) {
@@ -129,13 +121,13 @@ class CalendarFragment : Fragment() {
         }
     }
 
+    //filter list based on selected date
     private fun filterItemsForDate(date: LocalDate) {
-        val filtered = allItems.filter {
-            LocalDate.ofEpochDay(it.expiryDate) == date
-        }
+        val filtered = sharedItemViewModel.getItemsForDate(date)
         adapter.updateData(filtered.toMutableList())
     }
 
+    //linkes custom day layout to be used in bind()
     inner class DayViewContainer(view: View) : ViewContainer(view) {
         val dayText: TextView = view.findViewById(R.id.calendarDayText)
         val container: FrameLayout = view.findViewById(R.id.dayContainer)

@@ -1,5 +1,6 @@
 package com.example.expirease.fragment
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.graphics.Color
@@ -27,25 +28,33 @@ import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
 import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helper.OnItemUpdatedListener
+import com.example.expirease.manager.SharedItemViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import androidx.fragment.app.activityViewModels
+import com.example.expirease.data.HistoryItem
+import com.example.expirease.data.ItemStatus
+
 
 class HomeFragment : Fragment(){
-    lateinit var listOfItems : MutableList<Item>
+    private val sharedItemViewModel: SharedItemViewModel by activityViewModels()
+
     lateinit var itemAdapter : ItemRecyclerViewAdapter
     lateinit var filteredList: MutableList<Item>
+    lateinit var listOfItems : MutableList<Item>
     lateinit var searchView: SearchView
+
+
     val categoryList = Category.values().toMutableList()
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                           savedInstanceState: Bundle?
     ): View?{
         //equivalent to setContent
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
         listOfItems = mutableListOf(
             Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_placeholder_product),
@@ -68,65 +77,81 @@ class HomeFragment : Fragment(){
         // for searching
         filteredList = listOfItems.toMutableList() // initialize filtered list to the current list
 
-        val itemRecyclerView = view.findViewById<RecyclerView>(R.id.item_recyclerview)
-        itemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        itemAdapter = ItemRecyclerViewAdapter(filteredList, onClick = { item ->
-            val bottomSheet = EditItemBottomSheet()
-            val bundle = Bundle().apply {
-                putInt("photo", item.photoResource)
-                putString("name", item.name)
-                putInt("quantity", item.quantity)
-                putLong("expiryDate", item.expiryDate)
-                putString("category", item.category.toString())
-            }
-            bottomSheet.arguments = bundle
-
-            bottomSheet.onItemUpdatedListener = object : OnItemUpdatedListener {
-                override fun onItemUpdated(name: String, quantity: Int, expiryDate: Long, category: String) {
-                    // update your list and adapter here
-                    item.name = name
-                    item.quantity = quantity
-                    item.expiryDate = expiryDate
-                    item.category = Category.valueOf(category.uppercase())
-
-                    itemAdapter.notifyDataSetChanged()
-                }
-            }
-
-            bottomSheet.show(parentFragmentManager, "EditItemBottomSheet")
-        })
-
-        itemRecyclerView.adapter = itemAdapter
-
-        //search view
-        searchView = view.findViewById<SearchView>(R.id.search_bar)
-        setupSearchView()
-
-        val button_add = view.findViewById<ImageView>(R.id.add_button)
-        button_add.setOnClickListener {
-            showAddItemDialog()
-            Toast.makeText(requireContext(), "button add clicked", Toast.LENGTH_LONG).show()
-        }
-
-
-        //adapter for category
-        val categoryRecyclerView = view.findViewById<RecyclerView>(R.id.category_recyclerview)
-        categoryRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-
-        val categoryAdapter = CategoryRecyclerViewAdapter(categoryList){category ->
-            Toast.makeText(requireContext(), "Clicked category: ${category.displayName}", Toast.LENGTH_LONG).show()
-
-            filterItemsByCategory(category)
-        }
-
-        categoryRecyclerView.adapter = categoryAdapter
-
+        setupRecyclerView(view)
+        setupSearchView(view)
+        setupAddButton(view)
+        setupCategoryRecyclerView(view)
 
         return view
     }
 
-    private fun setupSearchView() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // If you want to observe LiveData later
+        sharedItemViewModel.allItems.observe(viewLifecycleOwner) { updatedList ->
+            val activeItems = updatedList.filter { it.status == ItemStatus.ACTIVE }
+
+            listOfItems.clear()
+            listOfItems.addAll(activeItems)
+
+            filteredList.clear()
+            filteredList.addAll(activeItems)
+
+            itemAdapter.notifyDataSetChanged()
+            updateUI(activeItems)
+
+        //            // Do something with the updated list, like update UI
+//            filteredList.clear()
+//            filteredList.addAll(updatedList)
+//            itemAdapter.notifyDataSetChanged()
+//            updateUI(updatedList)
+        }
+    }
+
+    //extracted long function
+    private fun setupRecyclerView(view: View) {
+        val itemRecyclerView = view.findViewById<RecyclerView>(R.id.item_recyclerview)
+        itemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        itemAdapter = ItemRecyclerViewAdapter(
+            filteredList,
+            onClick = { item -> openEditItemBottomSheet(item) },
+            onLongClick = { item -> showItemOptionsDialog(item) })
+
+        itemRecyclerView.adapter = itemAdapter
+    }
+
+    private fun updateUI(itemList: List<Item>) {
+        val textViewNoItems = view?.findViewById<TextView>(R.id.textViewNoItems)
+        val recyclerViewItems = view?.findViewById<RecyclerView>(R.id.item_recyclerview)
+
+        if (itemList.isEmpty()) {
+            textViewNoItems?.visibility = View.VISIBLE
+            recyclerViewItems?.visibility = View.GONE
+        } else {
+            textViewNoItems?.visibility = View.GONE
+            recyclerViewItems?.visibility = View.VISIBLE
+            itemAdapter.notifyDataSetChanged()
+        }
+    }
+
+
+    fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int){
+        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
+        val currentTime = System.currentTimeMillis()
+        val status = if (expiryDate < currentTime) ItemStatus.EXPIRED else ItemStatus.ACTIVE
+        newItem.status = status
+        listOfItems.add(newItem)
+        filteredList.add(newItem)
+        itemAdapter.notifyItemInserted(filteredList.size - 1)
+
+        sharedItemViewModel.addItem(newItem)
+    }
+
+    private fun setupSearchView(view:View) {
+        searchView = view.findViewById<SearchView>(R.id.search_bar)
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false // No action needed on submit
@@ -137,6 +162,27 @@ class HomeFragment : Fragment(){
                 return true
             }
         })
+    }
+
+    private fun setupAddButton(view : View){
+        val button_add = view.findViewById<ImageView>(R.id.add_button)
+        button_add.setOnClickListener {
+            showAddItemDialog()
+            Toast.makeText(requireContext(), "button add clicked", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setupCategoryRecyclerView(view:View){
+        val categoryRecyclerView = view.findViewById<RecyclerView>(R.id.category_recyclerview)
+        categoryRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+
+        val categoryAdapter = CategoryRecyclerViewAdapter(categoryList){category ->
+            Toast.makeText(requireContext(), "Clicked category: ${category.displayName}", Toast.LENGTH_LONG).show()
+
+            filterItemsByCategory(category)
+        }
+
+        categoryRecyclerView.adapter = categoryAdapter
     }
 
     private fun filterList(query: String) {
@@ -216,8 +262,10 @@ class HomeFragment : Fragment(){
 
             val selectedCategory = Category.values().find { it.displayName == selectedCategoryName }
 
-            if(!name.isNullOrEmpty() && selectedCategory != null) {
+            if(!name.isNullOrEmpty() && selectedCategory != null ) {
+
                 addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)  // Add new item
+                dialog.dismiss()
             }
         }
 
@@ -228,13 +276,7 @@ class HomeFragment : Fragment(){
         dialog.show()
     }
 
-    fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int){
-        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
-        listOfItems.add(newItem)
 
-        filteredList.add(newItem)
-        itemAdapter.notifyItemInserted(filteredList.size - 1);
-    }
 
     fun isExpired(expiryDate: Long): Boolean{
         val today = System.currentTimeMillis()
@@ -256,5 +298,80 @@ class HomeFragment : Fragment(){
         }
         itemAdapter.notifyDataSetChanged()
     }
+
+    private fun openEditItemBottomSheet(item: Item){
+
+        val bottomSheet = EditItemBottomSheet()
+        val bundle = Bundle().apply {
+            putInt("photo", item.photoResource)
+            putString("name", item.name)
+            putInt("quantity", item.quantity)
+            putLong("expiryDate", item.expiryDate)
+            putString("category", item.category.toString())
+        }
+        bottomSheet.arguments = bundle
+
+        bottomSheet.onItemUpdatedListener = object : OnItemUpdatedListener {
+            override fun onItemUpdated(name: String, quantity: Int, expiryDate: Long, category: String) {
+                // update your list and adapter here
+                item.name = name
+                item.quantity = quantity
+                item.expiryDate = expiryDate
+                item.category = Category.valueOf(category.uppercase())
+
+                itemAdapter.notifyDataSetChanged()
+            }
+        }
+
+        bottomSheet.show(parentFragmentManager, "EditItemBottomSheet")
+    }
+
+    private fun showItemOptionsDialog(item : Item): Boolean {
+        AlertDialog.Builder(requireContext())
+            .setTitle(item.name)
+            .setItems(arrayOf("Consume", "Delete")) { dialog, which ->
+                when (which) {
+                    0 -> {
+                        // Consume
+                        if (item.quantity > 1) {
+                            item.quantity-- // Decrease quantity
+                            item.status = ItemStatus.CONSUMED // Set status as consumed
+//                            itemAdapter.notifyDataSetChanged()
+
+                            // Update item in ViewModel
+                            sharedItemViewModel.updateItem(item)
+
+                            // Remove from filteredList and listOfItems if not ACTIVE anymore
+                            if (item.status != ItemStatus.ACTIVE) {
+                                listOfItems.remove(item)
+                                filteredList.remove(item)
+                                itemAdapter.notifyDataSetChanged()
+                            }
+                            Toast.makeText(requireContext(), "${item.name} consumed!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // If only one left, set status as consumed
+                            item.status = ItemStatus.CONSUMED // Set status as consumed
+                            itemAdapter.notifyDataSetChanged()
+                            Toast.makeText(requireContext(), "${item.name} consumed!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    1 -> {
+                        // Delete
+                        item.status = ItemStatus.DELETED // Set status as deleted
+//                        itemAdapter.notifyDataSetChanged()
+                        sharedItemViewModel.updateItem(item)
+
+                        listOfItems.remove(item)
+                        filteredList.remove(item)
+                        itemAdapter.notifyDataSetChanged()
+                        Toast.makeText(requireContext(), "${item.name} marked as deleted!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+        return true
+    }
+
 
 }
