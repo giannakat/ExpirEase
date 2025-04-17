@@ -55,25 +55,6 @@ class HomeFragment : Fragment(){
         setupSearchView(view)
         setupAddButton(view)
         setupCategoryRecyclerView(view)
-//
-//        // Test item (can be removed later)
-//        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-//        val testItem = Item(
-//            "Egg",
-//            2,
-//            dateFormat.parse("2025-04-05")!!.time,
-//            Category.BAKERY,
-//            R.drawable.img_product_banana
-//        )
-//        if (!listOfItems.contains(testItem)) {
-//            app.listOfItems.add(testItem)
-//            filteredList.add(testItem)
-//        }
-//
-//        itemAdapter.notifyDataSetChanged()
-
-        // Fetch Firebase data after adapter is ready
-//        fetchItemsFromFirebase()
 
         return view
     }
@@ -83,16 +64,17 @@ class HomeFragment : Fragment(){
 
         // If you want to observe LiveData later
         sharedItemViewModel.allItems.observe(viewLifecycleOwner) { updatedList ->
-            val activeItems = updatedList.filter { it.status == ItemStatus.ACTIVE }
+            val activeItems = updatedList.filter { it.status == ItemStatus.ACTIVE || it.status == ItemStatus.EXPIRED }
+            val sortedItems = activeItems.sortedBy { it.expiryDate }
 
             listOfItems.clear()
             listOfItems.addAll(activeItems)
 
             filteredList.clear()
-            filteredList.addAll(activeItems)
+            filteredList.addAll(sortedItems)
 
             itemAdapter.notifyDataSetChanged()
-            updateUI(activeItems)
+            updateUI(sortedItems)
 
         //            // Do something with the updated list, like update UI
 //            filteredList.clear()

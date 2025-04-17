@@ -61,6 +61,7 @@ class SharedItemViewModel : ViewModel() {
         val currentList = _allItems.value?.toMutableList() ?: mutableListOf()
         currentList.add(item)
         _allItems.value = currentList
+        item.category.incrementItemCount()
     }
 
     fun updateItem(updated: Item) {
