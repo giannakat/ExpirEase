@@ -7,7 +7,7 @@ import com.example.expirease.R
 data class Item(
     var name: String = "",
     var quantity: Int = 0,
-    var expiryDate: Long,
+    var expiryDate: Long = 0L, // ✅ Add default value
     var category: Category = Category.OTHER,
     var photoResource: Int = R.drawable.img_product_banana
 ) : Parcelable {

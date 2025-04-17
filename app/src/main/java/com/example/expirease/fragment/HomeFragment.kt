@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -18,6 +19,8 @@ import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
 import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helper.OnItemUpdatedListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,7 +31,11 @@ class HomeFragment : Fragment() {
     lateinit var searchView: SearchView
     val categoryList = Category.values().toMutableList()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val app = requireActivity().application as MyApplication
 
         // Initialize lists
@@ -52,7 +59,12 @@ class HomeFragment : Fragment() {
             bottomSheet.arguments = bundle
 
             bottomSheet.onItemUpdatedListener = object : OnItemUpdatedListener {
-                override fun onItemUpdated(name: String, quantity: Int, expiryDate: Long, category: String) {
+                override fun onItemUpdated(
+                    name: String,
+                    quantity: Int,
+                    expiryDate: Long,
+                    category: String
+                ) {
                     item.name = name
                     item.quantity = quantity
                     item.expiryDate = expiryDate
@@ -66,9 +78,15 @@ class HomeFragment : Fragment() {
         })
         itemRecyclerView.adapter = itemAdapter
 
-        // Example item (for testing)
+        // Test item (can be removed later)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val testItem = Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_product_banana)
+        val testItem = Item(
+            "Egg",
+            2,
+            dateFormat.parse("2025-04-05")!!.time,
+            Category.BAKERY,
+            R.drawable.img_product_banana
+        )
         if (!listOfItems.contains(testItem)) {
             app.listOfItems.add(testItem)
             filteredList.add(testItem)
@@ -88,12 +106,20 @@ class HomeFragment : Fragment() {
 
         // Category RecyclerView
         val categoryRecyclerView = view.findViewById<RecyclerView>(R.id.category_recyclerview)
-        categoryRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        categoryRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         val categoryAdapter = CategoryRecyclerViewAdapter(categoryList) { category ->
-            Toast.makeText(requireContext(), "Clicked category: ${category.displayName}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Clicked category: ${category.displayName}",
+                Toast.LENGTH_SHORT
+            ).show()
             filterItemsByCategory(category)
         }
         categoryRecyclerView.adapter = categoryAdapter
+
+        // Fetch Firebase data after adapter is ready
+        fetchItemsFromFirebase()
 
         return view
     }
@@ -101,7 +127,6 @@ class HomeFragment : Fragment() {
     private fun setupSearchView() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterList(newText ?: "")
                 return true
@@ -121,7 +146,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun showAddItemDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_item, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_item, null)
         val editItemName = dialogView.findViewById<EditText>(R.id.edit_item_name)
         val editItemQuantity = dialogView.findViewById<EditText>(R.id.edit_item_quantity)
         val btnIncrease = dialogView.findViewById<Button>(R.id.btn_increase)
@@ -140,7 +166,10 @@ class HomeFragment : Fragment() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setCancelable(true)
 
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryList.map { it.displayName })
+        val spinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            categoryList.map { it.displayName })
         spinnerCategory.adapter = spinnerAdapter
 
         btnIncrease.setOnClickListener {
@@ -178,10 +207,20 @@ class HomeFragment : Fragment() {
             val selectedCategory = Category.values().find { it.displayName == selectedCategoryName }
 
             if (name.isNotEmpty() && selectedCategory != null) {
-                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)
+                addItem(
+                    name,
+                    quantity,
+                    selectedExpiryDate,
+                    selectedCategory,
+                    R.drawable.img_product_banana
+                )
                 dialog.dismiss()
             } else {
-                Toast.makeText(requireContext(), "Please enter all item details.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter all item details.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -192,7 +231,13 @@ class HomeFragment : Fragment() {
         dialog.show()
     }
 
-    private fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int) {
+    private fun addItem(
+        name: String,
+        quantity: Int,
+        expiryDate: Long,
+        selectedCategory: Category,
+        img: Int
+    ) {
         val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
 
         val app = requireActivity().application as MyApplication
@@ -211,5 +256,43 @@ class HomeFragment : Fragment() {
             filteredList.addAll(listOfItems.filter { it.category == category })
         }
         itemAdapter.notifyDataSetChanged()
+    }
+
+    private fun fetchItemsFromFirebase() {
+        val firebaseDatabase = FirebaseDatabase.getInstance()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val databaseReference: DatabaseReference = firebaseDatabase
+                .getReference("Users")
+                .child(userId)
+                .child("items")
+
+            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    listOfItems.clear()
+                    filteredList.clear()
+
+                    for (itemSnapshot in snapshot.children) {
+                        val item = itemSnapshot.getValue(Item::class.java)
+                        if (item != null) {
+                            listOfItems.add(item)
+                        }
+                    }
+
+                    filteredList.addAll(listOfItems)
+                    itemAdapter.notifyDataSetChanged()
+
+                    Log.d("FirebaseItems", "Loaded ${listOfItems.size} items")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Error fetching items: ${error.message}")
+                }
+            })
+        } else {
+            Log.e("AuthError", "User not authenticated")
+        }
     }
 }

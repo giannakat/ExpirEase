@@ -17,7 +17,12 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("Test", "MyApplication is initialized")
+        listOfItems = mutableListOf() // Initialize with an empty list
+    }
+
+    fun updateItemList(items: List<Item>) {
+        listOfItems.clear()
+        listOfItems.addAll(items)
     }
 
     fun saveItemsToFirebase(onComplete: () -> Unit) {
