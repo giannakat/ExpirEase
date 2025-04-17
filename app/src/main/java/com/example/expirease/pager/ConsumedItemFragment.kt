@@ -10,11 +10,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
-import com.example.expirease.data.HistoryItem
-import com.example.expirease.data.Item
 import com.example.expirease.data.ItemStatus
 import com.example.expirease.helper.HistoryAdapter
-import com.example.expirease.manager.SharedItemViewModel
+import com.example.expirease.viewmodel.SharedItemViewModel
 
 class ConsumedItemFragment : Fragment() {
     private val sharedItemViewModel: SharedItemViewModel by activityViewModels()

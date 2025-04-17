@@ -6,7 +6,6 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -14,24 +13,18 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
-import com.example.expirease.app.MyApplication
 import com.example.expirease.data.Category
 import com.example.expirease.data.Item
 import com.example.expirease.helper.CategoryRecyclerViewAdapter
 import com.example.expirease.helper.ItemRecyclerViewAdapter
 import com.example.expirease.helper.OnItemUpdatedListener
-import com.example.expirease.manager.SharedItemViewModel
+import com.example.expirease.viewmodel.SharedItemViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import androidx.fragment.app.activityViewModels
-import com.example.expirease.data.HistoryItem
 import com.example.expirease.data.ItemStatus
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class HomeFragment : Fragment(){
@@ -50,34 +43,13 @@ class HomeFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val app = requireActivity().application as MyApplication
-
-        // Initialize lists
-        listOfItems = app.listOfItems
+        listOfItems = mutableListOf()
         filteredList = listOfItems.toMutableList()
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        listOfItems = mutableListOf(
-            Item("Egg", 2, dateFormat.parse("2025-04-05")!!.time, Category.BAKERY, R.drawable.img_placeholder_product),
-            Item("Milk", 1, dateFormat.parse("2025-04-03")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Bread", 3, dateFormat.parse("2025-04-07")!!.time, Category.DAIRY, R.drawable.img_placeholder_product),
-            Item("Rice", 5, dateFormat.parse("2025-04-20")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Apple", 4, dateFormat.parse("2025-04-10")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Chicken", 2, dateFormat.parse("2025-04-04")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Fish", 3, dateFormat.parse("2025-04-06")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Carrot", 6, dateFormat.parse("2025-04-15")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Potato", 7, dateFormat.parse("2025-04-18")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Tomato", 3, dateFormat.parse("2025-04-12")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Onion", 4, dateFormat.parse("2025-04-17")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Garlic", 2, dateFormat.parse("2025-04-22")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Cheese", 1, dateFormat.parse("2025-04-08")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Butter", 2, dateFormat.parse("2025-04-11")!!.time, Category.FRUITS, R.drawable.img_placeholder_product),
-            Item("Yogurt", 3, dateFormat.parse("2025-04-05")!!.time, Category.FRUITS, R.drawable.img_placeholder_product)
-        )
-
         // for searching
-        filteredList = listOfItems.toMutableList() // initialize filtered list to the current list
+       // filteredList = listOfItems.toMutableList() // initialize filtered list to the current list
 
         setupRecyclerView(view)
         setupSearchView(view)
@@ -101,7 +73,7 @@ class HomeFragment : Fragment(){
 //        itemAdapter.notifyDataSetChanged()
 
         // Fetch Firebase data after adapter is ready
-        fetchItemsFromFirebase()
+//        fetchItemsFromFirebase()
 
         return view
     }
@@ -159,13 +131,13 @@ class HomeFragment : Fragment(){
 
 
     fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int){
-        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
+        val newItem = Item(name, quantity, ItemStatus.ACTIVE, expiryDate, selectedCategory, img)
         val currentTime = System.currentTimeMillis()
         val status = if (expiryDate < currentTime) ItemStatus.EXPIRED else ItemStatus.ACTIVE
         newItem.status = status
-        listOfItems.add(newItem)
-        filteredList.add(newItem)
-        itemAdapter.notifyItemInserted(filteredList.size - 1)
+        //listOfItems.add(newItem)
+        //filteredList.add(newItem)
+        //itemAdapter.notifyItemInserted(filteredList.size - 1)
 
         sharedItemViewModel.addItem(newItem)
     }
@@ -278,7 +250,7 @@ class HomeFragment : Fragment(){
             if(!name.isNullOrEmpty() && selectedCategory != null ) {
 
                 addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)  // Add new item
-
+                dialog.dismiss()
             }
         }
 
@@ -296,27 +268,28 @@ class HomeFragment : Fragment(){
         return expiryDate < today
     }
 
-    fun isExpiringSoon(expiryDate: Long): Boolean{
+    fun isExpiringSoon(expiryDate: Long): Boolean {
         val today = System.currentTimeMillis()
-        val threeDaysLater = today + (3*24*60*60*1000)
+        val threeDaysLater = today + (3 * 24 * 60 * 60 * 1000)
         return expiryDate in today..threeDaysLater
-
-    private fun addItem(
-        name: String,
-        quantity: Int,
-        expiryDate: Long,
-        selectedCategory: Category,
-        img: Int
-    ) {
-        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
-
-        val app = requireActivity().application as MyApplication
-        app.listOfItems.add(newItem)
-
-        listOfItems.add(newItem)
-        filteredList.add(newItem)
-        itemAdapter.notifyItemInserted(filteredList.size - 1)
     }
+
+//    private fun addItem(
+//        name: String,
+//        quantity: Int,
+//        expiryDate: Long,
+//        selectedCategory: Category,
+//        img: Int
+//    ) {
+//        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
+//
+//        val app = requireActivity().application as MyApplication
+//        app.listOfItems.add(newItem)
+//
+//        listOfItems.add(newItem)
+//        filteredList.add(newItem)
+//        itemAdapter.notifyItemInserted(filteredList.size - 1)
+//    }
 
     private fun filterItemsByCategory(category: Category) {
         filteredList.clear()
@@ -402,43 +375,43 @@ class HomeFragment : Fragment(){
         return true
     }
 
+//    private fun fetchItemsFromFirebase() {
+//        val firebaseDatabase = FirebaseDatabase.getInstance()
+//        val currentUser = FirebaseAuth.getInstance().currentUser
+//
+//        if (currentUser != null) {
+//            val userId = currentUser.uid
+//            val databaseReference: DatabaseReference = firebaseDatabase
+//                    .getReference("Users")
+//                    .child(userId)
+//                    .child("items")
+//
+//            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    listOfItems.clear()
+//                    filteredList.clear()
+//
+//                    for (itemSnapshot in snapshot.children) {
+//                        val item = itemSnapshot.getValue(Item::class.java)
+//                        if (item != null) {
+//                            listOfItems.add(item)
+//                        }
+//                    }
+//
+//                    filteredList.addAll(listOfItems)
+//                    itemAdapter.notifyDataSetChanged()
+//
+//                    Log.d("FirebaseItems", "Loaded ${listOfItems.size} items")
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    Log.e("FirebaseError", "Error fetching items: ${error.message}")
+//                }
+//            })
+//        } else {
+//            Log.e("AuthError", "User not authenticated")
+//        }
+//    }
 
 }
-    private fun fetchItemsFromFirebase() {
-        val firebaseDatabase = FirebaseDatabase.getInstance()
-        val currentUser = FirebaseAuth.getInstance().currentUser
 
-        if (currentUser != null) {
-            val userId = currentUser.uid
-            val databaseReference: DatabaseReference = firebaseDatabase
-                .getReference("Users")
-                .child(userId)
-                .child("items")
-
-            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    listOfItems.clear()
-                    filteredList.clear()
-
-                    for (itemSnapshot in snapshot.children) {
-                        val item = itemSnapshot.getValue(Item::class.java)
-                        if (item != null) {
-                            listOfItems.add(item)
-                        }
-                    }
-
-                    filteredList.addAll(listOfItems)
-                    itemAdapter.notifyDataSetChanged()
-
-                    Log.d("FirebaseItems", "Loaded ${listOfItems.size} items")
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("FirebaseError", "Error fetching items: ${error.message}")
-                }
-            })
-        } else {
-            Log.e("AuthError", "User not authenticated")
-        }
-    }
-}

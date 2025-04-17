@@ -11,7 +11,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.auth.FirebaseUser
 import android.content.Intent
 import android.graphics.Color
 import android.text.SpannableString
@@ -23,8 +22,11 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.example.expirease.viewmodel.SharedItemViewModel
 
 class HomeWithFragmentActivity : AppCompatActivity() {
+    private lateinit var sharedItemViewModel: SharedItemViewModel
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
@@ -35,6 +37,8 @@ class HomeWithFragmentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_with_fragment)
+
+        sharedItemViewModel = ViewModelProvider(this)[SharedItemViewModel::class.java]
 
         db = FirebaseDatabase.getInstance()
         reference = db.getReference("Users")
@@ -132,7 +136,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                 Log.d("Logout", "User is authenticated. UID: ${user.uid}")
 
                 // Calling saveItemsToFirebase from MyApplication
-                app.saveItemsToFirebase {
+                sharedItemViewModel.saveItemsToFirebase {
                     Log.d("Logout", "Items saved. Proceeding to logout.")
                     FirebaseAuth.getInstance().signOut()
                     Log.d("Logout", "User signed out")

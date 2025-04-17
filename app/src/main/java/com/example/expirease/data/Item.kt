@@ -14,22 +14,24 @@ enum class ItemStatus {
 data class Item(
     var name: String = "",
     var quantity: Int = 0,
-    var status :ItemStatus = ItemStatus.ACTIVE
+    var status :ItemStatus = ItemStatus.ACTIVE,
     var expiryDate: Long = 0L, // ✅ Add default value
     var category: Category = Category.OTHER,
     var photoResource: Int = R.drawable.img_product_banana
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
-        parcel.readInt(),
-        parcel.readLong(),
+        parcel.readString() ?: "", //name
+        parcel.readInt(), //quantity
+            ItemStatus.valueOf(parcel.readString() ?: ItemStatus.ACTIVE.name), // status
+        parcel.readLong(), //expiryDate
         Category.valueOf(parcel.readString() ?: Category.OTHER.name),
-        parcel.readInt()
+        parcel.readInt()//photo
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
         parcel.writeInt(quantity)
+        parcel.writeString(status.name)
         parcel.writeLong(expiryDate)
         parcel.writeString(category.name)
         parcel.writeInt(photoResource)
@@ -41,6 +43,7 @@ data class Item(
         return mapOf(
             "name" to name,
             "quantity" to quantity,
+                "status" to status.name,
             "expiryDate" to expiryDate,
             "category" to category.name,
             "photoResource" to photoResource
