@@ -8,9 +8,10 @@ data class Item(
     var name: String = "",
     var quantity: Int = 0,
     var expiryDate: Long,
-    var category: Category,
+    var category: Category = Category.OTHER,
     var photoResource: Int = R.drawable.img_product_banana
 ) : Parcelable {
+
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readInt(),
@@ -28,6 +29,16 @@ data class Item(
     }
 
     override fun describeContents(): Int = 0
+
+    fun toMap(): Map<String, Any> {
+        return mapOf(
+            "name" to name,
+            "quantity" to quantity,
+            "expiryDate" to expiryDate,
+            "category" to category.name,
+            "photoResource" to photoResource
+        )
+    }
 
     companion object CREATOR : Parcelable.Creator<Item> {
         override fun createFromParcel(parcel: Parcel): Item = Item(parcel)
