@@ -8,17 +8,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
-import com.example.expirease.data.Category
-import com.example.expirease.data.Item
-import com.example.expirease.helperNotif.NotificationDetailsDialogFragment
-import com.example.expirease.helperNotif.NotificationRecyclerViewAdapter
+import com.example.expirease.data.Member
+import com.example.expirease.helperHousehold.AddMemberDialogFragment
+import com.example.expirease.helperHousehold.HouseholdDetailsDialogFragment
+import com.example.expirease.helperHousehold.HouseholdRecyclerViewAdapter
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HouseholdFragment : Fragment() {
-    private lateinit var listOfItems: MutableList<Item>
-    private lateinit var itemAdapter: NotificationRecyclerViewAdapter
-    private lateinit var filteredList: MutableList<Item>
+    private lateinit var listOfItems: MutableList<Member>
+    private lateinit var itemAdapter: HouseholdRecyclerViewAdapter
+    private lateinit var filteredList: MutableList<Member>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,8 +28,8 @@ class HouseholdFragment : Fragment() {
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         listOfItems = mutableListOf(
-            Item("Dish Soap", 1, dateFormat.parse("2025-04-20")!!.time, Category.BAKERY, R.drawable.img_product_banana),
-            Item("Toilet Paper", 3, dateFormat.parse("2025-04-18")!!.time, Category.BAKERY, R.drawable.img_product_banana)
+            Member("JM", "Casipong", R.drawable.img_product_banana),
+            Member("JM", "Casipong", R.drawable.img_product_banana)
         )
 
         filteredList = listOfItems.toMutableList()
@@ -37,18 +37,47 @@ class HouseholdFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.household_recyclerview)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        itemAdapter = NotificationRecyclerViewAdapter(filteredList, onClick = { item ->
-            val dialog = NotificationDetailsDialogFragment()
+        itemAdapter = HouseholdRecyclerViewAdapter(filteredList, onClick = { member ->
+            val dialog = HouseholdDetailsDialogFragment()
             val bundle = Bundle().apply {
-                putInt("photo", item.photoResource)
-                putString("name", item.name)
-                putInt("quantity", item.quantity)
+                putInt("photo", member.photoResource)
+                putString("firstname", member.firstname)
+                putString("lastname", member.lastname)
             }
             dialog.arguments = bundle
-            dialog.show(parentFragmentManager, "NotificationDetailsDialog")
+
+            dialog.setOnRemoveListener(object : HouseholdDetailsDialogFragment.OnMemberRemovedListener {
+                override fun onRemoveMember(firstname: String, lastname: String) {
+                    val memberToRemove = listOfItems.find {
+                        it.firstname == firstname && it.lastname == lastname
+                    }
+                    if (memberToRemove != null) {
+                        listOfItems.remove(memberToRemove)
+                        filteredList.remove(memberToRemove)
+                        itemAdapter.notifyDataSetChanged()
+                    }
+                }
+            })
+
+            dialog.show(parentFragmentManager, "HouseholdDetailsDialog")
         })
 
         recyclerView.adapter = itemAdapter
+
+        // Handle "+" button
+        val addButton = view.findViewById<View>(R.id.add)
+        addButton.setOnClickListener {
+            val addDialog = AddMemberDialogFragment()
+            addDialog.setOnMemberAddedListener(object : AddMemberDialogFragment.OnMemberAddedListener {
+                override fun onMemberAdded(firstname: String, lastname: String) {
+                    val newMember = Member(firstname, lastname, R.drawable.img_product_banana) // default image
+                    listOfItems.add(newMember)
+                    filteredList.add(newMember)
+                    itemAdapter.notifyDataSetChanged()
+                }
+            })
+            addDialog.show(parentFragmentManager, "AddMemberDialog")
+        }
 
         return view
     }

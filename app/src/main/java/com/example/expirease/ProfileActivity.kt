@@ -1,15 +1,19 @@
 package com.example.expirease
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import com.example.expirease.app.MyApplication
 
 class ProfileActivity : AppCompatActivity() {
@@ -27,9 +31,59 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var btnBack: Button
     private lateinit var accountIcon: ImageView
 
+    private val pickImageRequestCode = 101
+    private val PERMISSION_REQUEST_CODE = 102
+
+    private fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    private val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
+                    pickImage.launch("image/*")
+                } else {
+                    Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+    private lateinit var sharedPrefs: SharedPreferences
+
+    private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            accountIcon.setImageURI(it)
+            saveImageUri(it.toString())
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
+
+        // UI
+        accountIcon = findViewById(R.id.accountIcon)
+        val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
+        editPhotoLayout.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED
+            ) {
+                pickImage.launch("image/*")
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+
 
         etName = findViewById(R.id.nameValue)
         etUsername = findViewById(R.id.usernameValue)
@@ -46,6 +100,8 @@ class ProfileActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.saveProfileButton)
         btnBack = findViewById(R.id.back_button)
 
+        // Load data
+        loadProfileData()
 
         // Enable editing
         editNameIcon.setOnClickListener { enableEditing(etName) }
@@ -66,6 +122,19 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadProfileData() {
+        val app = application as MyApplication
+        etName.setText(app.name)
+        etEmail.setText(app.email)
+        etUsername.setText(app.username)
+        etPassword.setText(app.password)
+        etPhone.setText(sharedPrefs.getString("phone", ""))
+
+        // Load saved image
+        sharedPrefs.getString("imageUri", null)?.let {
+            accountIcon.setImageURI(Uri.parse(it))
+        }
+    }
 
     private fun enableEditing(editText: EditText) {
         editText.isFocusableInTouchMode = true
@@ -100,7 +169,15 @@ class ProfileActivity : AppCompatActivity() {
         app.password = etPassword.text.toString()
         app.email = etEmail.text.toString()
         app.name = etName.text.toString()
-        
+
+        // Save phone and image URI in SharedPreferences
+        with(sharedPrefs.edit()) {
+            putString("phone", etPhone.text.toString())
+            apply()
+        }
     }
 
+    private fun saveImageUri(uri: String) {
+        sharedPrefs.edit().putString("imageUri", uri).apply()
+    }
 }

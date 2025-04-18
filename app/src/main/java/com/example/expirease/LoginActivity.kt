@@ -1,6 +1,5 @@
 package com.example.expirease
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -9,74 +8,82 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.expirease.app.MyApplication
+import com.example.expirease.data.Users
+import com.example.expirease.databinding.ActivityLoginBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityLoginBinding
+    private lateinit var auth: FirebaseAuth
+    private lateinit var reference: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val loginButton: Button = findViewById(R.id.btnlogin)
-        val signUpTextView: TextView = findViewById(R.id.signUpTextView)
-        val edittext_username : EditText = findViewById<EditText>(R.id.edittext_username)
-        val edittext_password : EditText = findViewById<EditText>(R.id.edittext_password)
+        auth = FirebaseAuth.getInstance()
+        reference = FirebaseDatabase.getInstance().getReference("Users")
 
-        //custom class for passing data
-        edittext_username.setText((application as MyApplication).username)
-        edittext_password.setText((application as MyApplication).password)
+        val loginButton = binding.btnlogin
+        val usernameField = binding.edittextUsername
+        val passwordField = binding.edittextPassword
 
-        //login button validation
         loginButton.setOnClickListener {
-            val username = edittext_username.text.toString()
-            val password = edittext_password.text.toString()
+            val username = usernameField.text.toString()
+            val password = passwordField.text.toString()
 
             if (username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Username or password cannot be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if (username == "gianna" && password == "123") {
-                Toast.makeText(this, "Signed in as an admin", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeWithFragmentActivity::class.java)
-                startActivity(intent) // Only start ProfileActivity if login is correct
-                finish()
-            } else if(username == (application as MyApplication).username && password == (application as MyApplication).password){
-                Toast.makeText(this, "Username and password are correct", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeWithFragmentActivity::class.java)
-                startActivity(intent)
-
-                finish()
-            }else{
-                Toast.makeText(this, "Username and password are incorrect", Toast.LENGTH_LONG).show()
-            }
-
+            reference.orderByChild("username").equalTo(username)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.exists()) {
+                        val user = snapshot.children.first().getValue(Users::class.java)
+                        val email = user?.email
+                        if (email != null) {
+                            auth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+                                        finish()
+                                    } else {
+                                        Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        } else {
+                            Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(this, "Username not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Database error", Toast.LENGTH_SHORT).show()
+                }
         }
 
-        // Move sign-up text configuration outside the button click event
-        val text = "Don't have an Account? Sign up"
-        val spannableString = SpannableString(text)
+        val text = SpannableString("Don't have an Account? Sign up")
+        val start = text.indexOf("Sign up")
+        val end = start + "Sign up".length
 
-        val startIndex = text.indexOf("Sign up")
-        val endIndex = startIndex + "Sign up".length
-
-        // Change text color
-        spannableString.setSpan(ForegroundColorSpan(Color.GREEN), startIndex, endIndex, 0)
-
-        // Make it clickable
-        spannableString.setSpan(object : ClickableSpan() {
+        text.setSpan(ForegroundColorSpan(Color.GREEN), start, end, 0)
+        text.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
             }
-        }, startIndex, endIndex, 0)
+        }, start, end, 0)
 
-        // Set the SpannableString to the TextView
-        signUpTextView.text = spannableString
-        signUpTextView.movementMethod = LinkMovementMethod.getInstance()
+        binding.signUpTextView.text = text
+        binding.signUpTextView.movementMethod = LinkMovementMethod.getInstance()
     }
 }

@@ -4,18 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.expirease.R
+import com.example.expirease.data.Item
 
 class NotificationDetailsDialogFragment : DialogFragment() {
+
+    private var item: Item? = null
+    private var onRemove: ((Item) -> Unit)? = null
+
+    fun setItemData(item: Item, onRemove: (Item) -> Unit) {
+        this.item = item
+        this.onRemove = onRemove
+    }
 
     override fun onResume() {
         super.onResume()
         dialog?.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.85).toInt(), // 85% of screen width
-            ViewGroup.LayoutParams.WRAP_CONTENT // Height adjusts to content
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
     }
 
@@ -32,11 +42,17 @@ class NotificationDetailsDialogFragment : DialogFragment() {
         val itemPhoto = view.findViewById<ImageView>(R.id.item_photo)
         val itemName = view.findViewById<TextView>(R.id.item_name)
         val itemExpiry = view.findViewById<TextView>(R.id.item_expiryDate)
+        val removeButton = view.findViewById<Button>(R.id.remove_notification_button)
 
-        arguments?.let {
-            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
-            itemName.text = it.getString("name") ?: "Unknown Item"
-            itemExpiry.text = "Expiry: ${it.getLong("expiry", 0)}"
+        item?.let {
+            itemPhoto.setImageResource(it.photoResource)
+            itemName.text = it.name
+            itemExpiry.text = "Expiry: ${it.expiryDate}"
+
+            removeButton.setOnClickListener {
+                onRemove?.invoke(item!!)
+                dismiss()
+            }
         }
     }
 }

@@ -7,29 +7,29 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
-import com.example.expirease.data.Item
+import com.example.expirease.data.Member
 
 class HouseholdRecyclerViewAdapter(
-    private val listOfItems: MutableList<Item>,
-    private val onClick: (Item) -> Unit
+    private val listOfItems: MutableList<Member>,
+    private val onClick: (Member) -> Unit
 ) : RecyclerView.Adapter<HouseholdRecyclerViewAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val photo: ImageView = view.findViewById(R.id.item_photo)
-        val name: TextView = view.findViewById(R.id.item_name)
-        val quantity: TextView = view.findViewById(R.id.item_quantity)
+        val firstname: TextView = view.findViewById(R.id.member_firstname)
+        val lastname: TextView = view.findViewById(R.id.member_lastname)
 
-        fun bind(item: Item, onClick: (Item) -> Unit) {
+        fun bind(item: Member, onClick: (Member) -> Unit) {
             photo.setImageResource(item.photoResource)
-            name.text = item.name
-            quantity.text = "Quantity: ${item.quantity}"
+            firstname.text = item.firstname
+            lastname.text = item.lastname
             itemView.setOnClickListener { onClick(item) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.notif_recycler_view, parent, false)
+            .inflate(R.layout.household_recycler_view, parent, false)
         return ItemViewHolder(view)
     }
 
