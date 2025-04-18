@@ -1,5 +1,6 @@
 package com.example.expirease
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,12 +17,15 @@ import com.example.expirease.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var reference: DatabaseReference
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         reference = FirebaseDatabase.getInstance().getReference("Users")
+        firestore = FirebaseFirestore.getInstance()
 
         val loginButton = binding.btnlogin
         val usernameField = binding.edittextUsername
@@ -54,6 +60,28 @@ class LoginActivity : AppCompatActivity() {
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+
+                                        // ✅ Retrieve Firebase device token and store it in Firestore
+                                        FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
+                                            if (tokenTask.isSuccessful) {
+                                                val token = tokenTask.result // Firebase device token
+
+                                                // Store the token in Firestore under the user's document
+                                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                                if (userId != null) {
+                                                    val userRef = firestore.collection("users").document(userId)
+                                                    userRef.update("deviceToken", token)
+                                                        .addOnSuccessListener {
+                                                            Log.d(TAG, "Device token updated successfully")
+                                                        }
+                                                        .addOnFailureListener { e ->
+                                                            Log.w(TAG, "Error updating device token", e)
+                                                        }
+                                                }
+                                            }
+                                        }
+
+                                        // Start Home activity after successful login
                                         startActivity(Intent(this, HomeWithFragmentActivity::class.java))
                                         finish()
                                     } else {
@@ -72,6 +100,7 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
+        // Make "Sign up" text clickable
         val text = SpannableString("Don't have an Account? Sign up")
         val start = text.indexOf("Sign up")
         val end = start + "Sign up".length

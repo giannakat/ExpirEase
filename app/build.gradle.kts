@@ -88,6 +88,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation ("com.google.firebase:firebase-messaging-ktx")
 
     // Testing
     testImplementation(libs.junit)
@@ -97,4 +98,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
+
 }

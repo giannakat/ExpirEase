@@ -1,0 +1,341 @@
+Index: app/src/main/java/com/example/expirease/LoginActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.expirease\r\n\r\nimport android.content.Intent\r\nimport android.graphics.Color\r\nimport android.os.Bundle\r\nimport android.text.SpannableString\r\nimport android.text.method.LinkMovementMethod\r\nimport android.text.style.ClickableSpan\r\nimport android.text.style.ForegroundColorSpan\r\nimport android.view.View\r\nimport android.widget.Toast\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport com.example.expirease.data.Users\r\nimport com.example.expirease.databinding.ActivityLoginBinding\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.database.DatabaseReference\r\nimport com.google.firebase.database.FirebaseDatabase\r\n\r\nclass LoginActivity : AppCompatActivity() {\r\n\r\n    private lateinit var binding: ActivityLoginBinding\r\n    private lateinit var auth: FirebaseAuth\r\n    private lateinit var reference: DatabaseReference\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        binding = ActivityLoginBinding.inflate(layoutInflater)\r\n        setContentView(binding.root)\r\n\r\n        auth = FirebaseAuth.getInstance()\r\n        reference = FirebaseDatabase.getInstance().getReference(\"Users\")\r\n\r\n        val loginButton = binding.btnlogin\r\n        val usernameField = binding.edittextUsername\r\n        val passwordField = binding.edittextPassword\r\n\r\n        loginButton.setOnClickListener {\r\n            val username = usernameField.text.toString()\r\n            val password = passwordField.text.toString()\r\n\r\n            if (username.isEmpty() || password.isEmpty()) {\r\n                Toast.makeText(this, \"Username or password cannot be empty\", Toast.LENGTH_LONG).show()\r\n                return@setOnClickListener\r\n            }\r\n\r\n            reference.orderByChild(\"username\").equalTo(username)\r\n                .get()\r\n                .addOnSuccessListener { snapshot ->\r\n                    if (snapshot.exists()) {\r\n                        val user = snapshot.children.first().getValue(Users::class.java)\r\n                        val email = user?.email\r\n                        if (email != null) {\r\n                            auth.signInWithEmailAndPassword(email, password)\r\n                                .addOnCompleteListener { task ->\r\n                                    if (task.isSuccessful) {\r\n                                        Toast.makeText(this, \"Login Successful!\", Toast.LENGTH_SHORT).show()\r\n                                        startActivity(Intent(this, HomeWithFragmentActivity::class.java))\r\n                                        finish()\r\n                                    } else {\r\n                                        Toast.makeText(this, \"Authentication failed\", Toast.LENGTH_SHORT).show()\r\n                                    }\r\n                                }\r\n                        } else {\r\n                            Toast.makeText(this, \"User email not found\", Toast.LENGTH_SHORT).show()\r\n                        }\r\n                    } else {\r\n                        Toast.makeText(this, \"Username not found\", Toast.LENGTH_SHORT).show()\r\n                    }\r\n                }\r\n                .addOnFailureListener {\r\n                    Toast.makeText(this, \"Database error\", Toast.LENGTH_SHORT).show()\r\n                }\r\n        }\r\n\r\n        val text = SpannableString(\"Don't have an Account? Sign up\")\r\n        val start = text.indexOf(\"Sign up\")\r\n        val end = start + \"Sign up\".length\r\n\r\n        text.setSpan(ForegroundColorSpan(Color.GREEN), start, end, 0)\r\n        text.setSpan(object : ClickableSpan() {\r\n            override fun onClick(widget: View) {\r\n                startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))\r\n            }\r\n        }, start, end, 0)\r\n\r\n        binding.signUpTextView.text = text\r\n        binding.signUpTextView.movementMethod = LinkMovementMethod.getInstance()\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/expirease/LoginActivity.kt b/app/src/main/java/com/example/expirease/LoginActivity.kt
+--- a/app/src/main/java/com/example/expirease/LoginActivity.kt	(revision f2de8dac0ba76a2d6f4a026dd9a041abb64f989d)
++++ b/app/src/main/java/com/example/expirease/LoginActivity.kt	(date 1744963131170)
+@@ -1,5 +1,6 @@
+ package com.example.expirease
+ 
++import android.content.ContentValues.TAG
+ import android.content.Intent
+ import android.graphics.Color
+ import android.os.Bundle
+@@ -7,6 +8,7 @@
+ import android.text.method.LinkMovementMethod
+ import android.text.style.ClickableSpan
+ import android.text.style.ForegroundColorSpan
++import android.util.Log
+ import android.view.View
+ import android.widget.Toast
+ import androidx.appcompat.app.AppCompatActivity
+@@ -15,12 +17,15 @@
+ import com.google.firebase.auth.FirebaseAuth
+ import com.google.firebase.database.DatabaseReference
+ import com.google.firebase.database.FirebaseDatabase
++import com.google.firebase.firestore.FirebaseFirestore
++import com.google.firebase.messaging.FirebaseMessaging
+ 
+ class LoginActivity : AppCompatActivity() {
+ 
+     private lateinit var binding: ActivityLoginBinding
+     private lateinit var auth: FirebaseAuth
+     private lateinit var reference: DatabaseReference
++    private lateinit var firestore: FirebaseFirestore
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+@@ -29,6 +34,7 @@
+ 
+         auth = FirebaseAuth.getInstance()
+         reference = FirebaseDatabase.getInstance().getReference("Users")
++        firestore = FirebaseFirestore.getInstance()
+ 
+         val loginButton = binding.btnlogin
+         val usernameField = binding.edittextUsername
+@@ -54,6 +60,28 @@
+                                 .addOnCompleteListener { task ->
+                                     if (task.isSuccessful) {
+                                         Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
++
++                                        // Retrieve Firebase device token and store it in Firestore
++                                        FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
++                                            if (tokenTask.isSuccessful) {
++                                                val token = tokenTask.result // Firebase device token
++
++                                                // Store the token in Firestore under the user's document
++                                                val userId = FirebaseAuth.getInstance().currentUser?.uid
++                                                if (userId != null) {
++                                                    val userRef = firestore.collection("users").document(userId)
++                                                    userRef.update("deviceToken", token)
++                                                        .addOnSuccessListener {
++                                                            Log.d(TAG, "Device token updated successfully")
++                                                        }
++                                                        .addOnFailureListener { e ->
++                                                            Log.w(TAG, "Error updating device token", e)
++                                                        }
++                                                }
++                                            }
++                                        }
++
++                                        // Start Home activity after successful login
+                                         startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+                                         finish()
+                                     } else {
+@@ -72,6 +100,7 @@
+                 }
+         }
+ 
++        // Make "Sign up" text clickable
+         val text = SpannableString("Don't have an Account? Sign up")
+         val start = text.indexOf("Sign up")
+         val end = start + "Sign up".length
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\">\r\n    <uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\"/>\r\n\r\n    <application\r\n        android:name=\".app.MyApplication\"\r\n        android:allowBackup=\"true\"\r\n        android:dataExtractionRules=\"@xml/data_extraction_rules\"\r\n        android:fullBackupContent=\"@xml/backup_rules\"\r\n        android:icon=\"@mipmap/e_launcher\"\r\n        android:label=\"@string/app_name\"\r\n        android:roundIcon=\"@mipmap/e_launcher_foreground\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/Theme.ExpirEase\"\r\n        tools:targetApi=\"31\">\r\n        <activity\r\n            android:name=\".NotificationsActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".helperNotif.NotificationCustomListViewAdapter\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".helperNotif.NotificationRecyclerViewAdapter\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".helperNotif.NotificationDetailsDialogFragment\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".helper.ItemDetailsActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".CustomListViewActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".ListViewActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".HomeWithFragmentActivity\"\r\n            android:exported=\"false\"\r\n            android:theme=\"@style/Theme.ExpirEase\"/>\r\n        <activity\r\n            android:name=\".DevelopersActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".LogoutActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".SettingsActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".ProfileActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".SplashScreenActivity\"\r\n            android:exported=\"false\"/>\r\n        <activity\r\n            android:name=\".RegisterActivity\"\r\n            android:exported=\"false\" />\r\n        <activity\r\n            android:name=\".LoginActivity\"\r\n            android:exported=\"true\" >\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n    </application>\r\n\r\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+--- a/app/src/main/AndroidManifest.xml	(revision f2de8dac0ba76a2d6f4a026dd9a041abb64f989d)
++++ b/app/src/main/AndroidManifest.xml	(date 1744963326719)
+@@ -1,6 +1,8 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools">
++
++    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+ 
+     <application
+@@ -65,6 +67,14 @@
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
++
++        <service
++            android:name=".MyFirebaseMessagingService"
++            android:exported="false">
++            <intent-filter>
++                <action android:name="com.google.firebase.MESSAGING_EVENT" />
++            </intent-filter>
++        </service>
+     </application>
+ 
+ </manifest>
+\ No newline at end of file
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.androidApplication)\r\n    alias(libs.plugins.jetbrainsKotlinAndroid)\r\n    alias(libs.plugins.googleServices)\r\n}\r\n\r\nandroid {\r\n    namespace = \"com.example.expirease\"\r\n    compileSdk = 35\r\n\r\n    defaultConfig {\r\n        applicationId = \"com.example.expirease\"\r\n        minSdk = 26\r\n        targetSdk = 34\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n        vectorDrawables.useSupportLibrary = true\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\r\n                \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_1_8\r\n        targetCompatibility = JavaVersion.VERSION_1_8\r\n    }\r\n\r\n    kotlinOptions {\r\n        jvmTarget = \"1.8\"\r\n    }\r\n\r\n    buildFeatures {\r\n        compose = true\r\n        viewBinding = true\r\n    }\r\n\r\n    composeOptions {\r\n        kotlinCompilerExtensionVersion = \"1.5.1\"\r\n    }\r\n\r\n    packaging.resources.excludes += \"/META-INF/{AL2.0,LGPL2.1}\"\r\n}\r\n\r\ndependencies {\r\n    // Core\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    implementation(libs.androidx.activity.compose)\r\n\r\n    // Compose\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(libs.androidx.ui)\r\n    implementation(libs.androidx.ui.graphics)\r\n    implementation(libs.androidx.ui.tooling.preview)\r\n    implementation(libs.androidx.material3)\r\n\r\n    // UI Components\r\n    implementation(libs.androidx.appcompat)\r\n    implementation(libs.material)\r\n    implementation(libs.androidx.activity)\r\n    implementation(libs.androidx.constraintlayout)\r\n    implementation(libs.androidx.cardview)\r\n    implementation(libs.androidx.lifecycle.viewmodel.android)\r\n\r\n    // RecyclerView, Fragments, ViewModels, LiveData\r\n    implementation(\"androidx.recyclerview:recyclerview:1.2.1\")\r\n    implementation(\"androidx.fragment:fragment-ktx:1.6.2\")\r\n    implementation(\"androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0\")\r\n    implementation(\"androidx.lifecycle:lifecycle-livedata-ktx:2.4.0\")\r\n\r\n    // Navigation / Tabs\r\n    implementation(\"androidx.viewpager2:viewpager2:1.0.0\")\r\n\r\n    // Calendar\r\n    implementation(\"com.kizitonwose.calendar:view:2.4.0\")\r\n\r\n    // \uD83D\uDD25 Firebase (use BoM to sync versions)\r\n    implementation(platform(\"com.google.firebase:firebase-bom:32.7.0\"))\r\n    implementation(\"com.google.firebase:firebase-auth-ktx\")\r\n    implementation(\"com.google.firebase:firebase-database-ktx\")\r\n    implementation(\"com.google.firebase:firebase-firestore-ktx\")\r\n\r\n    // Testing\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.ui.test.junit4)\r\n    debugImplementation(libs.androidx.ui.tooling)\r\n    debugImplementation(libs.androidx.ui.test.manifest)\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision f2de8dac0ba76a2d6f4a026dd9a041abb64f989d)
++++ b/app/build.gradle.kts	(date 1744962493354)
+@@ -88,6 +88,7 @@
+     implementation("com.google.firebase:firebase-auth-ktx")
+     implementation("com.google.firebase:firebase-database-ktx")
+     implementation("com.google.firebase:firebase-firestore-ktx")
++    implementation ("com.google.firebase:firebase-messaging-ktx")
+ 
+     // Testing
+     testImplementation(libs.junit)
+@@ -97,4 +98,7 @@
+     androidTestImplementation(libs.androidx.ui.test.junit4)
+     debugImplementation(libs.androidx.ui.tooling)
+     debugImplementation(libs.androidx.ui.test.manifest)
++
++
++
+ }
+Index: app/src/main/java/com/example/expirease/helperNotif/NotificationHelper.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/expirease/helperNotif/NotificationHelper.kt b/app/src/main/java/com/example/expirease/helperNotif/NotificationHelper.kt
+new file mode 100644
+--- /dev/null	(date 1744964642808)
++++ b/app/src/main/java/com/example/expirease/helperNotif/NotificationHelper.kt	(date 1744964642808)
+@@ -0,0 +1,52 @@
++package com.example.expirease.helperNotif
++
++import android.Manifest
++import android.app.NotificationChannel
++import android.app.NotificationManager
++import android.content.Context
++import android.content.pm.PackageManager
++import android.os.Build
++import androidx.core.app.ActivityCompat
++import androidx.core.app.NotificationCompat
++import androidx.core.app.NotificationManagerCompat
++import com.example.expirease.R
++
++object NotificationHelper {
++    private const val CHANNEL_ID = "expiry_notifications"
++    private const val CHANNEL_NAME = "Expiry Notifications"
++
++    fun createNotificationChannel(context: Context) {
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++            val channel = NotificationChannel(
++                CHANNEL_ID,
++                CHANNEL_NAME,
++                NotificationManager.IMPORTANCE_HIGH
++            ).apply {
++                description = "Notifies when items are expiring or expired"
++            }
++            val manager: NotificationManager =
++                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
++            manager.createNotificationChannel(channel)
++        }
++    }
++
++    fun showNotification(context: Context, title: String, message: String, id: Int) {
++        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
++            .setSmallIcon(R.drawable.img_product_banana) // Replace with your own icon
++            .setContentTitle(title)
++            .setContentText(message)
++            .setPriority(NotificationCompat.PRIORITY_HIGH)
++            .build()
++
++        // 🔧 Use context here instead of `this`
++        if (ActivityCompat.checkSelfPermission(
++                context,
++                Manifest.permission.POST_NOTIFICATIONS
++            ) != PackageManager.PERMISSION_GRANTED
++        ) {
++            return
++        }
++
++        NotificationManagerCompat.from(context).notify(id, notification)
++    }
++}
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_17\" default=\"true\" project-jdk-name=\"jbr-17\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\r\n  </component>\r\n  <component name=\"ProjectType\">\r\n    <option name=\"id\" value=\"Android\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision f2de8dac0ba76a2d6f4a026dd9a041abb64f989d)
++++ b/.idea/misc.xml	(date 1744963065026)
+@@ -1,6 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="jbr-21" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/build/classes" />
+   </component>
+   <component name="ProjectType">
+Index: app/src/main/java/com/example/expirease/MyFirebaseMessagingService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/expirease/MyFirebaseMessagingService.kt b/app/src/main/java/com/example/expirease/MyFirebaseMessagingService.kt
+new file mode 100644
+--- /dev/null	(date 1744964677063)
++++ b/app/src/main/java/com/example/expirease/MyFirebaseMessagingService.kt	(date 1744964677063)
+@@ -0,0 +1,65 @@
++package com.example.expirease
++
++
++import android.app.NotificationChannel
++import android.app.NotificationManager
++import android.content.Context
++import android.os.Build
++import android.util.Log
++import androidx.core.app.NotificationCompat
++import com.example.expirease.helperNotif.NotificationHelper
++import com.google.firebase.messaging.FirebaseMessagingService
++import com.google.firebase.messaging.RemoteMessage
++
++class MyFirebaseMessagingService : FirebaseMessagingService() {
++
++    // Called when the app is in the foreground or background
++    override fun onMessageReceived(remoteMessage: RemoteMessage) {
++        // Check if the message contains data.
++        if (remoteMessage.data.isNotEmpty()) {
++            val itemName = remoteMessage.data["itemName"]
++            val expiryDate = remoteMessage.data["expiryDate"]
++
++            // Make sure the channel is created
++            NotificationHelper.createNotificationChannel(this)
++
++            // Use the helper to show the notification
++            NotificationHelper.showNotification(
++                context = this,
++                title = "Item Expiry Alert",
++                message = "Item: $itemName is expiring soon ($expiryDate)",
++                id = 1
++            )
++        }
++    }
++
++    // Called when the Firebase token is refreshed
++    override fun onNewToken(token: String) {
++        Log.d("FCM", "Refreshed token: $token")
++    }
++
++    private fun showNotification(title: String, body: String) {
++        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
++        val notificationId = 1
++
++        val notificationChannelId = "expirease_channel"
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++            val channel = NotificationChannel(
++                notificationChannelId,
++                "Expirease Notifications",
++                NotificationManager.IMPORTANCE_DEFAULT
++            )
++            notificationManager.createNotificationChannel(channel)
++        }
++
++        // Create and display the notification
++        val notification = NotificationCompat.Builder(this, notificationChannelId)
++            .setContentTitle(title)
++            .setContentText(body)
++            .setSmallIcon(R.drawable.img_product_banana)  // Use your own icon
++            .setAutoCancel(true)
++            .build()
++
++        notificationManager.notify(notificationId, notification)
++    }
++}
+Index: app/src/main/res/layout/activity_notifications.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\">\r\n\r\n    <TextView\r\n        android:id=\"@+id/expiringsoon\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:text=\"Expiring Soon\"\r\n        android:layout_marginTop=\"80dp\"\r\n        android:layout_marginHorizontal=\"20dp\"/>\r\n\r\n    <androidx.recyclerview.widget.RecyclerView\r\n        android:id=\"@+id/notif_recyclerview1\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_centerHorizontal=\"true\"\r\n        android:layout_marginTop=\"20dp\"\r\n        android:layout_marginHorizontal=\"20dp\"/>\r\n\r\n    <TextView\r\n        android:id=\"@+id/expired\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:text=\"Expiring Soon\"\r\n        android:layout_marginTop=\"80dp\"\r\n        android:layout_marginHorizontal=\"20dp\"/>\r\n\r\n    <androidx.recyclerview.widget.RecyclerView\r\n        android:id=\"@+id/notif_recyclerview2\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_centerHorizontal=\"true\"\r\n        android:layout_marginTop=\"20dp\"\r\n        android:layout_marginHorizontal=\"20dp\"/>\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_notifications.xml b/app/src/main/res/layout/activity_notifications.xml
+--- a/app/src/main/res/layout/activity_notifications.xml	(revision f2de8dac0ba76a2d6f4a026dd9a041abb64f989d)
++++ b/app/src/main/res/layout/activity_notifications.xml	(date 1744960564837)
+@@ -24,7 +24,7 @@
+         android:id="@+id/expired"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+-        android:text="Expiring Soon"
++        android:text="Expired"
+         android:layout_marginTop="80dp"
+         android:layout_marginHorizontal="20dp"/>
+ 
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"CompilerConfiguration\">\r\n    <bytecodeTargetLevel target=\"17\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision f2de8dac0ba76a2d6f4a026dd9a041abb64f989d)
++++ b/.idea/compiler.xml	(date 1744962517432)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="CompilerConfiguration">
+-    <bytecodeTargetLevel target="17" />
++    <bytecodeTargetLevel target="21" />
+   </component>
+ </project>
+\ No newline at end of file
