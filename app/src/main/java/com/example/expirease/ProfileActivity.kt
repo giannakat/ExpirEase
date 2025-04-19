@@ -17,6 +17,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.expirease.app.MyApplication
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.FileOutputStream
 
@@ -37,16 +40,16 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var accountIcon: ImageView
     private lateinit var sharedPrefs: SharedPreferences
 
+    private var selectedImageUri: Uri? = null
+
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             try {
-                contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
+                contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                selectedImageUri = it
                 saveImageUri(it.toString())
                 saveImageToLocal(it)
-                loadProfileImage() // Always reload image after selection
+                loadProfileImage()
             } catch (e: SecurityException) {
                 e.printStackTrace()
                 Toast.makeText(this, "Permission denied for image!", Toast.LENGTH_SHORT).show()
@@ -55,11 +58,8 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) {
-            openImagePicker()
-        } else {
-            Toast.makeText(this, "Storage permission denied.", Toast.LENGTH_SHORT).show()
-        }
+        if (granted) openImagePicker()
+        else Toast.makeText(this, "Storage permission denied.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,9 +86,7 @@ class ProfileActivity : AppCompatActivity() {
         loadProfileData()
         loadProfileImage()
 
-        editPhotoLayout.setOnClickListener {
-            checkAndRequestPermission()
-        }
+        editPhotoLayout.setOnClickListener { checkAndRequestPermission() }
 
         editNameIcon.setOnClickListener { enableEditing(etName) }
         editUsernameIcon.setOnClickListener { enableEditing(etUsername) }
@@ -99,7 +97,6 @@ class ProfileActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             if (validateFields()) {
                 saveChanges()
-                Toast.makeText(this, "Saved successfully!", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -123,27 +120,38 @@ class ProfileActivity : AppCompatActivity() {
 
         if (uriString != null) {
             val uri = Uri.parse(uriString)
-            val persistedUris = contentResolver.persistedUriPermissions
-            val hasPermission = persistedUris.any { it.uri == uri && it.isReadPermission }
+            val hasPermission = contentResolver.persistedUriPermissions.any {
+                it.uri == uri && it.isReadPermission
+            }
             if (hasPermission) {
-                try {
-                    accountIcon.setImageURI(uri)
-                    return
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            } else {
-                Toast.makeText(this, "Image access expired or revoked.", Toast.LENGTH_SHORT).show()
+                accountIcon.setImageURI(uri)
+                return
             }
         }
 
         if (file.exists()) {
             val bitmap = BitmapFactory.decodeFile(file.absolutePath)
             accountIcon.setImageBitmap(bitmap)
+            return
+        }
+
+        // ✅ Fetch from Firebase Storage if not found locally
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
+            val localFile = File.createTempFile("temp_profile", ".jpg")
+
+            storageRef.getFile(localFile).addOnSuccessListener {
+                val bitmap = BitmapFactory.decodeFile(localFile.absolutePath)
+                accountIcon.setImageBitmap(bitmap)
+            }.addOnFailureListener {
+                accountIcon.setImageResource(R.drawable.img_placeholder_user)
+            }
         } else {
-            accountIcon.setImageResource(R.drawable.img_placeholder_user) // fallback image
+            accountIcon.setImageResource(R.drawable.img_placeholder_user)
         }
     }
+
 
     private fun enableEditing(editText: EditText) {
         editText.isFocusableInTouchMode = true
@@ -153,7 +161,6 @@ class ProfileActivity : AppCompatActivity() {
         if (editText.text.toString().isEmpty()) {
             editText.setSelection(0)
         }
-
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
@@ -165,9 +172,7 @@ class ProfileActivity : AppCompatActivity() {
             etEmail.text.isNotEmpty() &&
             etPhone.text.isNotEmpty() &&
             etPassword.text.isNotEmpty()
-        ) {
-            true
-        } else {
+        ) true else {
             Toast.makeText(this, "All fields must be filled before saving!", Toast.LENGTH_SHORT).show()
             false
         }
@@ -175,14 +180,74 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun saveChanges() {
         val app = application as MyApplication
-        app.username = etUsername.text.toString()
-        app.password = etPassword.text.toString()
-        app.email = etEmail.text.toString()
-        app.name = etName.text.toString()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
 
-        with(sharedPrefs.edit()) {
-            putString("phone", etPhone.text.toString())
-            apply()
+        if (uid == null) {
+            Toast.makeText(this, "No authenticated user!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val name = etName.text.toString()
+        val username = etUsername.text.toString()
+        val email = etEmail.text.toString()
+        val phone = etPhone.text.toString()
+        val password = etPassword.text.toString()
+
+        // Save locally
+        app.username = username
+        app.password = password
+        app.email = email
+        app.name = name
+        sharedPrefs.edit().putString("phone", phone).apply()
+
+        // Upload profile image to Firebase Storage if new image selected
+        if (selectedImageUri != null) {
+            val storageRef = FirebaseStorage.getInstance().reference
+                .child("profile_images/$uid.jpg")
+
+            storageRef.putFile(selectedImageUri!!)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                        saveUserDataToFirebase(uid, name, username, email, phone, password, downloadUri.toString())
+                    }.addOnFailureListener { uriError ->
+                        Log.e("ProfileUpload", "Download URL failed: ${uriError.message}")
+                        Toast.makeText(this, "Failed to get download URL", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener { uploadError ->
+                    Log.e("ProfileUpload", "Upload failed: ${uploadError.message}")
+                    Toast.makeText(this, "Image upload failed!", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            // No new image, use existing URI if any
+            val existingImageUri = sharedPrefs.getString("imageUri", null)
+            saveUserDataToFirebase(uid, name, username, email, phone, password, existingImageUri)
+        }
+    }
+
+    private fun saveUserDataToFirebase(
+        uid: String,
+        name: String,
+        username: String,
+        email: String,
+        phone: String,
+        password: String,
+        imageUrl: String?
+    ) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+        val userMap = mapOf(
+            "name" to name,
+            "username" to username,
+            "email" to email,
+            "phone" to phone,
+            "password" to password,
+            "profileImageUrl" to imageUrl
+        )
+
+        dbRef.updateChildren(userMap).addOnSuccessListener {
+            Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to update profile!", Toast.LENGTH_SHORT).show()
         }
     }
 

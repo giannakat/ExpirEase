@@ -8,7 +8,7 @@ class MyApplication : Application() {
     var username: String = ""
     var password: String = ""
     var email: String = ""
-    var name: String = "Gianna Carreon"
+    var name: String = "User"
 
     //moved to viewmodel
 }

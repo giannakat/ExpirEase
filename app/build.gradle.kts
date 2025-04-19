@@ -83,13 +83,14 @@ dependencies {
     // Calendar
     implementation("com.kizitonwose.calendar:view:2.4.0")
 
-    // Firebase
+    // ✅ Firebase (using BoM to avoid version conflicts)
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx") // ✅ no version here
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
 
     // Testing
     testImplementation(libs.junit)
@@ -100,8 +101,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //Profile
-    implementation ("com.github.yalantis:ucrop:2.2.8")
-    implementation (libs.androidx.appcompat.v142) // for AppCompatActivity
-
+    // Profile / Image Crop
+    implementation("com.github.yalantis:ucrop:2.2.8")
+    implementation(libs.androidx.appcompat.v142)
 }
