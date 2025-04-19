@@ -1,5 +1,7 @@
 [versions]
+activityKtx = "1.10.1"
 agp = "8.3.2"
+appcompatVersion = "1.4.2"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -19,6 +21,8 @@ googleServices = "4.3.15"
 firebaseDatabaseKtx = "21.0.0"  # Version of the Google Services plugin
 
 [libraries]
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+androidx-appcompat-v142 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

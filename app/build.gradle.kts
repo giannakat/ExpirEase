@@ -100,6 +100,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
+    //Profile
+    implementation ("com.github.yalantis:ucrop:2.2.8")
+    implementation (libs.androidx.appcompat.v142) // for AppCompatActivity
 
 }
