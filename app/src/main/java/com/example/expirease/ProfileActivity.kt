@@ -36,25 +36,25 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    PERMISSION_REQUEST_CODE
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_CODE
             )
         }
     }
 
     private val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    pickImage.launch("image/*")
-                } else {
-                    Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show()
-                }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                pickImage.launch("image/*")
+            } else {
+                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show()
             }
+        }
 
     private lateinit var sharedPrefs: SharedPreferences
 
@@ -76,7 +76,7 @@ class ProfileActivity : AppCompatActivity() {
         val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
         editPhotoLayout.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED
+                == PackageManager.PERMISSION_GRANTED
             ) {
                 pickImage.launch("image/*")
             } else {
