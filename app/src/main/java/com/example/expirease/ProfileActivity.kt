@@ -5,17 +5,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.expirease.app.MyApplication
+import java.io.File
+import java.io.FileOutputStream
 
 class ProfileActivity : AppCompatActivity() {
+
     private lateinit var etName: EditText
     private lateinit var etUsername: EditText
     private lateinit var etEmail: EditText
@@ -29,34 +35,32 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var btnSave: Button
     private lateinit var btnBack: Button
     private lateinit var accountIcon: ImageView
-
     private lateinit var sharedPrefs: SharedPreferences
 
-    // Image picker using OpenDocument
-    private val pickImage = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             try {
                 contentResolver.takePersistableUriPermission(
                     it,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                accountIcon.setImageURI(it)
                 saveImageUri(it.toString())
+                saveImageToLocal(it)
+                loadProfileImage() // Always reload image after selection
             } catch (e: SecurityException) {
-                Toast.makeText(this, "Failed to access image.", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
+                Toast.makeText(this, "Permission denied for image!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                pickImage.launch(arrayOf("image/*"))
-            } else {
-                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show()
-            }
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            openImagePicker()
+        } else {
+            Toast.makeText(this, "Storage permission denied.", Toast.LENGTH_SHORT).show()
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +68,6 @@ class ProfileActivity : AppCompatActivity() {
 
         sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
 
-        // UI refs
         accountIcon = findViewById(R.id.accountIcon)
         val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
         etName = findViewById(R.id.nameValue)
@@ -81,16 +84,12 @@ class ProfileActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.back_button)
 
         loadProfileData()
+        loadProfileImage()
 
         editPhotoLayout.setOnClickListener {
-            if (hasStoragePermission()) {
-                pickImage.launch(arrayOf("image/*"))
-            } else {
-                requestStoragePermission()
-            }
+            checkAndRequestPermission()
         }
 
-        // Enable editing
         editNameIcon.setOnClickListener { enableEditing(etName) }
         editUsernameIcon.setOnClickListener { enableEditing(etUsername) }
         editEmailIcon.setOnClickListener { enableEditing(etEmail) }
@@ -116,33 +115,41 @@ class ProfileActivity : AppCompatActivity() {
         etUsername.setText(app.username)
         etPassword.setText(app.password)
         etPhone.setText(sharedPrefs.getString("phone", ""))
+    }
 
-        sharedPrefs.getString("imageUri", null)?.let { uriString ->
+    private fun loadProfileImage() {
+        val uriString = sharedPrefs.getString("imageUri", null)
+        val file = File(filesDir, "profile_image.jpg")
+
+        if (uriString != null) {
             val uri = Uri.parse(uriString)
-
             val persistedUris = contentResolver.persistedUriPermissions
             val hasPermission = persistedUris.any { it.uri == uri && it.isReadPermission }
-
             if (hasPermission) {
                 try {
                     accountIcon.setImageURI(uri)
-                } catch (e: SecurityException) {
+                    return
+                } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(this, "Image can't be loaded (no permission).", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this, "Image access expired or revoked.", Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
+        if (file.exists()) {
+            val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+            accountIcon.setImageBitmap(bitmap)
+        } else {
+            accountIcon.setImageResource(R.drawable.img_placeholder_user) // fallback image
+        }
+    }
 
     private fun enableEditing(editText: EditText) {
         editText.isFocusableInTouchMode = true
         editText.isFocusable = true
         editText.isCursorVisible = true
         editText.requestFocus()
-
         if (editText.text.toString().isEmpty()) {
             editText.setSelection(0)
         }
@@ -183,19 +190,38 @@ class ProfileActivity : AppCompatActivity() {
         sharedPrefs.edit().putString("imageUri", uri).apply()
     }
 
-    private fun hasStoragePermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+    private fun checkAndRequestPermission() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            Manifest.permission.READ_MEDIA_IMAGES
+        else
+            Manifest.permission.READ_EXTERNAL_STORAGE
+
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            openImagePicker()
         } else {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            permissionLauncher.launch(permission)
         }
     }
 
-    private fun requestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun openImagePicker() {
+        pickImageLauncher.launch(arrayOf("image/*"))
+    }
+
+    private fun saveImageToLocal(uri: Uri) {
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+
+            val file = File(filesDir, "profile_image.jpg")
+            val outputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            outputStream.close()
+
+            Log.d("Profile", "Image saved locally to ${file.absolutePath}")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Failed to save image locally.", Toast.LENGTH_SHORT).show()
         }
     }
 }
