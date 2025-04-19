@@ -1,23 +1,22 @@
 package com.example.expirease
 
-import android.content.ContentValues.TAG
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.expirease.data.Users
 import com.example.expirease.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
@@ -25,7 +24,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var reference: DatabaseReference
-    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +32,13 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         reference = FirebaseDatabase.getInstance().getReference("Users")
-        firestore = FirebaseFirestore.getInstance()
+
+        // 🔐 Ask for notification permission (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+            }
+        }
 
         val loginButton = binding.btnlogin
         val usernameField = binding.edittextUsername
@@ -50,57 +54,50 @@ class LoginActivity : AppCompatActivity() {
             }
 
             reference.orderByChild("username").equalTo(username)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    if (snapshot.exists()) {
-                        val user = snapshot.children.first().getValue(Users::class.java)
-                        val email = user?.email
-                        if (email != null) {
-                            auth.signInWithEmailAndPassword(email, password)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            val userSnapshot = snapshot.children.first()
+                            val user = userSnapshot.getValue(Users::class.java)
+                            val email = user?.email
 
-                                        // ✅ Retrieve Firebase device token and store it in Firestore
-                                        FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
-                                            if (tokenTask.isSuccessful) {
-                                                val token = tokenTask.result // Firebase device token
-
-                                                // Store the token in Firestore under the user's document
-                                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                                if (userId != null) {
-                                                    val userRef = firestore.collection("users").document(userId)
-                                                    userRef.update("deviceToken", token)
-                                                        .addOnSuccessListener {
-                                                            Log.d(TAG, "Device token updated successfully")
+                            if (email != null) {
+                                auth.signInWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            val userId = auth.currentUser?.uid
+                                            if (userId != null) {
+                                                FirebaseMessaging.getInstance().token
+                                                    .addOnCompleteListener { tokenTask ->
+                                                        if (tokenTask.isSuccessful) {
+                                                            val token = tokenTask.result
+                                                            reference.child(userId).child("deviceToken").setValue(token)
                                                         }
-                                                        .addOnFailureListener { e ->
-                                                            Log.w(TAG, "Error updating device token", e)
-                                                        }
-                                                }
+                                                    }
                                             }
-                                        }
 
-                                        // Start Home activity after successful login
-                                        startActivity(Intent(this, HomeWithFragmentActivity::class.java))
-                                        finish()
-                                    } else {
-                                        Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
+                                            startActivity(Intent(this@LoginActivity, HomeWithFragmentActivity::class.java))
+                                            finish()
+                                        } else {
+                                            Toast.makeText(this@LoginActivity, "Authentication failed", Toast.LENGTH_SHORT).show()
+                                        }
                                     }
-                                }
+                            } else {
+                                Toast.makeText(this@LoginActivity, "User email not found", Toast.LENGTH_SHORT).show()
+                            }
                         } else {
-                            Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginActivity, "Username not found", Toast.LENGTH_SHORT).show()
                         }
-                    } else {
-                        Toast.makeText(this, "Username not found", Toast.LENGTH_SHORT).show()
                     }
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Database error", Toast.LENGTH_SHORT).show()
-                }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@LoginActivity, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
 
-        // Make "Sign up" text clickable
+        // ✨ Make "Sign up" text clickable
         val text = SpannableString("Don't have an Account? Sign up")
         val start = text.indexOf("Sign up")
         val end = start + "Sign up".length
@@ -114,5 +111,21 @@ class LoginActivity : AppCompatActivity() {
 
         binding.signUpTextView.text = text
         binding.signUpTextView.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    // ✅ Handle the result of the permission request
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1001) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Notifications enabled!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Notifications disabled. You won’t get alerts!", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 }

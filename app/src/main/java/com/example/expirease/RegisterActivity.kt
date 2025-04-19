@@ -15,7 +15,6 @@ import com.example.expirease.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 
 class RegisterActivity : AppCompatActivity() {
@@ -23,7 +22,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var reference: DatabaseReference
-    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +30,6 @@ class RegisterActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         reference = FirebaseDatabase.getInstance().getReference("Users")
-        firestore = FirebaseFirestore.getInstance()
 
         val nameField = binding.createName
         val emailField = binding.createEmail
@@ -65,16 +62,15 @@ class RegisterActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
-                        val user = Users(username, email, password)
+                        val user = Users(username, email, "") // Don't store plaintext password
 
                         reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
                             if (dbTask.isSuccessful) {
-                                // ✅ Get FCM token and store in Firestore
+                                // ✅ Save the FCM device token into Realtime Database
                                 FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
                                     if (tokenTask.isSuccessful) {
                                         val token = tokenTask.result
-                                        val userRef = firestore.collection("Users").document(userId)
-                                        userRef.set(mapOf("deviceToken" to token))
+                                        reference.child(userId).child("deviceToken").setValue(token)
                                     }
                                 }
 
@@ -91,6 +87,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
         }
 
+        // Setup clickable login text
         val loginText = SpannableString("Already have an account? Login")
         val start = loginText.indexOf("Login")
         val end = start + "Login".length

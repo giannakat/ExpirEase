@@ -109,7 +109,7 @@ class NotificationsActivity : AppCompatActivity() {
             expiringSoonList.clear()
             expiredList.clear()
 
-            expiringSoonList.addAll(itemList.filter { it.expiryDate >= now })
+            expiringSoonList.addAll(itemList.filter {it.expiryDate >= now && it.expiryDate <= now + 7 * 24 * 60 * 60 * 1000})
             expiredList.addAll(itemList.filter { it.expiryDate < now })
 
 

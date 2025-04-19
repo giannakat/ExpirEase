@@ -8,58 +8,60 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.expirease.helperNotif.NotificationHelper
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    // Called when the app is in the foreground or background
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // Check if the message contains data.
-        if (remoteMessage.data.isNotEmpty()) {
-            val itemName = remoteMessage.data["itemName"]
-            val expiryDate = remoteMessage.data["expiryDate"]
-
-            // Make sure the channel is created
-            NotificationHelper.createNotificationChannel(this)
-
-            // Use the helper to show the notification
-            NotificationHelper.showNotification(
-                context = this,
-                title = "Item Expiry Alert",
-                message = "Item: $itemName is expiring soon ($expiryDate)",
-                id = 1
-            )
-        }
-    }
-
-    // Called when the Firebase token is refreshed
     override fun onNewToken(token: String) {
+        super.onNewToken(token)
         Log.d("FCM", "Refreshed token: $token")
+        // Optionally save it to Firestore or Realtime DB
     }
 
-    private fun showNotification(title: String, body: String) {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationId = 1
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
+        Log.d("FCM", "Message received: ${remoteMessage.data}")
 
-        val notificationChannelId = "expirease_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                notificationChannelId,
-                "Expirease Notifications",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(channel)
+        // Check if userId and itemIndex are present in the data
+        val userId = remoteMessage.data["userId"] ?: run {
+            Log.d("FCM", "UserId not found in message data")
+            return
         }
+        val itemIndex = remoteMessage.data["itemIndex"] ?: "0"
 
-        // Create and display the notification
-        val notification = NotificationCompat.Builder(this, notificationChannelId)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setSmallIcon(R.drawable.img_product_banana)  // Use your own icon
-            .setAutoCancel(true)
-            .build()
+        // Fetch the item details from Firebase Realtime Database
+        val dbRef = FirebaseDatabase.getInstance().reference
+        dbRef.child("Users").child(userId).child("items").child(itemIndex)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    // Fetch item details from the snapshot
+                    val itemName = snapshot.child("name").value?.toString() ?: "Unknown item"
+                    val expiryDateMillis = snapshot.child("expiryDate").value?.toString()?.toLongOrNull()
+                        ?: System.currentTimeMillis() // Fallback to current time if expiryDate is invalid
 
-        notificationManager.notify(notificationId, notification)
+                    // Convert expiryDateMillis to a readable date format (e.g., "yyyy-MM-dd")
+                    val expiryDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                        .format(java.util.Date(expiryDateMillis))
+
+                    // Create and show the notification
+                    NotificationHelper.createNotificationChannel(this)
+                    NotificationHelper.showNotification(
+                        context = this,
+                        title = "Item Expiry Alert",
+                        message = "Item: $itemName is expiring soon ($expiryDate)",
+                        id = 1
+                    )
+                } else {
+                    Log.d("FCM", "Item not found in database")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FCM", "Error fetching data from Firebase: ${exception.message}")
+            }
     }
+
 }
+
