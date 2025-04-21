@@ -43,16 +43,24 @@ class ProfileActivity : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance().reference
     private val storage = FirebaseStorage.getInstance()
 
+    // Register for image picking and permissions
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             try {
-                contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
+                // Ensure persistable URI permission
+                contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                Log.d("PICK_IMAGE", "Picked image URI: $it")
+
+                // Save URI for future use
                 saveImageUri(it.toString())
+
+                // Save the image locally (optional, for caching)
                 saveImageToLocal(it)
+
+                // Upload image to Firebase
                 uploadImageToFirebase(it)
+
+                // Optionally, load the profile image
                 loadProfileImage()
             } catch (e: SecurityException) {
                 e.printStackTrace()
@@ -126,26 +134,29 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun loadProfileImage() {
         val uriString = sharedPrefs.getString("imageUri", null)
-        val file = File(filesDir, "profile_image.jpg")
 
-        val hasLocalUriPermission = uriString?.let {
-            val uri = Uri.parse(it)
-            contentResolver.persistedUriPermissions.any { perm -> perm.uri == uri && perm.isReadPermission }
-        } ?: false
+        // If there is no URI stored or URI permission revoked
+        if (uriString == null) {
+            accountIcon.setImageResource(R.drawable.img_placeholder_user)
+            return
+        }
 
-        when {
-            hasLocalUriPermission && uriString != null -> {
-                accountIcon.setImageURI(Uri.parse(uriString))
-            }
-            file.exists() -> {
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                accountIcon.setImageBitmap(bitmap)
-            }
-            else -> {
-                accountIcon.setImageResource(R.drawable.img_placeholder_user)
-            }
+        val uri = Uri.parse(uriString)
+
+        // Check if URI permission is still valid
+        val hasPermission = contentResolver.persistedUriPermissions.any {
+            it.uri == uri && it.isReadPermission
+        }
+
+        if (hasPermission) {
+            accountIcon.setImageURI(uri)
+        } else {
+            // Permission was revoked, show placeholder
+            Log.e("PROFILE_IMAGE", "Image access revoked or expired.")
+            accountIcon.setImageResource(R.drawable.img_placeholder_user)
         }
     }
+
 
     private fun enableEditing(editText: EditText) {
         editText.isFocusableInTouchMode = true
@@ -239,58 +250,44 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebase(uri: Uri) {
-        val currentUser = firebaseAuth.currentUser
-        if (currentUser == null) {
-            Toast.makeText(this, "No authenticated user. Skipping Firebase save.", Toast.LENGTH_SHORT).show()
-            Log.w("UPLOAD_IMAGE", "Skipped upload: User not authenticated")
-            return
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val uid = currentUser.uid
+            val ref = FirebaseStorage.getInstance().reference.child("Users/$uid/profile.jpg")
+
+            ref.putFile(uri)
+                .addOnSuccessListener {
+                    // Handle success
+                    Log.d("UPLOAD_SUCCESS", "Image uploaded successfully")
+                }
+                .addOnFailureListener { e ->
+                    // Handle failure
+                    Log.e("UPLOAD_ERROR", "Upload failed", e)
+                }
+        } else {
+            Log.e("UPLOAD_ERROR", "User not authenticated")
         }
-
-        val uid = currentUser.uid
-        val ref = storage.reference.child("Users/$uid/profile.jpg")
-
-        // Upload the image to Firebase Storage
-        ref.putFile(uri)
-            .addOnSuccessListener {
-                // On success, get the download URL and save it to Firebase Realtime Database
-                ref.downloadUrl
-                    .addOnSuccessListener { downloadUri ->
-                        Log.d("UPLOAD_SUCCESS", "Image uploaded successfully: $downloadUri")
-
-                        // Save the image URL to Firebase Realtime Database
-                        database.child("Users").child(uid).child("profileImageUrl").setValue(downloadUri.toString())
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    Log.d("DATABASE_UPDATE", "Image URL saved successfully")
-                                } else {
-                                    Log.e("DATABASE_UPDATE_ERROR", "Failed to save image URL", task.exception)
-                                }
-                            }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("DOWNLOAD_URL_ERROR", "Failed to get download URL", e)
-                    }
-            }
-            .addOnFailureListener { e ->
-                Log.e("UPLOAD_ERROR", "Image upload failed", e)
-            }
     }
 
     private fun checkAndRequestPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            when {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    openImagePicker()
-                }
-                else -> {
-                    permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13 and above, request READ_MEDIA_IMAGES permission
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                openImagePicker()
+            } else {
+                permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
             }
         } else {
-            openImagePicker()
+            // For devices below Android 13, use the old permissions
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                openImagePicker()
+            } else {
+                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
     }
 
