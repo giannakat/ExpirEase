@@ -61,26 +61,34 @@ class RegisterActivity : AppCompatActivity() {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
-                        val user = Users(username, email, "") // Don't store plaintext password
+                        val currentUser = auth.currentUser
+                        currentUser?.sendEmailVerification()
+                            ?.addOnCompleteListener { emailTask ->
+                                if (emailTask.isSuccessful) {
+                                    val userId = currentUser.uid
+                                    val user = Users(username, email, password) // Do not store passwords
 
-                        reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
-                            if (dbTask.isSuccessful) {
-                                // ✅ Save the FCM device token into Realtime Database
-                                FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
-                                    if (tokenTask.isSuccessful) {
-                                        val token = tokenTask.result
-                                        reference.child(userId).child("deviceToken").setValue(token)
+                                    reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
+                                        if (dbTask.isSuccessful) {
+                                            FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
+                                                if (tokenTask.isSuccessful) {
+                                                    val token = tokenTask.result
+                                                    reference.child(userId).child("deviceToken").setValue(token)
+                                                }
+                                            }
+
+                                            Toast.makeText(this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show()
+                                            auth.signOut() // Force logout until verified
+                                            startActivity(Intent(this, LoginActivity::class.java))
+                                            finish()
+                                        } else {
+                                            Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                                        }
                                     }
+                                } else {
+                                    Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_SHORT).show()
                                 }
-
-                                Toast.makeText(this, "Registered Successfully", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this, LoginActivity::class.java))
-                                finish()
-                            } else {
-                                Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
                             }
-                        }
                     } else {
                         Toast.makeText(this, "Firebase Auth failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }

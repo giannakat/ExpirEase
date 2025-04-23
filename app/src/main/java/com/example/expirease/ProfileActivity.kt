@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -16,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.expirease.app.MyApplication
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -83,6 +85,7 @@ class ProfileActivity : AppCompatActivity() {
 
         sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
 
+        // Initialize your views here
         accountIcon = findViewById(R.id.accountIcon)
         val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
         etName = findViewById(R.id.nameValue)
@@ -98,7 +101,10 @@ class ProfileActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.saveProfileButton)
         btnBack = findViewById(R.id.back_button)
 
-        loadProfileData()
+        // Check email verification status
+        checkEmailVerification()
+
+        fetchUserDataFromFirebase()
         loadProfileImage()
 
         editPhotoLayout.setOnClickListener {
@@ -123,13 +129,79 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadProfileData() {
-        val app = application as MyApplication
-        etName.setText(app.name)
-        etEmail.setText(app.email)
-        etUsername.setText(app.username)
-        etPassword.setText(app.password)
-        etPhone.setText(sharedPrefs.getString("phone", ""))
+    // Check if the email is verified
+    private fun checkEmailVerification() {
+        firebaseAuth.currentUser?.reload()?.addOnCompleteListener { reloadTask ->
+            if (reloadTask.isSuccessful) {
+                val refreshedUser = firebaseAuth.currentUser
+                Log.d("EMAIL_VERIFIED", "Email verified? ${refreshedUser?.isEmailVerified}")
+                if (refreshedUser?.isEmailVerified == false) {
+                    Toast.makeText(this, "Please verify your email to continue.", Toast.LENGTH_LONG).show()
+                    firebaseAuth.signOut()
+                    val intent = Intent(this, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Log.d("EMAIL_VERIFIED", "Access granted to verified user")
+                }
+            } else {
+                Log.e("EMAIL_VERIFIED", "Failed to reload user: ${reloadTask.exception?.message}")
+            }
+        }
+
+    }
+
+    private fun fetchUserDataFromFirebase() {
+        val uid = firebaseAuth.currentUser?.uid ?: return
+        val userRef = database.child("Users").child(uid)
+
+        userRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val name = snapshot.child("name").getValue(String::class.java)
+                val username = snapshot.child("username").getValue(String::class.java)
+                val email = snapshot.child("email").getValue(String::class.java)
+                val phone = snapshot.child("phone").getValue(String::class.java)
+                val password = snapshot.child("password").getValue(String::class.java)
+
+                etName.setText(name ?: "")
+                etUsername.setText(username ?: "")
+                etEmail.setText(email ?: "")
+                etPhone.setText(phone ?: "")
+                etPassword.setText(password ?: "")
+            } else {
+                Log.w("FETCH_USER", "No user data found.")
+            }
+        }.addOnFailureListener { e ->
+            Log.e("FETCH_USER", "Failed to retrieve user data", e)
+        }
+    }
+
+    private fun updateUserDataInDatabase(
+        uid: String,
+        name: String,
+        username: String,
+        email: String,
+        phone: String,
+        password: String
+    ) {
+        val userUpdates = mapOf(
+            "name" to name,
+            "username" to username,
+            "email" to email,
+            "phone" to phone,
+            "password" to password
+        )
+
+        database.child("Users").child(uid).updateChildren(userUpdates)
+            .addOnSuccessListener {
+                Log.d("DB_UPDATE", "User data updated in Realtime Database")
+                Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Log.e("DB_UPDATE", "Failed to update user data", e)
+                Toast.makeText(this, "Failed to update data in database.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun loadProfileImage() {
@@ -156,7 +228,6 @@ class ProfileActivity : AppCompatActivity() {
             accountIcon.setImageResource(R.drawable.img_placeholder_user)
         }
     }
-
 
     private fun enableEditing(editText: EditText) {
         editText.isFocusableInTouchMode = true
@@ -189,109 +260,109 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun saveChanges() {
         val app = application as MyApplication
-        val uid = firebaseAuth.currentUser?.uid
+        val currentUser = firebaseAuth.currentUser
+        val uid = currentUser?.uid
 
-        if (uid == null) {
+        if (uid == null || currentUser.email == null) {
             Toast.makeText(this, "User not authenticated!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        app.username = etUsername.text.toString()
-        app.password = etPassword.text.toString()
-        app.email = etEmail.text.toString()
-        app.name = etName.text.toString()
+        val newEmail = etEmail.text.toString()
+        val password = etPassword.text.toString()
 
-        val userRef = database.child("Users").child(uid)
+        // Re-authenticate the user with their current credentials
+        val credential = EmailAuthProvider.getCredential(currentUser.email!!, password)
+        currentUser.reauthenticate(credential)
+            .addOnCompleteListener { reauthTask ->
+                if (reauthTask.isSuccessful) {
+                    Log.d("AUTH", "Re-authentication successful")
 
-        val updatedUser = mapOf(
-            "username" to app.username,
-            "password" to app.password,
-            "email" to app.email,
-            "name" to app.name,
-            "phone" to etPhone.text.toString()
-        )
+                    // Update email if changed
+                    if (newEmail != currentUser.email) {
+                        currentUser.verifyBeforeUpdateEmail(newEmail)
+                            .addOnCompleteListener { emailTask ->
+                                if (emailTask.isSuccessful) {
+                                    Log.d("EMAIL_UPDATE", "Email updated in Firebase Auth")
 
-        userRef.updateChildren(updatedUser).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
-                saveProfileToSharedPrefs()
-            } else {
-                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun saveProfileToSharedPrefs() {
-        sharedPrefs.edit().apply {
-            putString("name", etName.text.toString())
-            putString("username", etUsername.text.toString())
-            putString("email", etEmail.text.toString())
-            putString("phone", etPhone.text.toString())
-            putString("password", etPassword.text.toString())
-            apply()
-        }
-    }
-
-    private fun saveImageUri(uri: String) {
-        sharedPrefs.edit().putString("imageUri", uri).apply()
-    }
-
-    private fun saveImageToLocal(uri: Uri) {
-        val file = File(filesDir, "profile_image.jpg")
-        try {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                FileOutputStream(file).use { outputStream ->
-                    inputStream.copyTo(outputStream)
+                                    // Send verification to new email
+                                    currentUser.sendEmailVerification()
+                                        .addOnCompleteListener { verifyTask ->
+                                            if (verifyTask.isSuccessful) {
+                                                Toast.makeText(
+                                                    this,
+                                                    "Email updated. Please verify your new email before logging in next time.",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            } else {
+                                                Toast.makeText(
+                                                    this,
+                                                    "Failed to send verification email.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                } else {
+                                    val errorMsg = emailTask.exception?.message
+                                    Toast.makeText(this, "Failed to update email.", Toast.LENGTH_SHORT).show()
+                                    Log.e("EMAIL_UPDATE", "Email update failed: $errorMsg", emailTask.exception)
+                                }
+                            }
+                    }
+                } else {
+                    Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun uploadImageToFirebase(uri: Uri) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            val uid = currentUser.uid
-            val ref = FirebaseStorage.getInstance().reference.child("Users/$uid/profile.jpg")
-
-            ref.putFile(uri)
-                .addOnSuccessListener {
-                    // Handle success
-                    Log.d("UPLOAD_SUCCESS", "Image uploaded successfully")
-                }
-                .addOnFailureListener { e ->
-                    // Handle failure
-                    Log.e("UPLOAD_ERROR", "Upload failed", e)
-                }
-        } else {
-            Log.e("UPLOAD_ERROR", "User not authenticated")
-        }
     }
 
     private fun checkAndRequestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // For Android 13 and above, request READ_MEDIA_IMAGES permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                openImagePicker()
-            } else {
-                permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-            }
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            openImagePicker()
         } else {
-            // For devices below Android 13, use the old permissions
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                openImagePicker()
-            } else {
-                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
+            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
     private fun openImagePicker() {
         pickImageLauncher.launch(arrayOf("image/*"))
     }
+
+    private fun saveImageUri(uri: String) {
+        with(sharedPrefs.edit()) {
+            putString("imageUri", uri)
+            apply()
+        }
+    }
+
+    private fun saveImageToLocal(uri: Uri) {
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            val file = File(filesDir, "profile_image.jpg")
+            val outputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            outputStream.flush()
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error saving image locally.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun uploadImageToFirebase(uri: Uri) {
+        val storageRef = storage.reference.child("profile_images/${firebaseAuth.currentUser?.uid}")
+        val uploadTask = storageRef.putFile(uri)
+
+        uploadTask.addOnSuccessListener {
+            storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                Log.d("UPLOAD", "Image uploaded successfully: $downloadUrl")
+            }
+        }.addOnFailureListener { e ->
+            Log.e("UPLOAD", "Failed to upload image", e)
+        }
+    }
+
 }
