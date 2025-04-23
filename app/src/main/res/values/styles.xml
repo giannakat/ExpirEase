@@ -5,4 +5,10 @@
         <item name="android:windowMinWidthMinor">60%</item>
         <item name="android:windowBackground">@android:color/white</item>
     </style>
+
+    <style name="Theme.App.Dialog.SplashScreen">
+        <item  name="windowSplashScreenAnimatedIcon">@drawable/bg_button_solid</item>
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+    </style>
 </resources>

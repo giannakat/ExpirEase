@@ -56,14 +56,17 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
-    // Compose
+    // splashscreen
+    implementation("androidx.core:core-splashscreen:1.0.0")
+
+// Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // UI Components
+// UI Components
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
@@ -71,19 +74,19 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.viewmodel.android)
 
-    // RecyclerView, Fragments, ViewModels, LiveData
+// RecyclerView, Fragments, ViewModels, LiveData
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
 
-    // Navigation / Tabs
+// Navigation / Tabs
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 
-    // Calendar
+// Calendar
     implementation("com.kizitonwose.calendar:view:2.4.0")
 
-    // ✅ Firebase (using BoM to avoid version conflicts)
+// ✅ Firebase (using BoM to avoid version conflicts)
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
@@ -92,7 +95,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
 
-    // Testing
+// Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -101,7 +104,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Profile / Image Crop
+// Profile / Image Crop
     implementation("com.github.yalantis:ucrop:2.2.8")
     implementation(libs.androidx.appcompat.v142)
+
 }
