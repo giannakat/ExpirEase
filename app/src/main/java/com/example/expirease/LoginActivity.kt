@@ -26,12 +26,18 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var reference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+            finish()
+            return
+        }
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = FirebaseAuth.getInstance()
         reference = FirebaseDatabase.getInstance().getReference("Users")
+        auth = FirebaseAuth.getInstance()
 
         // 🔐 Ask for notification permission (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
