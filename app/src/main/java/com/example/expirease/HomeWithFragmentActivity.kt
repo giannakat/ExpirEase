@@ -18,8 +18,10 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -30,6 +32,8 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
+    lateinit var toggle: ActionBarDrawerToggle
+
     private lateinit var db: FirebaseDatabase
     private lateinit var reference: DatabaseReference
     private lateinit var auth: FirebaseAuth
@@ -56,26 +60,17 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        val toggle = ActionBarDrawerToggle(
+        toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar,
             R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
+
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        // Logout item styling
-        val menu = navView.menu
-        val logoutItem = menu.findItem(R.id.nav_logout)
-        val spanString = SpannableString(logoutItem.title)
-        spanString.setSpan(ForegroundColorSpan(Color.RED), 0, spanString.length, 0)
-        logoutItem.title = spanString
-        val icon = logoutItem.icon
-        icon?.let {
-            val wrapped = DrawableCompat.wrap(it)
-            DrawableCompat.setTint(wrapped, Color.RED)
-            logoutItem.icon = wrapped
-        }
+        updateToolbarStyleForFragment(HomeFragment())
 
         // Notification button
         val notifButton: ImageView = findViewById(R.id.notif_icon)
@@ -112,10 +107,26 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, newFragment)
                     .commit()
+                //change design of toolbar
+                supportFragmentManager.executePendingTransactions()
+                updateToolbarStyleForFragment(newFragment)
             }
 
             drawerLayout.closeDrawers()
             true
+        }
+
+        // Logout item styling
+        val menu = navView.menu
+        val logoutItem = menu.findItem(R.id.nav_logout)
+        val spanString = SpannableString(logoutItem.title)
+        spanString.setSpan(ForegroundColorSpan(Color.RED), 0, spanString.length, 0)
+        logoutItem.title = spanString
+        val icon = logoutItem.icon
+        icon?.let {
+            val wrapped = DrawableCompat.wrap(it)
+            DrawableCompat.setTint(wrapped, Color.RED)
+            logoutItem.icon = wrapped
         }
     }
 
@@ -173,4 +184,58 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
         negativeButton.setTextColor(Color.BLACK)
     }
+
+    fun updateToolbarStyleForFragment(fragment: Fragment) {
+        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        val toolbarTitle: TextView = findViewById(R.id.toolbar_title)
+        val notifIcon: ImageView = findViewById(R.id.notif_icon)
+
+        when (fragment) {
+            is HomeFragment -> {
+                toolbar.setBackgroundColor(Color.TRANSPARENT)
+                toolbar.elevation = 0f
+                toolbarTitle.text = "ExpirEase"
+                toolbarTitle.setTextColor(ContextCompat.getColor(this, R.color.green)) // for better contrast on transparent bg
+                notifIcon.setColorFilter(ContextCompat.getColor(this, R.color.green))
+                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.green)
+            }
+
+            is HouseholdFragment -> {
+                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.elevation = 8f
+                toolbarTitle.text = "Household"
+                toolbarTitle.setTextColor(Color.WHITE)
+                notifIcon.setColorFilter(Color.WHITE)
+                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.white)
+            }
+
+            is HistoryFragment -> {
+                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.elevation = 8f
+                toolbarTitle.text = "History"
+                toolbarTitle.setTextColor(Color.WHITE)
+                notifIcon.setColorFilter(Color.WHITE)
+                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.white)
+            }
+
+            is SettingsFragment -> {
+                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.elevation = 8f
+                toolbarTitle.text = "Settings"
+                toolbarTitle.setTextColor(Color.WHITE)
+                notifIcon.setColorFilter(Color.WHITE)
+                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.white)
+            }
+
+            is CalendarFragment -> {
+                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.elevation = 8f
+                toolbarTitle.text = "Calendar"
+                toolbarTitle.setTextColor(Color.WHITE)
+                notifIcon.setColorFilter(Color.WHITE)
+                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.white)
+            }
+        }
+    }
+
 }
