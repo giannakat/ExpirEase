@@ -270,6 +270,9 @@ class ProfileActivity : AppCompatActivity() {
 
         val newEmail = etEmail.text.toString()
         val password = etPassword.text.toString()
+        val name = etName.text.toString()
+        val username = etUsername.text.toString()
+        val phone = etPhone.text.toString()
 
         // Re-authenticate the user with their current credentials
         val credential = EmailAuthProvider.getCredential(currentUser.email!!, password)
@@ -283,31 +286,26 @@ class ProfileActivity : AppCompatActivity() {
                         currentUser.verifyBeforeUpdateEmail(newEmail)
                             .addOnCompleteListener { emailTask ->
                                 if (emailTask.isSuccessful) {
-                                    Log.d("EMAIL_UPDATE", "Email updated in Firebase Auth")
+                                    Log.d("EMAIL_UPDATE", "Verification email sent for new email")
 
-                                    // Send verification to new email
-                                    currentUser.sendEmailVerification()
-                                        .addOnCompleteListener { verifyTask ->
-                                            if (verifyTask.isSuccessful) {
-                                                Toast.makeText(
-                                                    this,
-                                                    "Email updated. Please verify your new email before logging in next time.",
-                                                    Toast.LENGTH_LONG
-                                                ).show()
-                                            } else {
-                                                Toast.makeText(
-                                                    this,
-                                                    "Failed to send verification email.",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                        }
+                                    Toast.makeText(
+                                        this,
+                                        "Please verify your new email address. Changes will apply after verification.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                    // Save the rest of the data in Realtime Database
+                                    updateUserDataInDatabase(uid, name, username, newEmail, phone, password)
+
                                 } else {
                                     val errorMsg = emailTask.exception?.message
-                                    Toast.makeText(this, "Failed to update email.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_SHORT).show()
                                     Log.e("EMAIL_UPDATE", "Email update failed: $errorMsg", emailTask.exception)
                                 }
                             }
+                    } else {
+                        // No email change, proceed to update other details
+                        updateUserDataInDatabase(uid, name, username, newEmail, phone, password)
                     }
                 } else {
                     Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
