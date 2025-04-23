@@ -140,8 +140,7 @@ class HomeFragment : Fragment(){
         val button_add = view.findViewById<ImageView>(R.id.add_button)
         button_add.setOnClickListener {
             showAddItemDialog()
-            Toast.makeText(requireContext(), "button add clicked", Toast.LENGTH_LONG).show()
-        }
+           }
     }
 
     private fun setupCategoryRecyclerView(view:View){
@@ -231,7 +230,7 @@ class HomeFragment : Fragment(){
 
             if(!name.isNullOrEmpty() && selectedCategory != null ) {
 
-                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)  // Add new item
+                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_placeholder_product)  // Add new item
                 dialog.dismiss()
             }
         }
@@ -255,23 +254,6 @@ class HomeFragment : Fragment(){
         val threeDaysLater = today + (3 * 24 * 60 * 60 * 1000)
         return expiryDate in today..threeDaysLater
     }
-
-//    private fun addItem(
-//        name: String,
-//        quantity: Int,
-//        expiryDate: Long,
-//        selectedCategory: Category,
-//        img: Int
-//    ) {
-//        val newItem = Item(name, quantity, expiryDate, selectedCategory, img)
-//
-//        val app = requireActivity().application as MyApplication
-//        app.listOfItems.add(newItem)
-//
-//        listOfItems.add(newItem)
-//        filteredList.add(newItem)
-//        itemAdapter.notifyItemInserted(filteredList.size - 1)
-//    }
 
     private fun filterItemsByCategory(category: Category) {
         filteredList.clear()
@@ -356,44 +338,5 @@ class HomeFragment : Fragment(){
             .show()
         return true
     }
-
-//    private fun fetchItemsFromFirebase() {
-//        val firebaseDatabase = FirebaseDatabase.getInstance()
-//        val currentUser = FirebaseAuth.getInstance().currentUser
-//
-//        if (currentUser != null) {
-//            val userId = currentUser.uid
-//            val databaseReference: DatabaseReference = firebaseDatabase
-//                    .getReference("Users")
-//                    .child(userId)
-//                    .child("items")
-//
-//            databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    listOfItems.clear()
-//                    filteredList.clear()
-//
-//                    for (itemSnapshot in snapshot.children) {
-//                        val item = itemSnapshot.getValue(Item::class.java)
-//                        if (item != null) {
-//                            listOfItems.add(item)
-//                        }
-//                    }
-//
-//                    filteredList.addAll(listOfItems)
-//                    itemAdapter.notifyDataSetChanged()
-//
-//                    Log.d("FirebaseItems", "Loaded ${listOfItems.size} items")
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.e("FirebaseError", "Error fetching items: ${error.message}")
-//                }
-//            })
-//        } else {
-//            Log.e("AuthError", "User not authenticated")
-//        }
-//    }
-
 }
 
