@@ -13,11 +13,12 @@ import com.example.expirease.R
 class HouseholdDetailsDialogFragment : DialogFragment() {
 
     interface OnMemberRemovedListener {
-        fun onRemoveMember(firstname: String, lastname: String)
+        fun onRemoveMember(id: String)
     }
 
     private var removeListener: OnMemberRemovedListener? = null
 
+    // Set the listener to be used by the parent fragment
     fun setOnRemoveListener(listener: OnMemberRemovedListener) {
         this.removeListener = listener
     }
@@ -46,16 +47,21 @@ class HouseholdDetailsDialogFragment : DialogFragment() {
         val removeButton = view.findViewById<Button>(R.id.add) // Button is actually for "Remove"
 
         arguments?.let {
-            val photo = it.getInt("photo", R.drawable.img_product_banana)
+            val id = it.getString("id", "")
             val firstname = it.getString("firstname") ?: "Unknown"
             val lastname = it.getString("lastname") ?: "Unknown"
+            val photo = it.getInt("photo", R.drawable.img_product_banana)
 
             memberPhoto.setImageResource(photo)
             memberFirstName.text = firstname
             memberLastName.text = lastname
 
+            // Set the click listener for the "Remove" button
             removeButton.setOnClickListener {
-                removeListener?.onRemoveMember(firstname, lastname)
+                // Pass the ID to the listener when the button is clicked
+                id?.let {
+                    removeListener?.onRemoveMember(it)
+                }
                 dismiss()
             }
         }
