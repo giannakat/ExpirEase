@@ -23,33 +23,65 @@ class SharedItemViewModel : ViewModel() {
     private val _allItems = MutableLiveData<List<Item>>()
     val allItems: LiveData<List<Item>> get() = _allItems
 
-    //TODO connect to the user
-   // private val app = application as MyApplication
+    private val _filteredItems = MutableLiveData<List<Item>>()
+    val filteredItems: LiveData<List<Item>> get() = _filteredItems
 
     private val firebaseAuth = FirebaseAuth.getInstance()
+    private val userId = firebaseAuth.currentUser?.uid
     private val database: DatabaseReference
-        get() = FirebaseDatabase.getInstance().getReference("Users/${firebaseAuth.currentUser?.uid}/items")
+        get() = FirebaseDatabase.getInstance().getReference("Users/$userId/items")
+    private val dismissedRef: DatabaseReference
+        get() = FirebaseDatabase.getInstance().getReference("Users/$userId/dismissedNotifications")
 
     init {
-        fetchItemsFromFirebase()
+        fetchItemsWithDismissFilter()
     }
 
-    private fun fetchItemsFromFirebase() {
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val items = mutableListOf<Item>()
-                snapshot.children.forEach { itemSnapshot ->
-                    itemSnapshot.getValue(Item::class.java)?.let {
-                        items.add(it)
+    fun fetchItemsWithDismissFilter() {
+        if (userId == null) return
+
+        dismissedRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dismissedSnapshot: DataSnapshot) {
+                val dismissedSet = dismissedSnapshot.children.mapNotNull { it.key }.toSet()
+
+                database.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val items = mutableListOf<Item>()
+                        val filtered = mutableListOf<Item>()
+
+                        for (itemSnap in snapshot.children) {
+                            val item = itemSnap.getValue(Item::class.java)
+                            if (item != null) {
+                                items.add(item)
+
+                                val itemId = "${item.name}_${item.expiryDate}"
+                                if (!dismissedSet.contains(itemId)) {
+                                    filtered.add(item)
+                                }
+                            }
+                        }
+
+                        // All items available to the app (used in Home, etc.)
+                        _allItems.value = items
+
+                        // Only filtered items for NotificationsActivity
+                        _filteredItems.value = filtered
                     }
-                }
-                _allItems.value = items
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("ViewModel", "Failed to load items: ${error.message}")
+                    }
+                })
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle error if needed
+                Log.e("ViewModel", "Failed to load dismissed notifications: ${error.message}")
             }
         })
+    }
+
+    fun refreshFilteredItems() {
+        fetchItemsWithDismissFilter()
     }
 
     fun addItem(item : Item){
@@ -170,25 +202,6 @@ class SharedItemViewModel : ViewModel() {
             onComplete()
         }
 
-//        val user = FirebaseAuth.getInstance().currentUser
-//        if (user != null) {
-//            val uid = user.uid
-//            val databaseRef = FirebaseDatabase.getInstance().getReference("Users/$uid/items")
-//            val itemsMap = _allItems.value { it.toMap() }
-//
-//            databaseRef.setValue(itemsMap)
-//                .addOnSuccessListener {
-//                    Log.d("Firebase", "Items saved successfully")
-//                    onComplete()
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.e("Firebase", "Failed to save items", e)
-//                    onComplete()
-//                }
-//        } else {
-//            Log.w("Firebase", "User is null during saveItemsToFirebase")
-//            onComplete()
-//        }
     }
 
 }

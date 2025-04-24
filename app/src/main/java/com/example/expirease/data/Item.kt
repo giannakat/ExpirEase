@@ -1,8 +1,11 @@
 package com.example.expirease.data
 
+import android.icu.text.SimpleDateFormat
 import android.os.Parcel
 import android.os.Parcelable
 import com.example.expirease.R
+import java.util.Date
+import java.util.Locale
 
 enum class ItemStatus {
     ACTIVE,
@@ -27,6 +30,10 @@ data class Item(
         Category.valueOf(parcel.readString() ?: Category.OTHER.name),
         parcel.readInt()//photo
     )
+
+    val expiryDateString: String
+        get() = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(expiryDate))
+
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
