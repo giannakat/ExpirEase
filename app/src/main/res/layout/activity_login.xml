@@ -66,6 +66,17 @@
         android:inputType="textPassword"
         android:hint="Enter your password"/>
 
+    <ImageView
+        android:id="@+id/iv_toggle_password"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="right"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_eye_closed"
+        android:contentDescription="Toggle Visibility"/>
+
     <TextView
         android:id="@+id/signUpTextView"
         android:layout_width="wrap_content"

@@ -6,11 +6,14 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.expirease.data.Users
@@ -111,6 +114,26 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this@LoginActivity, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
+        }
+
+        var isPasswordVisible = false
+
+        val passwordEditText: EditText = binding.edittextPassword
+        val togglePassword: ImageView = binding.ivTogglePassword
+
+        togglePassword.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+            if (isPasswordVisible) {
+                // Show password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_open)
+            } else {
+                // Hide password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_closed)
+            }
+            // Keep cursor at the end
+            passwordEditText.setSelection(passwordEditText.text.length)
         }
 
         // ✨ Make "Sign up" text clickable
