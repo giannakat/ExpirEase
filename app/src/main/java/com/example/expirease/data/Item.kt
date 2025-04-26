@@ -14,18 +14,19 @@ enum class ItemStatus {
 data class Item(
     var name: String = "",
     var quantity: Int = 0,
-    var status :ItemStatus = ItemStatus.ACTIVE,
-    var expiryDate: Long = 0L, // ✅ Add default value
-    var category: Category = Category.OTHER,
+    var status: ItemStatus = ItemStatus.ACTIVE,
+    var expiryDate: Long = 0L,
+    var categoryId: String = "",
     var photoResource: Int = R.drawable.img_product_banana
 ) : Parcelable {
+
     constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "", //name
-        parcel.readInt(), //quantity
-            ItemStatus.valueOf(parcel.readString() ?: ItemStatus.ACTIVE.name), // status
-        parcel.readLong(), //expiryDate
-        Category.valueOf(parcel.readString() ?: Category.OTHER.name),
-        parcel.readInt()//photo
+        parcel.readString() ?: "",
+        parcel.readInt(),
+        ItemStatus.valueOf(parcel.readString() ?: ItemStatus.ACTIVE.name),
+        parcel.readLong(),
+        parcel.readString() ?: "",
+        parcel.readInt()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -33,7 +34,7 @@ data class Item(
         parcel.writeInt(quantity)
         parcel.writeString(status.name)
         parcel.writeLong(expiryDate)
-        parcel.writeString(category.name)
+        parcel.writeString(categoryId)
         parcel.writeInt(photoResource)
     }
 
@@ -43,15 +44,30 @@ data class Item(
         return mapOf(
             "name" to name,
             "quantity" to quantity,
-                "status" to status.name,
+            "status" to status.name,
             "expiryDate" to expiryDate,
-            "category" to category.name,
+            "categoryId" to categoryId,
             "photoResource" to photoResource
         )
     }
 
-    companion object CREATOR : Parcelable.Creator<Item> {
-        override fun createFromParcel(parcel: Parcel): Item = Item(parcel)
-        override fun newArray(size: Int): Array<Item?> = arrayOfNulls(size)
+    companion object {
+        @JvmField
+        val CREATOR = object : Parcelable.Creator<Item> {
+            override fun createFromParcel(parcel: Parcel) = Item(parcel)
+            override fun newArray(size: Int) = arrayOfNulls<Item>(size)
+        }
+
+        fun fromMap(map: Map<String, Any>): Item {
+            return Item(
+                name = map["name"] as? String ?: "",
+                quantity = (map["quantity"] as? Long)?.toInt() ?: (map["quantity"] as? Int ?: 0),
+                status = ItemStatus.valueOf(map["status"] as? String ?: ItemStatus.ACTIVE.name),
+                expiryDate = map["expiryDate"] as? Long ?: 0L,
+                categoryId = map["categoryId"] as? String ?: "",
+                photoResource = (map["photoResource"] as? Long)?.toInt() ?: (map["photoResource"] as? Int ?: R.drawable.img_product_banana)
+            )
+        }
     }
 }
+
