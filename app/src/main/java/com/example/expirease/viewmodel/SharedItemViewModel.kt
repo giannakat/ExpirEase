@@ -39,37 +39,7 @@ class SharedItemViewModel : ViewModel() {
         fetchItemsWithDismissFilter()
     }
 
-    private fun fetchItemsFromFirebase() {
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val items = mutableListOf<Item>()
-
-                // Reset category counts before processing new data
-                CategoryManager.getCategories().forEach { it.resetItemCount() }
-
-                snapshot.children.forEach { itemSnapshot ->
-                    itemSnapshot.getValue(Item::class.java)?.let { item ->
-                        // Find the category based on the categoryId
-                        val category = CategoryManager.getCategories().find { it.id == item.categoryId }
-
-                        if (category != null) {
-                            // If category exists, increment its item count
-                            category.incrementItemCount()
-                            println("Increase item count for category: ${category.displayName} ")
-                        } else {
-                            // If no category is found, handle it based on your preference
-                            Log.d("CategoryWarning", "Item '${item.name}' has an invalid category '${item.categoryId}'")
-                        }
-
-                        // Add the item to the list
-                        items.add(item)
-                    }
-                }
-
-                // Update the list of items in ViewModel
-                _allItems.value = items
-            }
-    fun fetchItemsWithDismissFilter() {
+    private fun fetchItemsWithDismissFilter() {
         if (userId == null) return
 
         dismissedRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -150,35 +120,6 @@ class SharedItemViewModel : ViewModel() {
         _allItems.value = _allItems.value?.map {
             if (it.name == updated.name && it.expiryDate == updated.expiryDate) updated else it
         }
-    }
-
-    private fun getAllItems(): List<Item> {
-        return listOf() // start empty
-    }
-
-    fun getItemsByStatus(status: ItemStatus): LiveData<List<Item>> {
-        val filteredItems = _allItems.value?.filter { it.status == status } ?: listOf()
-        val liveData = MutableLiveData<List<Item>>()
-        liveData.value = filteredItems
-        return liveData
-    }
-
-    // Function to filter items based on their status
-    fun getFilteredItems(status: ItemStatus): LiveData<List<Item>> {
-        val filteredList = _allItems.value?.filter { it.status == status } ?: emptyList()
-        val liveData = MutableLiveData<List<Item>>()
-        liveData.value = filteredList
-        return liveData
-    }
-
-    // Function to update item status (e.g., marking an item as expired)
-
-
-    fun getItemsByCategory(category: Category): LiveData<List<Item>> {
-        val filteredItems = _allItems.value?.filter { it.categoryId == category.id } ?: listOf()
-        val liveData = MutableLiveData<List<Item>>()
-        liveData.value = filteredItems
-        return liveData
     }
 
     fun getItemsForDate(date: LocalDate): List<Item> {
