@@ -9,6 +9,7 @@ object CategoryManager {
         Category("vegetables", "Vegetables"),
         Category("fruits", "Fruits"),
         Category("beverages", "Beverages"),
+        Category("others", "Others")
         // Add more categories as needed
     )
 
