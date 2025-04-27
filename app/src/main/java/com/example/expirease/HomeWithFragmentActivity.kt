@@ -128,6 +128,38 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             DrawableCompat.setTint(wrapped, Color.RED)
             logoutItem.icon = wrapped
         }
+
+        // Update the header with the username
+        updateNavHeader()
+    }
+
+    // Method to update the navigation header with the name
+    private fun updateNavHeader() {
+        val headerView = navView.getHeaderView(0)
+        val nameTextView = headerView.findViewById<TextView>(R.id.username) // Assuming you have a TextView with id "username" in your layout
+
+        // Get the current user from FirebaseAuth
+        val user = auth.currentUser
+        if (user != null) {
+            // Fetch the name from Firebase Realtime Database or from user details
+            val userRef = reference.child(user.uid)
+
+            userRef.get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val dataSnapshot = task.result
+                    // Fetch the name (or use "USER" if it's null or empty)
+                    val name = dataSnapshot?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "USER"
+
+                    // Update the TextView with the name
+                    nameTextView.text = name
+                } else {
+                    Log.e("HomeWithFragmentActivity", "Failed to get name", task.exception)
+                    nameTextView.text = "USER" // Fallback if fetching fails
+                }
+            }
+        } else {
+            nameTextView.text = "USER" // Fallback if user is not authenticated
+        }
     }
 
     // Handle logout dialog

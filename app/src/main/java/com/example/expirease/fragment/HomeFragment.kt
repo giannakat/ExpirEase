@@ -37,7 +37,6 @@ class HomeFragment : Fragment() {
 
     private lateinit var searchView: SearchView
     private val categoryList = CategoryManager.getCategories().toMutableList()
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         listOfItems = mutableListOf()
