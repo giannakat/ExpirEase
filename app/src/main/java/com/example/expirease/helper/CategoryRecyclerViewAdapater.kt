@@ -28,6 +28,8 @@ class CategoryRecyclerViewAdapter(private val categoryList: MutableList<Category
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val item = categoryList[position]
 
+        println("Binding Category: ${item.displayName}, Item Count: ${item.itemCount}")  // Print the values
+
         holder.categoryName.text = item.displayName
         holder.categoryItemCount.text = item.itemCount.toString()
 
