@@ -62,33 +62,27 @@ class RegisterActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val currentUser = auth.currentUser
-                        currentUser?.sendEmailVerification()
-                            ?.addOnCompleteListener { emailTask ->
-                                if (emailTask.isSuccessful) {
-                                    val userId = currentUser.uid
-                                    val user = Users(username, email, password) // Do not store passwords
+                        val userId = currentUser?.uid
+                        if (userId != null) {
+                            val user = Users(username, email, password) // ⚠️ Reminder: don't store passwords like this in production
 
-                                    reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
-                                        if (dbTask.isSuccessful) {
-                                            FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
-                                                if (tokenTask.isSuccessful) {
-                                                    val token = tokenTask.result
-                                                    reference.child(userId).child("deviceToken").setValue(token)
-                                                }
-                                            }
-
-                                            Toast.makeText(this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show()
-                                            auth.signOut() // Force logout until verified
-                                            startActivity(Intent(this, LoginActivity::class.java))
-                                            finish()
-                                        } else {
-                                            Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                            reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
+                                if (dbTask.isSuccessful) {
+                                    FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
+                                        if (tokenTask.isSuccessful) {
+                                            val token = tokenTask.result
+                                            reference.child(userId).child("deviceToken").setValue(token)
                                         }
                                     }
+
+                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_LONG).show()
+                                    startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+                                    finish()
                                 } else {
-                                    Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
                                 }
                             }
+                        }
                     } else {
                         Toast.makeText(this, "Firebase Auth failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }

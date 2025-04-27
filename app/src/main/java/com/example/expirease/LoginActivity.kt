@@ -74,30 +74,20 @@ class LoginActivity : AppCompatActivity() {
                                 auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            val user = auth.currentUser
-                                            user?.reload()?.addOnCompleteListener { reloadTask ->
-                                                if (reloadTask.isSuccessful) {
-                                                    if (user.isEmailVerified) {
-                                                        val userId = user.uid
-                                                        FirebaseMessaging.getInstance().token
-                                                            .addOnCompleteListener { tokenTask ->
-                                                                if (tokenTask.isSuccessful) {
-                                                                    val token = tokenTask.result
-                                                                    reference.child(userId).child("deviceToken").setValue(token)
-                                                                }
-                                                            }
-
-                                                        Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
-                                                        startActivity(Intent(this@LoginActivity, HomeWithFragmentActivity::class.java))
-                                                        finish()
-                                                    } else {
-                                                        Toast.makeText(this@LoginActivity, "Please verify your email before logging in.", Toast.LENGTH_LONG).show()
-                                                        auth.signOut() // Optional: log them out if not verified
+                                            val userId = auth.currentUser?.uid
+                                            if (userId != null) {
+                                                FirebaseMessaging.getInstance().token
+                                                    .addOnCompleteListener { tokenTask ->
+                                                        if (tokenTask.isSuccessful) {
+                                                            val token = tokenTask.result
+                                                            reference.child(userId).child("deviceToken").setValue(token)
+                                                        }
                                                     }
-                                                } else {
-                                                    Toast.makeText(this@LoginActivity, "Failed to refresh user. Try again.", Toast.LENGTH_SHORT).show()
-                                                }
                                             }
+
+                                            Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
+                                            startActivity(Intent(this@LoginActivity, HomeWithFragmentActivity::class.java))
+                                            finish()
                                         } else {
                                             Toast.makeText(this@LoginActivity, "Authentication failed", Toast.LENGTH_SHORT).show()
                                         }

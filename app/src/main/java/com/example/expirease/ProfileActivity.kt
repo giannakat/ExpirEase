@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
@@ -45,24 +44,13 @@ class ProfileActivity : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance().reference
     private val storage = FirebaseStorage.getInstance()
 
-    // Register for image picking and permissions
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             try {
-                // Ensure persistable URI permission
                 contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                Log.d("PICK_IMAGE", "Picked image URI: $it")
-
-                // Save URI for future use
                 saveImageUri(it.toString())
-
-                // Save the image locally (optional, for caching)
                 saveImageToLocal(it)
-
-                // Upload image to Firebase
                 uploadImageToFirebase(it)
-
-                // Optionally, load the profile image
                 loadProfileImage()
             } catch (e: SecurityException) {
                 e.printStackTrace()
@@ -85,7 +73,6 @@ class ProfileActivity : AppCompatActivity() {
 
         sharedPrefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
 
-        // Initialize your views here
         accountIcon = findViewById(R.id.accountIcon)
         val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
         etName = findViewById(R.id.nameValue)
@@ -101,15 +88,10 @@ class ProfileActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.saveProfileButton)
         btnBack = findViewById(R.id.back_button)
 
-        // Check email verification status
-        checkEmailVerification()
-
         fetchUserDataFromFirebase()
         loadProfileImage()
 
-        editPhotoLayout.setOnClickListener {
-            checkAndRequestPermission()
-        }
+        editPhotoLayout.setOnClickListener { checkAndRequestPermission() }
 
         editNameIcon.setOnClickListener { enableEditing(etName) }
         editUsernameIcon.setOnClickListener { enableEditing(etUsername) }
@@ -129,46 +111,17 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    // Check if the email is verified
-    private fun checkEmailVerification() {
-        firebaseAuth.currentUser?.reload()?.addOnCompleteListener { reloadTask ->
-            if (reloadTask.isSuccessful) {
-                val refreshedUser = firebaseAuth.currentUser
-                Log.d("EMAIL_VERIFIED", "Email verified? ${refreshedUser?.isEmailVerified}")
-                if (refreshedUser?.isEmailVerified == false) {
-                    Toast.makeText(this, "Please verify your email to continue.", Toast.LENGTH_LONG).show()
-                    firebaseAuth.signOut()
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
-                } else {
-                    Log.d("EMAIL_VERIFIED", "Access granted to verified user")
-                }
-            } else {
-                Log.e("EMAIL_VERIFIED", "Failed to reload user: ${reloadTask.exception?.message}")
-            }
-        }
-
-    }
-
     private fun fetchUserDataFromFirebase() {
         val uid = firebaseAuth.currentUser?.uid ?: return
         val userRef = database.child("Users").child(uid)
 
         userRef.get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
-                val name = snapshot.child("name").getValue(String::class.java)
-                val username = snapshot.child("username").getValue(String::class.java)
-                val email = snapshot.child("email").getValue(String::class.java)
-                val phone = snapshot.child("phone").getValue(String::class.java)
-                val password = snapshot.child("password").getValue(String::class.java)
-
-                etName.setText(name ?: "")
-                etUsername.setText(username ?: "")
-                etEmail.setText(email ?: "")
-                etPhone.setText(phone ?: "")
-                etPassword.setText(password ?: "")
+                etName.setText(snapshot.child("name").getValue(String::class.java) ?: "")
+                etUsername.setText(snapshot.child("username").getValue(String::class.java) ?: "")
+                etEmail.setText(snapshot.child("email").getValue(String::class.java) ?: "")
+                etPhone.setText(snapshot.child("phone").getValue(String::class.java) ?: "")
+                etPassword.setText(snapshot.child("password").getValue(String::class.java) ?: "")
             } else {
                 Log.w("FETCH_USER", "No user data found.")
             }
@@ -195,27 +148,23 @@ class ProfileActivity : AppCompatActivity() {
 
         database.child("Users").child(uid).updateChildren(userUpdates)
             .addOnSuccessListener {
-                Log.d("DB_UPDATE", "User data updated in Realtime Database")
                 Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Log.e("DB_UPDATE", "Failed to update user data", e)
-                Toast.makeText(this, "Failed to update data in database.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to update data.", Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun loadProfileImage() {
         val uriString = sharedPrefs.getString("imageUri", null)
 
-        // If there is no URI stored or URI permission revoked
         if (uriString == null) {
             accountIcon.setImageResource(R.drawable.img_placeholder_user)
             return
         }
 
         val uri = Uri.parse(uriString)
-
-        // Check if URI permission is still valid
         val hasPermission = contentResolver.persistedUriPermissions.any {
             it.uri == uri && it.isReadPermission
         }
@@ -223,8 +172,6 @@ class ProfileActivity : AppCompatActivity() {
         if (hasPermission) {
             accountIcon.setImageURI(uri)
         } else {
-            // Permission was revoked, show placeholder
-            Log.e("PROFILE_IMAGE", "Image access revoked or expired.")
             accountIcon.setImageResource(R.drawable.img_placeholder_user)
         }
     }
@@ -259,7 +206,6 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun saveChanges() {
-        val app = application as MyApplication
         val currentUser = firebaseAuth.currentUser
         val uid = currentUser?.uid
 
@@ -274,39 +220,18 @@ class ProfileActivity : AppCompatActivity() {
         val username = etUsername.text.toString()
         val phone = etPhone.text.toString()
 
-        // Re-authenticate the user with their current credentials
         val credential = EmailAuthProvider.getCredential(currentUser.email!!, password)
         currentUser.reauthenticate(credential)
             .addOnCompleteListener { reauthTask ->
                 if (reauthTask.isSuccessful) {
-                    Log.d("AUTH", "Re-authentication successful")
-
-                    // Update email if changed
-                    if (newEmail != currentUser.email) {
-                        currentUser.verifyBeforeUpdateEmail(newEmail)
-                            .addOnCompleteListener { emailTask ->
-                                if (emailTask.isSuccessful) {
-                                    Log.d("EMAIL_UPDATE", "Verification email sent for new email")
-
-                                    Toast.makeText(
-                                        this,
-                                        "Please verify your new email address. Changes will apply after verification.",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-
-                                    // Save the rest of the data in Realtime Database
-                                    updateUserDataInDatabase(uid, name, username, newEmail, phone, password)
-
-                                } else {
-                                    val errorMsg = emailTask.exception?.message
-                                    Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_SHORT).show()
-                                    Log.e("EMAIL_UPDATE", "Email update failed: $errorMsg", emailTask.exception)
-                                }
+                    currentUser.updateEmail(newEmail)
+                        .addOnCompleteListener { emailTask ->
+                            if (emailTask.isSuccessful) {
+                                updateUserDataInDatabase(uid, name, username, newEmail, phone, password)
+                            } else {
+                                Toast.makeText(this, "Failed to update email.", Toast.LENGTH_SHORT).show()
                             }
-                    } else {
-                        // No email change, proceed to update other details
-                        updateUserDataInDatabase(uid, name, username, newEmail, phone, password)
-                    }
+                        }
                 } else {
                     Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
@@ -352,15 +277,14 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun uploadImageToFirebase(uri: Uri) {
         val storageRef = storage.reference.child("profile_images/${firebaseAuth.currentUser?.uid}")
-        val uploadTask = storageRef.putFile(uri)
-
-        uploadTask.addOnSuccessListener {
-            storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
-                Log.d("UPLOAD", "Image uploaded successfully: $downloadUrl")
+        storageRef.putFile(uri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                    Log.d("UPLOAD", "Image uploaded successfully: $downloadUrl")
+                }
             }
-        }.addOnFailureListener { e ->
-            Log.e("UPLOAD", "Failed to upload image", e)
-        }
+            .addOnFailureListener { e ->
+                Log.e("UPLOAD", "Failed to upload image", e)
+            }
     }
-
 }
