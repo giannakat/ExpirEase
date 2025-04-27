@@ -9,17 +9,17 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.expirease.app.MyApplication
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
@@ -42,7 +42,6 @@ class ProfileActivity : AppCompatActivity() {
 
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance().reference
-    private val storage = FirebaseStorage.getInstance()
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
@@ -153,22 +152,22 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun loadProfileImage() {
-        val uriString = sharedPrefs.getString("imageUri", null)
+        val uid = firebaseAuth.currentUser?.uid
+        if (uid != null) {
+            val userRef = database.child("Users").child(uid)
 
-        if (uriString == null) {
-            accountIcon.setImageResource(R.drawable.img_placeholder_user)
-            return
-        }
-
-        val uri = Uri.parse(uriString)
-        val hasPermission = contentResolver.persistedUriPermissions.any {
-            it.uri == uri && it.isReadPermission
-        }
-
-        if (hasPermission) {
-            accountIcon.setImageURI(uri)
-        } else {
-            accountIcon.setImageResource(R.drawable.img_placeholder_user)
+            userRef.child("profileImage").get().addOnSuccessListener { snapshot ->
+                val base64String = snapshot.getValue(String::class.java)
+                if (base64String != null) {
+                    val bitmap = decodeBase64ToBitmap(base64String)
+                    accountIcon.setImageBitmap(bitmap)
+                } else {
+                    accountIcon.setImageResource(R.drawable.img_placeholder_user)
+                }
+            }.addOnFailureListener { e ->
+                Log.e("LOAD_IMAGE", "Failed to load profile image", e)
+                accountIcon.setImageResource(R.drawable.img_placeholder_user)
+            }
         }
     }
 
@@ -209,55 +208,12 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        // Fetch current password from Firebase
-        fetchCurrentPasswordFromFirebase(uid) { currentPassword ->
-            if (currentPassword.isNotEmpty()) {
-                // Reauthenticate the user using the current password fetched from Firebase
-                val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentPassword)
+        val name = etName.text.toString()
+        val username = etUsername.text.toString()
+        val phone = etPhone.text.toString()
+        val password = etPassword.text.toString()
 
-                currentUser.reauthenticate(credential)
-                    .addOnCompleteListener { reauthTask ->
-                        if (reauthTask.isSuccessful) {
-                            // Successfully reauthenticated, now update the password
-                            val newPassword = etPassword.text.toString()
-
-                            // Update the new password
-                            currentUser.updatePassword(newPassword)
-                                .addOnCompleteListener { passwordUpdateTask ->
-                                    if (passwordUpdateTask.isSuccessful) {
-                                        // Successfully updated the password, now update other user data
-                                        val name = etName.text.toString()
-                                        val username = etUsername.text.toString()
-                                        val phone = etPhone.text.toString()
-
-                                        updateUserDataInDatabase(uid, name, username, phone, newPassword)
-                                        Toast.makeText(this, "Password updated successfully!", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        // Handle the password update failure
-                                        Toast.makeText(this, "Failed to update password.", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                        } else {
-                            // Handle reauthentication failure
-                            Toast.makeText(this, "Authentication failed. Please check your current password.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-            } else {
-                Toast.makeText(this, "Failed to fetch current password from database.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun fetchCurrentPasswordFromFirebase(uid: String, callback: (String) -> Unit) {
-        val userRef = database.child("Users").child(uid)
-
-        userRef.get().addOnSuccessListener { snapshot ->
-            val currentPassword = snapshot.child("password").getValue(String::class.java)
-            callback(currentPassword ?: "")
-        }.addOnFailureListener { e ->
-            Log.e("FETCH_PASSWORD", "Failed to fetch current password", e)
-            callback("")
-        }
+        updateUserDataInDatabase(uid, name, username, phone, password)
     }
 
     private fun checkAndRequestPermission() {
@@ -298,15 +254,40 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebase(uri: Uri) {
-        val storageRef = storage.reference.child("profile_images/${firebaseAuth.currentUser?.uid}")
-        storageRef.putFile(uri)
-            .addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
-                    Log.d("UPLOAD", "Image uploaded successfully: $downloadUrl")
-                }
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            // Convert the Bitmap to a Base64 String
+            val base64String = encodeImageToBase64(bitmap)
+
+            // Save the Base64 String to Firebase Realtime Database
+            val uid = firebaseAuth.currentUser?.uid
+            if (uid != null) {
+                val userRef = database.child("Users").child(uid)
+                userRef.child("profileImage").setValue(base64String)
+                    .addOnSuccessListener {
+                        Log.d("UPLOAD", "Image saved successfully to Realtime Database")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("UPLOAD", "Failed to save image", e)
+                    }
             }
-            .addOnFailureListener { e ->
-                Log.e("UPLOAD", "Failed to upload image", e)
-            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error uploading image to Firebase.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun encodeImageToBase64(bitmap: Bitmap): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    private fun decodeBase64ToBitmap(base64String: String): Bitmap {
+        val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
     }
 }
