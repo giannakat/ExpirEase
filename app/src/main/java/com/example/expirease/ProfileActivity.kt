@@ -27,18 +27,18 @@ class ProfileActivity : AppCompatActivity() {
 
     private lateinit var etName: EditText
     private lateinit var etUsername: EditText
-    private lateinit var etEmail: EditText
     private lateinit var etPhone: EditText
     private lateinit var etPassword: EditText
     private lateinit var editNameIcon: ImageView
     private lateinit var editUsernameIcon: ImageView
-    private lateinit var editEmailIcon: ImageView
     private lateinit var editPhoneIcon: ImageView
     private lateinit var editPasswordIcon: ImageView
     private lateinit var btnSave: Button
     private lateinit var btnBack: Button
     private lateinit var accountIcon: ImageView
     private lateinit var sharedPrefs: SharedPreferences
+
+    private lateinit var currentPassword: String
 
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance().reference
@@ -77,12 +77,10 @@ class ProfileActivity : AppCompatActivity() {
         val editPhotoLayout = findViewById<LinearLayout>(R.id.editPhoto)
         etName = findViewById(R.id.nameValue)
         etUsername = findViewById(R.id.usernameValue)
-        etEmail = findViewById(R.id.emailValue)
         etPhone = findViewById(R.id.phoneValue)
         etPassword = findViewById(R.id.passwordValue)
         editNameIcon = findViewById(R.id.editName)
         editUsernameIcon = findViewById(R.id.editUsername)
-        editEmailIcon = findViewById(R.id.editEmail)
         editPhoneIcon = findViewById(R.id.editPhone)
         editPasswordIcon = findViewById(R.id.editPassword)
         btnSave = findViewById(R.id.saveProfileButton)
@@ -95,9 +93,10 @@ class ProfileActivity : AppCompatActivity() {
 
         editNameIcon.setOnClickListener { enableEditing(etName) }
         editUsernameIcon.setOnClickListener { enableEditing(etUsername) }
-        editEmailIcon.setOnClickListener { enableEditing(etEmail) }
         editPhoneIcon.setOnClickListener { enableEditing(etPhone) }
         editPasswordIcon.setOnClickListener { enableEditing(etPassword) }
+
+        currentPassword = etPassword.text.toString()
 
         btnSave.setOnClickListener {
             if (validateFields()) {
@@ -119,7 +118,6 @@ class ProfileActivity : AppCompatActivity() {
             if (snapshot.exists()) {
                 etName.setText(snapshot.child("name").getValue(String::class.java) ?: "")
                 etUsername.setText(snapshot.child("username").getValue(String::class.java) ?: "")
-                etEmail.setText(snapshot.child("email").getValue(String::class.java) ?: "")
                 etPhone.setText(snapshot.child("phone").getValue(String::class.java) ?: "")
                 etPassword.setText(snapshot.child("password").getValue(String::class.java) ?: "")
             } else {
@@ -134,14 +132,12 @@ class ProfileActivity : AppCompatActivity() {
         uid: String,
         name: String,
         username: String,
-        email: String,
         phone: String,
         password: String
     ) {
         val userUpdates = mapOf(
             "name" to name,
             "username" to username,
-            "email" to email,
             "phone" to phone,
             "password" to password
         )
@@ -194,7 +190,6 @@ class ProfileActivity : AppCompatActivity() {
         return if (
             etName.text.isNotEmpty() &&
             etUsername.text.isNotEmpty() &&
-            etEmail.text.isNotEmpty() &&
             etPhone.text.isNotEmpty() &&
             etPassword.text.isNotEmpty()
         ) {
@@ -209,33 +204,60 @@ class ProfileActivity : AppCompatActivity() {
         val currentUser = firebaseAuth.currentUser
         val uid = currentUser?.uid
 
-        if (uid == null || currentUser.email == null) {
+        if (uid == null) {
             Toast.makeText(this, "User not authenticated!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val newEmail = etEmail.text.toString()
-        val password = etPassword.text.toString()
-        val name = etName.text.toString()
-        val username = etUsername.text.toString()
-        val phone = etPhone.text.toString()
+        // Fetch current password from Firebase
+        fetchCurrentPasswordFromFirebase(uid) { currentPassword ->
+            if (currentPassword.isNotEmpty()) {
+                // Reauthenticate the user using the current password fetched from Firebase
+                val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentPassword)
 
-        val credential = EmailAuthProvider.getCredential(currentUser.email!!, password)
-        currentUser.reauthenticate(credential)
-            .addOnCompleteListener { reauthTask ->
-                if (reauthTask.isSuccessful) {
-                    currentUser.updateEmail(newEmail)
-                        .addOnCompleteListener { emailTask ->
-                            if (emailTask.isSuccessful) {
-                                updateUserDataInDatabase(uid, name, username, newEmail, phone, password)
-                            } else {
-                                Toast.makeText(this, "Failed to update email.", Toast.LENGTH_SHORT).show()
-                            }
+                currentUser.reauthenticate(credential)
+                    .addOnCompleteListener { reauthTask ->
+                        if (reauthTask.isSuccessful) {
+                            // Successfully reauthenticated, now update the password
+                            val newPassword = etPassword.text.toString()
+
+                            // Update the new password
+                            currentUser.updatePassword(newPassword)
+                                .addOnCompleteListener { passwordUpdateTask ->
+                                    if (passwordUpdateTask.isSuccessful) {
+                                        // Successfully updated the password, now update other user data
+                                        val name = etName.text.toString()
+                                        val username = etUsername.text.toString()
+                                        val phone = etPhone.text.toString()
+
+                                        updateUserDataInDatabase(uid, name, username, phone, newPassword)
+                                        Toast.makeText(this, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        // Handle the password update failure
+                                        Toast.makeText(this, "Failed to update password.", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        } else {
+                            // Handle reauthentication failure
+                            Toast.makeText(this, "Authentication failed. Please check your current password.", Toast.LENGTH_SHORT).show()
                         }
-                } else {
-                    Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
-                }
+                    }
+            } else {
+                Toast.makeText(this, "Failed to fetch current password from database.", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun fetchCurrentPasswordFromFirebase(uid: String, callback: (String) -> Unit) {
+        val userRef = database.child("Users").child(uid)
+
+        userRef.get().addOnSuccessListener { snapshot ->
+            val currentPassword = snapshot.child("password").getValue(String::class.java)
+            callback(currentPassword ?: "")
+        }.addOnFailureListener { e ->
+            Log.e("FETCH_PASSWORD", "Failed to fetch current password", e)
+            callback("")
+        }
     }
 
     private fun checkAndRequestPermission() {

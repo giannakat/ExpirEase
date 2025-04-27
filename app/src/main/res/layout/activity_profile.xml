@@ -175,41 +175,7 @@
             android:clickable="true"
             android:focusable="true">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Email"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-
-                <EditText
-                    android:id="@+id/emailValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="gianna@example.com"
-                    android:background="@null"
-                    android:textSize="16sp"
-                    android:paddingLeft="40dp"
-                    android:focusable="false"
-                    android:cursorVisible="false"/>
-
-                <ImageView
-                    android:id="@+id/editEmail"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="12dp"
-                    android:src="@drawable/ic_profile_edit_pen_2"
-                    android:focusable="false"
-                    android:cursorVisible="false"/>
-            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
