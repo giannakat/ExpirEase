@@ -12,9 +12,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Base64
 import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -137,30 +139,48 @@ class HomeWithFragmentActivity : AppCompatActivity() {
     private fun updateNavHeader() {
         val headerView = navView.getHeaderView(0)
         val nameTextView = headerView.findViewById<TextView>(R.id.username) // Assuming you have a TextView with id "username" in your layout
+        val profileImageView = headerView.findViewById<ImageView>(R.id.profilepic) // Add this for profile image (make sure your header layout has an ImageView)
 
         // Get the current user from FirebaseAuth
         val user = auth.currentUser
         if (user != null) {
-            // Fetch the name from Firebase Realtime Database or from user details
             val userRef = reference.child(user.uid)
 
             userRef.get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val dataSnapshot = task.result
-                    // Fetch the name (or use "USER" if it's null or empty)
-                    val name = dataSnapshot?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "USER"
 
-                    // Update the TextView with the name
+                    // Fetch the name (or use "USER" if null or empty)
+                    val name = dataSnapshot?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "USER"
                     nameTextView.text = name
+
+                    // Fetch and decode the Base64 profile image
+                    val base64Image = dataSnapshot?.child("profileImage")?.value?.toString()
+
+                    if (!base64Image.isNullOrEmpty()) {
+                        try {
+                            val decodedBytes = Base64.decode(base64Image, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                            profileImageView.setImageBitmap(bitmap)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            profileImageView.setImageResource(R.drawable.img_placeholder_user) // fallback image if decode fails
+                        }
+                    } else {
+                        profileImageView.setImageResource(R.drawable.img_placeholder_user) // fallback image if no image in database
+                    }
                 } else {
-                    Log.e("HomeWithFragmentActivity", "Failed to get name", task.exception)
-                    nameTextView.text = "USER" // Fallback if fetching fails
+                    Log.e("HomeWithFragmentActivity", "Failed to get name or image", task.exception)
+                    nameTextView.text = "USER"
+                    profileImageView.setImageResource(R.drawable.img_placeholder_user)
                 }
             }
         } else {
-            nameTextView.text = "USER" // Fallback if user is not authenticated
+            nameTextView.text = "USER"
+            profileImageView.setImageResource(R.drawable.img_placeholder_user)
         }
     }
+
 
     // Handle logout dialog
     fun showLogoutDialog() {
