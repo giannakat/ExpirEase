@@ -130,27 +130,6 @@ class SharedItemViewModel : ViewModel() {
         } ?: emptyList()
     }
 
-    fun getFreshItems(): List<Item> {
-        return _allItems.value?.filter {
-            LocalDate.ofEpochDay(it.expiryDate).isAfter(LocalDate.now().plusDays(3))
-        } ?: emptyList()
-    }
-
-    fun getExpiringSoon(): List<Item> {
-        return _allItems.value?.filter {
-            val expiry = LocalDate.ofEpochDay(it.expiryDate)
-            expiry.isAfter(LocalDate.now()) && expiry <= LocalDate.now().plusDays(3)
-        } ?: emptyList()
-    }
-
-    fun getExpiredItems(): List<Item> {
-        return _allItems.value?.filter {
-            LocalDate.ofEpochDay(it.expiryDate).isBefore(LocalDate.now())
-        } ?: emptyList()
-    }
-
-
-
     fun restoreItem(item: Item) {
         item.status = ItemStatus.ACTIVE
         updateItem(item) // Assuming this will update LiveData and notify observers
@@ -178,25 +157,6 @@ class SharedItemViewModel : ViewModel() {
             onComplete()
         }
 
-//        val user = FirebaseAuth.getInstance().currentUser
-//        if (user != null) {
-//            val uid = user.uid
-//            val databaseRef = FirebaseDatabase.getInstance().getReference("Users/$uid/items")
-//            val itemsMap = _allItems.value { it.toMap() }
-//
-//            databaseRef.setValue(itemsMap)
-//                .addOnSuccessListener {
-//                    Log.d("Firebase", "Items saved successfully")
-//                    onComplete()
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.e("Firebase", "Failed to save items", e)
-//                    onComplete()
-//                }
-//        } else {
-//            Log.w("Firebase", "User is null during saveItemsToFirebase")
-//            onComplete()
-//        }
     }
 
 }
