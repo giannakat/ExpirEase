@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Item
-import com.example.expirease.data.Member
 
 class NotificationRecyclerViewAdapter(
     private val listOfItems: MutableList<Item>,
@@ -16,14 +15,14 @@ class NotificationRecyclerViewAdapter(
 ) : RecyclerView.Adapter<NotificationRecyclerViewAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val photo: ImageView = view.findViewById(R.id.item_photo)
-        val name: TextView = view.findViewById(R.id.item_name)
-        val expiry: TextView = view.findViewById(R.id.item_expiryDate)
+        private val photo: ImageView = view.findViewById(R.id.item_photo)
+        private val name: TextView = view.findViewById(R.id.item_name)
+        private val expiry: TextView = view.findViewById(R.id.item_expiryDate)
 
         fun bind(item: Item, onClick: (Item) -> Unit) {
             photo.setImageResource(item.photoResource)
             name.text = item.name
-            expiry.text = "Expiry: ${item.expiryDate}"
+            expiry.text = "Expiry: ${item.expiryDateString}"
             itemView.setOnClickListener { onClick(item) }
         }
     }
@@ -35,7 +34,7 @@ class NotificationRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bind(listOfItems[position], onClick) // Used bind() for cleaner binding logic
+        holder.bind(listOfItems[position], onClick)
     }
 
     override fun getItemCount(): Int = listOfItems.size

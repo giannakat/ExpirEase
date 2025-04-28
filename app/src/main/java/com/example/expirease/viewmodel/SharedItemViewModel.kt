@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.expirease.R
 import com.example.expirease.data.Category
+import com.example.expirease.data.CategoryManager
 import com.example.expirease.data.Item
 import com.example.expirease.data.ItemStatus
 import java.time.Instant
@@ -23,36 +25,68 @@ class SharedItemViewModel : ViewModel() {
     private val _allItems = MutableLiveData<List<Item>>()
     val allItems: LiveData<List<Item>> get() = _allItems
 
-    //TODO connect to the user
-   // private val app = application as MyApplication
+    private val _filteredItems = MutableLiveData<List<Item>>()
+    val filteredItems: LiveData<List<Item>> get() = _filteredItems
 
     private val firebaseAuth = FirebaseAuth.getInstance()
+    private val userId = firebaseAuth.currentUser?.uid
     private val database: DatabaseReference
-        get() = FirebaseDatabase.getInstance().getReference("Users/${firebaseAuth.currentUser?.uid}/items")
+        get() = FirebaseDatabase.getInstance().getReference("Users/$userId/items")
+    private val dismissedRef: DatabaseReference
+        get() = FirebaseDatabase.getInstance().getReference("Users/$userId/dismissedNotifications")
 
     init {
-        fetchItemsFromFirebase()
+        fetchItemsWithDismissFilter()
     }
 
-    private fun fetchItemsFromFirebase() {
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val items = mutableListOf<Item>()
-                snapshot.children.forEach { itemSnapshot ->
-                    itemSnapshot.getValue(Item::class.java)?.let {
-                        items.add(it)
+    private fun fetchItemsWithDismissFilter() {
+        if (userId == null) return
+
+        dismissedRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dismissedSnapshot: DataSnapshot) {
+                val dismissedSet = dismissedSnapshot.children.mapNotNull { it.key }.toSet()
+
+                database.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val items = mutableListOf<Item>()
+                        val filtered = mutableListOf<Item>()
+
+                        for (itemSnap in snapshot.children) {
+                            val item = itemSnap.getValue(Item::class.java)
+                            if (item != null) {
+                                items.add(item)
+
+                                val itemId = "${item.name}_${item.expiryDate}"
+                                if (!dismissedSet.contains(itemId)) {
+                                    filtered.add(item)
+                                }
+                            }
+                        }
+
+                        // All items available to the app (used in Home, etc.)
+                        _allItems.value = items
+
+                        // Only filtered items for NotificationsActivity
+                        _filteredItems.value = filtered
                     }
-                }
-                _allItems.value = items
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("ViewModel", "Failed to load items: ${error.message}")
+                    }
+                })
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle error if needed
+                Log.e("ViewModel", "Failed to load dismissed notifications: ${error.message}")
             }
         })
     }
 
-    fun addItem(item : Item){
+    fun refreshFilteredItems() {
+        fetchItemsWithDismissFilter()
+    }
+
+    fun addItem(item: Item) {
         val key = database.push().key
         if (key != null) {
             database.child(key).setValue(item)
@@ -61,7 +95,10 @@ class SharedItemViewModel : ViewModel() {
         val currentList = _allItems.value?.toMutableList() ?: mutableListOf()
         currentList.add(item)
         _allItems.value = currentList
-        item.category.incrementItemCount()
+
+        // Find the corresponding category and increment item count
+        val category = CategoryManager.getCategories().find { it.id == item.categoryId }
+        category?.incrementItemCount() // Increment the item count for the category
     }
 
     fun updateItem(updated: Item) {
@@ -85,35 +122,6 @@ class SharedItemViewModel : ViewModel() {
         }
     }
 
-    private fun getAllItems(): List<Item> {
-        return listOf() // start empty
-    }
-
-    fun getItemsByStatus(status: ItemStatus): LiveData<List<Item>> {
-        val filteredItems = _allItems.value?.filter { it.status == status } ?: listOf()
-        val liveData = MutableLiveData<List<Item>>()
-        liveData.value = filteredItems
-        return liveData
-    }
-
-    // Function to filter items based on their status
-    fun getFilteredItems(status: ItemStatus): LiveData<List<Item>> {
-        val filteredList = _allItems.value?.filter { it.status == status } ?: emptyList()
-        val liveData = MutableLiveData<List<Item>>()
-        liveData.value = filteredList
-        return liveData
-    }
-
-    // Function to update item status (e.g., marking an item as expired)
-
-
-    fun getItemsByCategory(category: Category): LiveData<List<Item>> {
-        val filteredItems = _allItems.value?.filter { it.category == category } ?: listOf()
-        val liveData = MutableLiveData<List<Item>>()
-        liveData.value = filteredItems
-        return liveData
-    }
-
     fun getItemsForDate(date: LocalDate): List<Item> {
         return _allItems.value?.filter {
             Instant.ofEpochMilli(it.expiryDate)
@@ -121,27 +129,6 @@ class SharedItemViewModel : ViewModel() {
                 .toLocalDate() == date
         } ?: emptyList()
     }
-
-    fun getFreshItems(): List<Item> {
-        return _allItems.value?.filter {
-            LocalDate.ofEpochDay(it.expiryDate).isAfter(LocalDate.now().plusDays(3))
-        } ?: emptyList()
-    }
-
-    fun getExpiringSoon(): List<Item> {
-        return _allItems.value?.filter {
-            val expiry = LocalDate.ofEpochDay(it.expiryDate)
-            expiry.isAfter(LocalDate.now()) && expiry <= LocalDate.now().plusDays(3)
-        } ?: emptyList()
-    }
-
-    fun getExpiredItems(): List<Item> {
-        return _allItems.value?.filter {
-            LocalDate.ofEpochDay(it.expiryDate).isBefore(LocalDate.now())
-        } ?: emptyList()
-    }
-
-
 
     fun restoreItem(item: Item) {
         item.status = ItemStatus.ACTIVE
@@ -170,25 +157,6 @@ class SharedItemViewModel : ViewModel() {
             onComplete()
         }
 
-//        val user = FirebaseAuth.getInstance().currentUser
-//        if (user != null) {
-//            val uid = user.uid
-//            val databaseRef = FirebaseDatabase.getInstance().getReference("Users/$uid/items")
-//            val itemsMap = _allItems.value { it.toMap() }
-//
-//            databaseRef.setValue(itemsMap)
-//                .addOnSuccessListener {
-//                    Log.d("Firebase", "Items saved successfully")
-//                    onComplete()
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.e("Firebase", "Failed to save items", e)
-//                    onComplete()
-//                }
-//        } else {
-//            Log.w("Firebase", "User is null during saveItemsToFirebase")
-//            onComplete()
-//        }
     }
 
 }

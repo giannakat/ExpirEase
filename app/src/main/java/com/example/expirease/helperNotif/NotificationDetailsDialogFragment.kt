@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.expirease.R
 import com.example.expirease.data.Item
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class NotificationDetailsDialogFragment : DialogFragment() {
 
@@ -47,12 +49,25 @@ class NotificationDetailsDialogFragment : DialogFragment() {
         item?.let {
             itemPhoto.setImageResource(it.photoResource)
             itemName.text = it.name
-            itemExpiry.text = "Expiry: ${it.expiryDate}"
+            itemExpiry.text = "Expiry: ${it.expiryDateString}" // ✅ Formatted date
 
             removeButton.setOnClickListener {
-                onRemove?.invoke(item!!)
-                dismiss()
+                item?.let {
+                    val userId = FirebaseAuth.getInstance().currentUser?.uid
+                    val itemId = it.name + "_" + it.expiryDate // Or any unique ID logic
+                    if (userId != null) {
+                        val ref = FirebaseDatabase.getInstance()
+                            .getReference("Users")
+                            .child(userId)
+                            .child("dismissedNotifications")
+                            .child(itemId)
+                        ref.setValue(true)
+                    }
+                    onRemove?.invoke(it)
+                    dismiss()
+                }
             }
+
         }
     }
 }

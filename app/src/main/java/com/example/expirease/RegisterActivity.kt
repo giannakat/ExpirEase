@@ -61,24 +61,26 @@ class RegisterActivity : AppCompatActivity() {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
-                        val user = Users(username, email, "") // Don't store plaintext password
+                        val currentUser = auth.currentUser
+                        val userId = currentUser?.uid
+                        if (userId != null) {
+                            val user = Users(username, email, password) // ⚠️ Reminder: don't store passwords like this in production
 
-                        reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
-                            if (dbTask.isSuccessful) {
-                                // ✅ Save the FCM device token into Realtime Database
-                                FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
-                                    if (tokenTask.isSuccessful) {
-                                        val token = tokenTask.result
-                                        reference.child(userId).child("deviceToken").setValue(token)
+                            reference.child(userId).setValue(user).addOnCompleteListener { dbTask ->
+                                if (dbTask.isSuccessful) {
+                                    FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
+                                        if (tokenTask.isSuccessful) {
+                                            val token = tokenTask.result
+                                            reference.child(userId).child("deviceToken").setValue(token)
+                                        }
                                     }
-                                }
 
-                                Toast.makeText(this, "Registered Successfully", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this, LoginActivity::class.java))
-                                finish()
-                            } else {
-                                Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_LONG).show()
+                                    startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+                                    finish()
+                                } else {
+                                    Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     } else {

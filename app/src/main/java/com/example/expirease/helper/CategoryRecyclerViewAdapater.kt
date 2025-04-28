@@ -20,13 +20,15 @@ class CategoryRecyclerViewAdapter(private val categoryList: MutableList<Category
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): CategoryRecyclerViewAdapter.CategoryViewHolder {
+    ): CategoryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.category_box_recycler_view, parent, false)
         return CategoryViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CategoryRecyclerViewAdapter.CategoryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val item = categoryList[position]
+
+        println("Binding Category: ${item.displayName}, Item Count: ${item.itemCount}")  // Print the values
 
         holder.categoryName.text = item.displayName
         holder.categoryItemCount.text = item.itemCount.toString()
