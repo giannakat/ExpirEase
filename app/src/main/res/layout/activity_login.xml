@@ -8,7 +8,7 @@
     android:padding="30dp"
     tools:context=".LoginActivity"
     android:orientation="vertical">
-    
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,30 +52,35 @@
         android:layout_marginTop="32dp"
         android:textSize="20sp"/>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp">
 
-    <EditText
-        android:id="@+id/edittext_password"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textSize="18sp"
-        android:padding="12dp"
-        android:layout_marginTop="12dp"
-        android:textColor="#707070"
-        android:ems="10"
-        android:background="@drawable/edittext_background"
-        android:inputType="textPassword"
-        android:hint="Enter your password"/>
+        <EditText
+            android:id="@+id/edittext_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:textColor="#707070"
+            android:ems="10"
+            android:background="@drawable/edittext_background"
+            android:inputType="textPassword"
+            android:hint="Enter your password"/>
 
-    <ImageView
-        android:id="@+id/iv_toggle_password"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_gravity="right"
-        android:layout_marginEnd="12dp"
-        android:src="@drawable/ic_eye_closed"
-        android:contentDescription="Toggle Visibility"/>
+        <ImageView
+            android:id="@+id/iv_toggle_password"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="right"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_eye_closed"
+            android:contentDescription="Toggle Visibility"/>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/signUpTextView"
