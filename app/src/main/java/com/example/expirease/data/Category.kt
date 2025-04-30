@@ -10,24 +10,8 @@ data class Category(
         itemCount++
     }
 
-    // Optionally, reset the count (in case you need to reset it later)
-    fun resetItemCount() {
-        itemCount = 0
-    }
-
     override fun toString(): String {
         return displayName
     }
 
-    companion object {
-        fun defaultCategories(): List<Category> {
-            return listOf(
-                Category(id = "dairy", displayName = "Dairy"),
-                Category(id = "meat", displayName = "Meat"),
-                Category(id = "vegetables", displayName = "Vegetables"),
-                Category(id = "fruits", displayName = "Fruits"),
-                Category(id = "bakery", displayName = "Bakery")
-            )
-        }
-    }
 }

@@ -221,7 +221,8 @@ class HomeFragment : Fragment() {
             val selectedCategory = categoryList.find { it.displayName == selectedCategoryName }
 
             if (name.isNotEmpty() && selectedCategory != null) {
-                addItem(name, quantity, selectedExpiryDate, selectedCategory, R.drawable.img_product_banana)
+                val imageResId = getImageForCategory(selectedCategory)
+                addItem(name, quantity, selectedExpiryDate, selectedCategory, imageResId)
                 dialog.dismiss()
             }
         }
@@ -231,6 +232,17 @@ class HomeFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun getImageForCategory(category: Category): Int {
+        return when (category.displayName.lowercase()) {
+            "fruits" -> R.drawable.img_product_fruit
+            "vegetables" -> R.drawable.img_product_vegetable
+            "dairy" -> R.drawable.img_product_dairy
+            "meat" -> R.drawable.img_product_meat
+            "beverages" -> R.drawable.img_product_drink
+            else -> R.drawable.img_product_others
+        }
     }
 
     private fun addItem(name: String, quantity: Int, expiryDate: Long, selectedCategory: Category, img: Int) {
