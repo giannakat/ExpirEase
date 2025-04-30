@@ -95,7 +95,7 @@ class HouseholdFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Error fetching members: ${error.message}", Toast.LENGTH_SHORT).show()
+                showToast("Error fetching members: ${error.message}")
             }
         })
     }
@@ -106,9 +106,9 @@ class HouseholdFragment : Fragment() {
         if (memberId != null) {
             database.child(memberId).setValue(member).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(context, "Member added", Toast.LENGTH_SHORT).show()
+                    showToast("Member added")
                 } else {
-                    Toast.makeText(context, "Error adding member", Toast.LENGTH_SHORT).show()
+                    showToast("Error adding member")
                 }
             }
         }
@@ -118,10 +118,16 @@ class HouseholdFragment : Fragment() {
     private fun removeMemberFromDatabase(id: String) {
         database.child(id).removeValue().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(context, "Member removed", Toast.LENGTH_SHORT).show()
+                showToast("Member removed")
             } else {
-                Toast.makeText(context, "Error removing member", Toast.LENGTH_SHORT).show()
+                showToast("Error removing member")
             }
+        }
+    }
+
+    private fun showToast(message: String) {
+        if (isAdded) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
     }
 }

@@ -16,11 +16,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.expirease.data.Users
 import com.example.expirease.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
+import android.view.MotionEvent
 
 class LoginActivity : AppCompatActivity() {
 
@@ -29,13 +31,14 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var reference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
             startActivity(Intent(this, HomeWithFragmentActivity::class.java))
             finish()
             return
         }
-        super.onCreate(savedInstanceState)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -125,6 +128,7 @@ class LoginActivity : AppCompatActivity() {
             // Keep cursor at the end
             passwordEditText.setSelection(passwordEditText.text.length)
         }
+
 
         // ✨ Make "Sign up" text clickable
         val text = SpannableString("Don't have an Account? Sign up")
