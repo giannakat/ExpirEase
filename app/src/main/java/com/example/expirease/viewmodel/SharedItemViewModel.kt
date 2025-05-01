@@ -4,29 +4,22 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.expirease.R
-import com.example.expirease.data.Category
 import com.example.expirease.data.CategoryManager
 import com.example.expirease.data.Item
 import com.example.expirease.data.ItemStatus
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 class SharedItemViewModel : ViewModel() {
 
     private val _allItems = MutableLiveData<List<Item>>()
     val allItems: LiveData<List<Item>> get() = _allItems
 
-    private val _filteredItems = MutableLiveData<List<Item>>()
-    val filteredItems: LiveData<List<Item>> get() = _filteredItems
+    private val _filteredItems = MutableLiveData<List<Item>?>()
+    val filteredItems: MutableLiveData<List<Item>?> get() = _filteredItems
 
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val userId = firebaseAuth.currentUser?.uid
@@ -63,10 +56,7 @@ class SharedItemViewModel : ViewModel() {
                             }
                         }
 
-                        // All items available to the app (used in Home, etc.)
                         _allItems.value = items
-
-                        // Only filtered items for NotificationsActivity
                         _filteredItems.value = filtered
                     }
 
@@ -96,9 +86,8 @@ class SharedItemViewModel : ViewModel() {
         currentList.add(item)
         _allItems.value = currentList
 
-        // Find the corresponding category and increment item count
         val category = CategoryManager.getCategories().find { it.id == item.categoryId }
-        category?.incrementItemCount() // Increment the item count for the category
+        category?.incrementItemCount()
     }
 
     fun updateItem(updated: Item) {
@@ -132,7 +121,7 @@ class SharedItemViewModel : ViewModel() {
 
     fun restoreItem(item: Item) {
         item.status = ItemStatus.ACTIVE
-        updateItem(item) // Assuming this will update LiveData and notify observers
+        updateItem(item)
     }
 
     fun saveItemsToFirebase(onComplete: () -> Unit) {
@@ -144,19 +133,41 @@ class SharedItemViewModel : ViewModel() {
             val databaseRef = FirebaseDatabase.getInstance().getReference("Users/$uid/items")
 
             databaseRef.setValue(items)
-                    .addOnSuccessListener {
-                        Log.d("Firebase", "Items saved successfully")
-                        onComplete()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Firebase", "Failed to save items", e)
-                        onComplete()
-                    }
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Items saved successfully")
+                    onComplete()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firebase", "Failed to save items", e)
+                    onComplete()
+                }
         } else {
             Log.w("Firebase", "User is null during saveItemsToFirebase")
             onComplete()
         }
-
     }
 
+    fun dismissItem(item: Item) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val itemId = "${item.name}_${item.expiryDate}"
+
+        if (user != null) {
+            val uid = user.uid
+            val ref = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(uid)
+                .child("dismissedNotifications")
+                .child(itemId)
+
+            ref.setValue(true).addOnSuccessListener {
+                val updatedList = _filteredItems.value?.toMutableList()
+                updatedList?.removeIf {
+                    it.name == item.name && it.expiryDate == item.expiryDate
+                }
+                _filteredItems.value = updatedList
+            }.addOnFailureListener {
+                Log.e("ViewModel", "Failed to dismiss item: ${it.message}")
+            }
+        }
+    }
 }

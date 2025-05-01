@@ -24,19 +24,13 @@ class NotificationRecyclerViewAdapter(
         fun bind(item: Item, onClick: (Item) -> Unit) {
             photo.setImageResource(item.photoResource)
             name.text = "Urgent!"
-
-            // Format the expiry date
             val formattedExpiryDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(item.expiryDate))
-
-            // Check if the item is expired or expiring soon
             val expiryText = if (item.expiryDate < System.currentTimeMillis()) {
                 "${item.name} has expired on $formattedExpiryDate"
             } else {
                 "${item.name} will expire on $formattedExpiryDate"
             }
-
             expiry.text = expiryText
-
             itemView.setOnClickListener { onClick(item) }
         }
     }
