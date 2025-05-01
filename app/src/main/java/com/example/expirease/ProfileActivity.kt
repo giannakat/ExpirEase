@@ -85,12 +85,12 @@ class ProfileActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             if (validateFields()) {
                 saveChanges()
-                startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+                finish()
             }
         }
 
         btnBack.setOnClickListener {
-            startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+            finish()
         }
 
         var isPasswordVisible = false

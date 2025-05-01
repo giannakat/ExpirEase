@@ -69,8 +69,6 @@ class HomeFragment : Fragment() {
             filteredList.addAll(sortedItems)
 
             itemAdapter.notifyDataSetChanged()
-
-            // 🚀 ADD THIS:
             updateCategoryItemCounts()
             categoryAdapter.notifyDataSetChanged()
 

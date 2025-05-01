@@ -59,6 +59,8 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
+        val menuItem = navView.menu.findItem(R.id.nav_logout)
+        menuItem.icon = ContextCompat.getDrawable(this, R.drawable.ic_nav_logout)
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
