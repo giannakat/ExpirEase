@@ -77,10 +77,10 @@ class ProfileActivity : AppCompatActivity() {
             checkAndRequestPermission()
         }
 
-        editNameIcon.setOnClickListener { enableEditing(etName) }
-        editUsernameIcon.setOnClickListener { enableEditing(etUsername) }
-        editPhoneIcon.setOnClickListener { enableEditing(etPhone) }
-        editPasswordIcon.setOnClickListener { enableEditing(etPassword) }
+        editNameIcon.setOnClickListener { enableEditing(etName, editNameIcon) }
+        editUsernameIcon.setOnClickListener { enableEditing(etUsername, editUsernameIcon) }
+        editPhoneIcon.setOnClickListener { enableEditing(etPhone, editPhoneIcon) }
+        editPasswordIcon.setOnClickListener { enableEditing(etPassword, editPasswordIcon) }
 
         btnSave.setOnClickListener {
             if (validateFields()) {
@@ -162,15 +162,27 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun enableEditing(editText: EditText) {
+    private fun enableEditing(editText: EditText, icon: ImageView) {
+        // Enable EditText and highlight text
         editText.isFocusableInTouchMode = true
         editText.isFocusable = true
         editText.isCursorVisible = true
         editText.requestFocus()
+        editText.selectAll()
 
+        // Show keyboard
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+
+        // Add highlight background to pen icon to simulate shadow
+        icon.background = ContextCompat.getDrawable(this, R.drawable.icon_shadow)
+        icon.postDelayed({
+            icon.background = null
+        }, 100)
+
     }
+
+
 
     private fun validateFields(): Boolean {
         return if (
