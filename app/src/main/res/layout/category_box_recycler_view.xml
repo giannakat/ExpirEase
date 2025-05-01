@@ -11,6 +11,13 @@
     card_view:cardCornerRadius="12dp"
     card_view:cardElevation="6dp">
 
+    <FrameLayout
+        android:id="@+id/category_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:background="@drawable/normal_background">
+
 <RelativeLayout
     android:layout_width="90dp"
     android:layout_height="90dp">
@@ -39,4 +46,5 @@
         android:layout_marginRight="8dp"/>
 
 </RelativeLayout>
+    </FrameLayout>
 </androidx.cardview.widget.CardView>

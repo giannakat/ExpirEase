@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -38,6 +39,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var searchView: SearchView
     private val categoryList = CategoryManager.getCategories().toMutableList()
+    private var selectedCategoryId: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         listOfItems = mutableListOf()
@@ -74,6 +76,7 @@ class HomeFragment : Fragment() {
 
             updateUI(sortedItems)
         }
+
     }
 
     private fun setupRecyclerView(view: View) {
@@ -107,17 +110,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateCategoryItemCounts() {
+        // Reset all category counts to 0
         categoryList.forEach { it.itemCount = 0 }
 
+        // Count items for each category
         listOfItems.forEach { item ->
             val category = categoryList.find { it.id.equals(item.categoryId, ignoreCase = true) }
+
             if (category != null) {
                 category.itemCount++
             } else {
+                // Handle invalid category
                 println("CategoryWarning: Item '${item.name}' has an invalid category '${item.categoryId}'")
             }
         }
 
+        // Update the adapter to reflect changes
         categoryAdapter.notifyDataSetChanged()
     }
 
@@ -157,9 +165,17 @@ class HomeFragment : Fragment() {
         categoryRecyclerView = view.findViewById(R.id.category_recyclerview)
         categoryRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-        categoryAdapter = CategoryRecyclerViewAdapter(categoryList) { category ->
+        categoryAdapter = CategoryRecyclerViewAdapter(categoryList, selectedCategoryId) { category ->
             Toast.makeText(requireContext(), "Clicked category: ${category.displayName}", Toast.LENGTH_SHORT).show()
-            filterItems(category)
+            if (category.id == categoryAdapter.selectedCategoryId) {
+                // Deselect if clicked again
+                categoryAdapter.updateSelectedCategoryId(null)
+                filterItems(null) // or show all items
+            } else {
+                // Select the new one
+                categoryAdapter.updateSelectedCategoryId(category.id)
+                filterItems(category)
+            }
         }
 
         categoryRecyclerView.adapter = categoryAdapter
@@ -246,12 +262,12 @@ class HomeFragment : Fragment() {
 
     private fun getImageForCategory(category: Category): Int {
         return when (category.displayName.lowercase()) {
-            "fruits" -> R.drawable.img_product_fruit
-            "vegetables" -> R.drawable.img_product_vegetable
-            "dairy" -> R.drawable.img_product_dairy
-            "meat" -> R.drawable.img_product_meat
-            "beverages" -> R.drawable.img_product_drink
-            else -> R.drawable.img_product_others
+            "fruits" -> R.drawable.img_product_banana
+            "vegetables" -> R.drawable.img_category_vegetable
+            "dairy" -> R.drawable.img_category_dairy
+            "meat" -> R.drawable.img_category_meat
+            "beverages" -> R.drawable.img_category_beverage
+            else -> R.drawable.img_category_others
         }
     }
 
@@ -264,11 +280,19 @@ class HomeFragment : Fragment() {
         updateCategoryItemCounts()
     }
 
-    private fun filterItems(category: Category) {
+    private fun filterItems(category: Category?) {
         filteredList.clear()
-        filteredList.addAll(listOfItems.filter { item ->
-            item.categoryId.equals(category.displayName, ignoreCase = true)
-        })
+
+        if (category == null) {
+            // Show all items when no category is selected
+            filteredList.addAll(listOfItems)
+        } else {
+            filteredList.addAll(
+                listOfItems.filter { item ->
+                    item.categoryId.equals(category.displayName, ignoreCase = true)
+                }
+            )
+        }
         itemAdapter.notifyDataSetChanged()
         updateUI(filteredList)
     }
