@@ -35,9 +35,9 @@ class NotificationsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Set up RecyclerViews
+        // Set up RecyclerView for expiring soon items
         val recyclerView1 = findViewById<RecyclerView>(R.id.notif_recyclerview1)
-        recyclerView1.layoutManager = LinearLayoutManager(this)
+        recyclerView1.layoutManager = LinearLayoutManager(this) // Vertical scrolling
         expiringSoonAdapter = NotificationRecyclerViewAdapter(expiringSoonList, onClick = { item ->
             val dialog = NotificationDetailsDialogFragment()
             dialog.setItemData(item) { itemToRemove ->
@@ -51,8 +51,9 @@ class NotificationsActivity : AppCompatActivity() {
         })
         recyclerView1.adapter = expiringSoonAdapter
 
+        // Set up RecyclerView for expired items
         val recyclerView2 = findViewById<RecyclerView>(R.id.notif_recyclerview2)
-        recyclerView2.layoutManager = LinearLayoutManager(this)
+        recyclerView2.layoutManager = LinearLayoutManager(this) // Vertical scrolling
         expiredAdapter = NotificationRecyclerViewAdapter(expiredList, onClick = { item ->
             val dialog = NotificationDetailsDialogFragment()
             dialog.setItemData(item) { itemToRemove ->
@@ -73,11 +74,15 @@ class NotificationsActivity : AppCompatActivity() {
             expiringSoonList.clear()
             expiredList.clear()
 
+            // Filter items for expiring soon (next 7 days)
             expiringSoonList.addAll(itemList.filter {
                 it.expiryDate in now..(now + 7 * 24 * 60 * 60 * 1000)
             })
+
+            // Filter items for expired
             expiredList.addAll(itemList.filter { it.expiryDate < now })
 
+            // Notify adapters about data changes
             expiringSoonAdapter.notifyDataSetChanged()
             expiredAdapter.notifyDataSetChanged()
         })
