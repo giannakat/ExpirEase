@@ -60,7 +60,6 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
 
         holder.cardView.setCardBackgroundColor(cardColor)
 
-
         holder.itemView.setOnClickListener {
             onClick(item)
         }

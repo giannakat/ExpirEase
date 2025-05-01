@@ -15,7 +15,4 @@ object CategoryManager {
 
     fun getCategories(): List<Category> = categories
 
-    fun getCategoryById(id: String): Category? {
-        return categories.find { it.id == id }
-    }
 }
