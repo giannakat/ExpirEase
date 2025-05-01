@@ -1,6 +1,7 @@
 package com.example.expirease
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.util.Base64
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
@@ -48,6 +50,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -87,6 +90,26 @@ class ProfileActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener {
             startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+        }
+
+        var isPasswordVisible = false
+
+        val passwordEditText: EditText = findViewById(R.id.passwordValue)
+        val togglePassword: ImageView = findViewById(R.id.iv_toggle_password)
+
+        togglePassword.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+            if (isPasswordVisible) {
+                // Show password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_open)
+            } else {
+                // Hide password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_closed)
+            }
+            // Keep cursor at the end
+            passwordEditText.setSelection(passwordEditText.text.length)
         }
     }
 
