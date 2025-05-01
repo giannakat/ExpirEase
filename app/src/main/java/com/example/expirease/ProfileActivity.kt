@@ -85,6 +85,7 @@ class ProfileActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             if (validateFields()) {
                 saveChanges()
+                startActivity(Intent(this, HomeWithFragmentActivity::class.java))
             }
         }
 
