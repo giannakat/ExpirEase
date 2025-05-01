@@ -6,12 +6,12 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
@@ -69,14 +69,11 @@ class HomeFragment : Fragment() {
             filteredList.addAll(sortedItems)
 
             itemAdapter.notifyDataSetChanged()
-
-            // 🚀 ADD THIS:
             updateCategoryItemCounts()
             categoryAdapter.notifyDataSetChanged()
 
             updateUI(sortedItems)
         }
-
     }
 
     private fun setupRecyclerView(view: View) {
@@ -90,25 +87,37 @@ class HomeFragment : Fragment() {
         )
 
         itemRecyclerView.adapter = itemAdapter
+
+        // 🚀 Swipe left to consume
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ) = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val item = filteredList[position]
+                consumeItem(item)
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(itemRecyclerView)
     }
 
     private fun updateCategoryItemCounts() {
-        // Reset all category counts to 0
         categoryList.forEach { it.itemCount = 0 }
 
-        // Count items for each category
         listOfItems.forEach { item ->
             val category = categoryList.find { it.id.equals(item.categoryId, ignoreCase = true) }
-
             if (category != null) {
                 category.itemCount++
             } else {
-                // Handle invalid category
                 println("CategoryWarning: Item '${item.name}' has an invalid category '${item.categoryId}'")
             }
         }
 
-        // Update the adapter to reflect changes
         categoryAdapter.notifyDataSetChanged()
     }
 
@@ -253,7 +262,6 @@ class HomeFragment : Fragment() {
 
         sharedItemViewModel.addItem(newItem)
         updateCategoryItemCounts()
-
     }
 
     private fun filterItems(category: Category) {
@@ -332,15 +340,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateCategoryCounts() {
-        // Reset all category item counts
         categoryList.forEach { it.itemCount = 0 }
-
-        // Count items per category
         listOfItems.forEach { item ->
             categoryList.find { it.id == item.categoryId }?.incrementItemCount()
         }
-
-        // Notify the adapter that the data changed
         categoryAdapter.notifyDataSetChanged()
     }
 }
