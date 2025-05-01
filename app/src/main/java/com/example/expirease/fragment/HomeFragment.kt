@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -257,8 +258,11 @@ class HomeFragment : Fragment() {
 
     private fun filterItems(category: Category) {
         filteredList.clear()
-        filteredList.addAll(listOfItems.filter { it.categoryId == category.id })
+        filteredList.addAll(listOfItems.filter { item ->
+            item.categoryId.equals(category.displayName, ignoreCase = true)
+        })
         itemAdapter.notifyDataSetChanged()
+        updateUI(filteredList)
     }
 
     private fun openEditItemBottomSheet(item: Item) {
@@ -268,7 +272,7 @@ class HomeFragment : Fragment() {
             putString("name", item.name)
             putInt("quantity", item.quantity)
             putLong("expiryDate", item.expiryDate)
-            putString("category", item.categoryId.toString())
+            putString("category", item.categoryId)
         }
         bottomSheet.arguments = bundle
 

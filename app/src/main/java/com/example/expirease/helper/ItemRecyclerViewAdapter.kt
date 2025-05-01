@@ -33,12 +33,12 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ItemRecyclerViewAdapter.ItemViewHolder {
+    ): ItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.product_item_recycler_view, parent, false)
         return ItemViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ItemRecyclerViewAdapter.ItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = listOfItems[position]
         holder.bind(item)
 

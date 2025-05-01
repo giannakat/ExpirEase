@@ -1,6 +1,5 @@
 package com.example.expirease.data
 
-import com.example.expirease.R
 
 object CategoryManager {
     private val categories = listOf(
