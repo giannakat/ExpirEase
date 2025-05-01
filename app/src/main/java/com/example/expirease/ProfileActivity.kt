@@ -1,6 +1,7 @@
 package com.example.expirease
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.util.Base64
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
@@ -48,6 +50,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("CutPasteId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -87,6 +90,26 @@ class ProfileActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener {
             startActivity(Intent(this, HomeWithFragmentActivity::class.java))
+        }
+
+        var isPasswordVisible = false
+
+        val passwordEditText: EditText = findViewById(R.id.passwordValue)
+        val togglePassword: ImageView = findViewById(R.id.iv_toggle_password)
+
+        togglePassword.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+            if (isPasswordVisible) {
+                // Show password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_open)
+            } else {
+                // Hide password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword.setImageResource(R.drawable.ic_eye_closed)
+            }
+            // Keep cursor at the end
+            passwordEditText.setSelection(passwordEditText.text.length)
         }
     }
 
@@ -172,21 +195,55 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        val credential = EmailAuthProvider.getCredential(currentUser.email!!, etPassword.text.toString())
+        // Fetch current password from Firebase
+        fetchCurrentPasswordFromFirebase(uid) { currentPassword ->
+            if (currentPassword.isNotEmpty()) {
+                // Reauthenticate the user using the current password fetched from Firebase
+                val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentPassword)
 
-        currentUser.reauthenticate(credential)
-            .addOnSuccessListener {
-                val name = etName.text.toString()
-                val username = etUsername.text.toString()
-                val phone = etPhone.text.toString()
-                val password = etPassword.text.toString()
+                currentUser.reauthenticate(credential)
+                    .addOnCompleteListener { reauthTask ->
+                        if (reauthTask.isSuccessful) {
+                            // Successfully reauthenticated, now update the password
+                            val newPassword = etPassword.text.toString()
 
-                updateUserDataInDatabase(uid, name, username, phone, password)
-                Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                            // Update the new password
+                            currentUser.updatePassword(newPassword)
+                                .addOnCompleteListener { passwordUpdateTask ->
+                                    if (passwordUpdateTask.isSuccessful) {
+                                        // Successfully updated the password, now update other user data
+                                        val name = etName.text.toString()
+                                        val username = etUsername.text.toString()
+                                        val phone = etPhone.text.toString()
+
+                                        updateUserDataInDatabase(uid, name, username, phone, newPassword)
+                                        Toast.makeText(this, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        // Handle the password update failure
+                                        Toast.makeText(this, "Failed to update password.", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        } else {
+                            // Handle reauthentication failure
+                            Toast.makeText(this, "Authentication failed. Please check your current password.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            } else {
+                Toast.makeText(this, "Failed to fetch current password from database.", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Authentication failed!", Toast.LENGTH_SHORT).show()
-            }
+        }
+    }
+
+    private fun fetchCurrentPasswordFromFirebase(uid: String, callback: (String) -> Unit) {
+        val userRef = database.child("Users").child(uid)
+
+        userRef.get().addOnSuccessListener { snapshot ->
+            val currentPassword = snapshot.child("password").getValue(String::class.java)
+            callback(currentPassword ?: "")
+        }.addOnFailureListener { e ->
+            Log.e("FETCH_PASSWORD", "Failed to fetch current password", e)
+            callback("")
+        }
     }
 
     private fun checkAndRequestPermission() {

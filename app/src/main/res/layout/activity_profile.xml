@@ -102,7 +102,6 @@
                     android:text="Gianna Carreon"
                     android:background="@null"
                     android:textSize="16sp"
-
                     android:paddingLeft="40dp"
                     android:focusable="false"
                     android:cursorVisible="false"/>
@@ -266,6 +265,15 @@
                     android:paddingLeft="40dp"
                     android:focusable="false"
                     android:cursorVisible="false"/>
+
+                <ImageView
+                    android:id="@+id/iv_toggle_password"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ic_eye_closed"
+                    android:contentDescription="Toggle Visibility"
+                    android:layout_gravity="center"/>
 
                 <ImageView
                     android:id="@+id/editPassword"
