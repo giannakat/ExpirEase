@@ -1,0 +1,73 @@
+Index: app/src/main/java/com/example/expirease/fragment/EditItemBottomSheet.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.expirease.fragment\r\n\r\nimport android.app.DatePickerDialog\r\nimport android.app.Dialog\r\nimport android.graphics.Color\r\nimport android.os.Bundle\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.Button\r\nimport android.widget.EditText\r\nimport android.widget.ImageButton\r\nimport android.widget.ImageView\r\nimport com.example.expirease.R\r\nimport com.example.expirease.helper.OnItemUpdatedListener\r\nimport com.google.android.material.bottomsheet.BottomSheetDialogFragment\r\nimport java.text.SimpleDateFormat\r\nimport java.util.Calendar\r\nimport java.util.Date\r\nimport java.util.Locale\r\n\r\nclass EditItemBottomSheet : BottomSheetDialogFragment() {\r\n    var onItemUpdatedListener: OnItemUpdatedListener? = null\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater,\r\n        container: ViewGroup?,\r\n        savedInstanceState: Bundle?\r\n    ): View? {\r\n        return inflater.inflate(R.layout.bottom_sheet_edit_item, container, false)\r\n    }\r\n\r\n    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {\r\n        val dialog = super.onCreateDialog(savedInstanceState)\r\n\r\n        dialog.setOnShowListener {\r\n            val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)\r\n            bottomSheet?.setBackgroundColor(Color.TRANSPARENT)\r\n        }\r\n\r\n        return dialog\r\n    }\r\n\r\n    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {\r\n        val itemPhoto = view.findViewById<ImageView>(R.id.item_photo)\r\n        val itemName = view.findViewById<EditText>(R.id.item_name)\r\n        val itemQuantity = view.findViewById<EditText>(R.id.item_quantity)\r\n        val itemExpiryDate = view.findViewById<EditText>(R.id.item_expiryDate)\r\n        val itemCategory = view.findViewById<EditText>(R.id.item_category)\r\n        val btnSave = view.findViewById<Button>(R.id.btn_save)\r\n        val btnCancel = view.findViewById<Button>(R.id.btn_cancel)\r\n        val btnCalendar = view.findViewById<ImageButton>(R.id.btn_show_calendar)\r\n\r\n        val calendar = Calendar.getInstance()\r\n\r\n        // Retrieve data from arguments\r\n        arguments?.let {\r\n            itemPhoto.setImageResource(it.getInt(\"photo\", R.drawable.img_product_banana))\r\n            itemName.setText(it.getString(\"name\", \"Unknown Item\"))\r\n            itemQuantity.setText(it.getInt(\"quantity\", 0).toString())\r\n\r\n            val expiryMillis = it.getLong(\"expiryDate\", System.currentTimeMillis())  // Get expiry date\r\n            val formattedDate = SimpleDateFormat(\"yyyy-MM-dd\", Locale.getDefault()).format(Date(expiryMillis))\r\n            itemExpiryDate.setText(formattedDate)\r\n            calendar.timeInMillis = expiryMillis\r\n\r\n            val category = it.getString(\"category\", \"others\")\r\n            itemCategory.setText(category)\r\n        }\r\n\r\n        btnCalendar.setOnClickListener {\r\n            val year = calendar.get(Calendar.YEAR)\r\n            val month = calendar.get(Calendar.MONTH)\r\n            val day = calendar.get(Calendar.DAY_OF_MONTH)\r\n\r\n            val datePicker = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->\r\n                // Update the EditText with selected date\r\n                val formatted = String.format(\"%04d-%02d-%02d\", selectedYear, selectedMonth + 1, selectedDay)\r\n                itemExpiryDate.setText(formatted)\r\n\r\n                // Save the date back to calendar if needed\r\n                calendar.set(selectedYear, selectedMonth, selectedDay)\r\n\r\n            }, year, month, day)\r\n\r\n            datePicker.show()\r\n        }\r\n        btnSave.setOnClickListener {\r\n            val updatedName = itemName.text.toString()\r\n            val updatedQuantity = itemQuantity.text.toString().toIntOrNull() ?: 1\r\n\r\n            // Parse back date from EditText\r\n           // val dateText = itemExpiryDate.text.toString().replace(\"Expiry Date: \", \"\")\r\n            //val formatter = SimpleDateFormat(\"yyyy-MM-dd\", Locale.getDefault())\r\n          //  val parsedDate = formatter.parse(dateText)\r\n           // val updatedExpiry = parsedDate?.time ?: System.currentTimeMillis()\r\n            val updatedExpiry = calendar.timeInMillis\r\n            val updatedCategory = itemCategory.text.toString().ifBlank { \"Others\" }\r\n\r\n            onItemUpdatedListener?.onItemUpdated(updatedName, updatedQuantity, updatedExpiry, updatedCategory)\r\n\r\n            dismiss()\r\n        }\r\n\r\n        btnCancel.setOnClickListener {\r\n            dismiss()\r\n        }\r\n\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/expirease/fragment/EditItemBottomSheet.kt b/app/src/main/java/com/example/expirease/fragment/EditItemBottomSheet.kt
+--- a/app/src/main/java/com/example/expirease/fragment/EditItemBottomSheet.kt	(revision e5d8d086740efb6b6ac346cd007fb82718113aad)
++++ b/app/src/main/java/com/example/expirease/fragment/EditItemBottomSheet.kt	(date 1746129680890)
+@@ -88,11 +88,7 @@
+             val updatedName = itemName.text.toString()
+             val updatedQuantity = itemQuantity.text.toString().toIntOrNull() ?: 1
+ 
+-            // Parse back date from EditText
+-           // val dateText = itemExpiryDate.text.toString().replace("Expiry Date: ", "")
+-            //val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+-          //  val parsedDate = formatter.parse(dateText)
+-           // val updatedExpiry = parsedDate?.time ?: System.currentTimeMillis()
++
+             val updatedExpiry = calendar.timeInMillis
+             val updatedCategory = itemCategory.text.toString().ifBlank { "Others" }
+ 
+Index: .idea/deploymentTargetDropDown.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetDropDown\">\r\n    <value>\r\n      <entry key=\"app\">\r\n        <State>\r\n          <runningDeviceTargetSelectedWithDropDown>\r\n            <Target>\r\n              <type value=\"RUNNING_DEVICE_TARGET\" />\r\n              <deviceKey>\r\n                <Key>\r\n                  <type value=\"SERIAL_NUMBER\" />\r\n                  <value value=\"8b398531\" />\r\n                </Key>\r\n              </deviceKey>\r\n            </Target>\r\n          </runningDeviceTargetSelectedWithDropDown>\r\n          <timeTargetWasSelectedWithDropDown value=\"2025-05-01T04:16:31.225735900Z\" />\r\n        </State>\r\n      </entry>\r\n    </value>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+--- a/.idea/deploymentTargetDropDown.xml	(revision e5d8d086740efb6b6ac346cd007fb82718113aad)
++++ b/.idea/deploymentTargetDropDown.xml	(date 1746148974268)
+@@ -3,20 +3,7 @@
+   <component name="deploymentTargetDropDown">
+     <value>
+       <entry key="app">
+-        <State>
+-          <runningDeviceTargetSelectedWithDropDown>
+-            <Target>
+-              <type value="RUNNING_DEVICE_TARGET" />
+-              <deviceKey>
+-                <Key>
+-                  <type value="SERIAL_NUMBER" />
+-                  <value value="8b398531" />
+-                </Key>
+-              </deviceKey>
+-            </Target>
+-          </runningDeviceTargetSelectedWithDropDown>
+-          <timeTargetWasSelectedWithDropDown value="2025-05-01T04:16:31.225735900Z" />
+-        </State>
++        <State />
+       </entry>
+     </value>
+   </component>
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"testRunner\" value=\"CHOOSE_PER_TEST\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"gradleJvm\" value=\"#GRADLE_LOCAL_JAVA_HOME\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n            <option value=\"$PROJECT_DIR$/app\" />\r\n          </set>\r\n        </option>\r\n        <option name=\"resolveExternalAnnotations\" value=\"false\" />\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision e5d8d086740efb6b6ac346cd007fb82718113aad)
++++ b/.idea/gradle.xml	(date 1746148974247)
+@@ -4,7 +4,6 @@
+   <component name="GradleSettings">
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
+-        <option name="testRunner" value="CHOOSE_PER_TEST" />
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+         <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+         <option name="modules">

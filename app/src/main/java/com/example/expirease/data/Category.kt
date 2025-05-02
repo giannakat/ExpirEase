@@ -5,8 +5,8 @@ import android.graphics.Color
 data class Category(
     val id: String,
     val displayName: String,
+    val backgroundColor: Int,
     var itemCount: Int = 0,  // Add item count property
-    val backgroundColor: Int = Color.LTGRAY
 ) {
     // Method to increment item count
     fun incrementItemCount() {

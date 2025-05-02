@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Item
 import com.example.expirease.data.ItemStatus
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HistoryAdapter(
     private var items: List<Item>, // make it mutable through a setter
@@ -35,11 +38,15 @@ class HistoryAdapter(
         val item = items[position]
         holder.itemName.text = item.name
         holder.itemAction.text = item.status.toString() ?: "Unknown"
-        holder.itemDate.text = item.expiryDate.toString() ?: "No date"
+
+        val displayFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        val formattedDate = displayFormat.format(Date(item.expiryDate))
+        holder.itemDate.text = "Expiry: " + formattedDate
+//        holder.itemDate.text = item.expiryDate.toString() ?: "No date"
 
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)
-                .setTitle(item.name)
+                .setTitle("Product: " + item.name)
                 .setMessage(
                     if (item.status == ItemStatus.EXPIRED)
                         "This item has expired and cannot be restored."

@@ -23,6 +23,7 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         val photo = view.findViewById<ImageView>(R.id.item_photo)
         val name = view.findViewById<TextView>(R.id.item_name)
         val quantity = view.findViewById<TextView>(R.id.item_quantity)
+        val itemStatus = view.findViewById<TextView>(R.id.item_status)
 
         fun bind(item: Item) {
             // set text, image, etc.
@@ -52,13 +53,15 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         val diff = expiryDate.time - currentDate.time
         val daysRemaining = TimeUnit.MILLISECONDS.toDays(diff)
 
-        val cardColor = when {
-            daysRemaining < 0 -> Color.parseColor("#FFCDD2")  // Red
-            daysRemaining <= 3 -> Color.parseColor("#FFF9C4") // Yellow
-            else -> Color.parseColor("#C8E6C9")               // Green
+        val (statusText, cardColor) = when {
+            daysRemaining < 0 -> "Expired" to Color.parseColor("#FFCDD2")  // Red
+            daysRemaining <= 3 -> "Expiring" to Color.parseColor("#FFF9C4") // Yellow
+            else -> "Fresh" to Color.parseColor("#C8E6C9")               // Green
         }
 
         holder.cardView.setCardBackgroundColor(cardColor)
+        holder.itemStatus.text = statusText
+        holder.itemStatus.setBackgroundColor(cardColor)
 
         holder.itemView.setOnClickListener {
             onClick(item)

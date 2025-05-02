@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Spinner
 import com.example.expirease.R
 import com.example.expirease.helper.OnItemUpdatedListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -43,18 +45,25 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val itemPhoto = view.findViewById<ImageView>(R.id.item_photo)
         val itemName = view.findViewById<EditText>(R.id.item_name)
-        val itemQuantity = view.findViewById<EditText>(R.id.item_quantity)
+        val itemQuantity = view.findViewById<EditText>(R.id.edit_item_quantity)
         val itemExpiryDate = view.findViewById<EditText>(R.id.item_expiryDate)
-        val itemCategory = view.findViewById<EditText>(R.id.item_category)
+        val spinnerCategory = view.findViewById<Spinner>(R.id.spinner_category)
+//        val itemCategory = view.findViewById<EditText>(R.id.item_category)
         val btnSave = view.findViewById<Button>(R.id.btn_save)
         val btnCancel = view.findViewById<Button>(R.id.btn_cancel)
         val btnCalendar = view.findViewById<ImageButton>(R.id.btn_show_calendar)
+        val btnIncrease = view.findViewById<Button>(R.id.btn_increase)
+        val btnDecrease = view.findViewById<Button>(R.id.btn_decrease)
 
         val calendar = Calendar.getInstance()
 
+        val categoryOptions = arrayOf("Dairy", "Meat", "Vegetable", "Fruit", "Beverage", "Others")
+        spinnerCategory.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryOptions)
+
+
         // Retrieve data from arguments
         arguments?.let {
-            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_product_banana))
+            itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_placeholder_product))
             itemName.setText(it.getString("name", "Unknown Item"))
             itemQuantity.setText(it.getInt("quantity", 0).toString())
 
@@ -64,7 +73,20 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
             calendar.timeInMillis = expiryMillis
 
             val category = it.getString("category", "others")
-            itemCategory.setText(category)
+            val index = categoryOptions.indexOfFirst { it.equals(category, ignoreCase = true) }
+            if (index >= 0) spinnerCategory.setSelection(index)
+        }
+
+        btnIncrease.setOnClickListener {
+            val current = itemQuantity.text.toString().toIntOrNull() ?: 0
+            itemQuantity.setText((current + 1).toString())
+        }
+
+        btnDecrease.setOnClickListener {
+            val current = itemQuantity.text.toString().toIntOrNull() ?: 0
+            if (current > 1) {
+                itemQuantity.setText((current - 1).toString())
+            }
         }
 
         btnCalendar.setOnClickListener {
@@ -84,17 +106,15 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
 
             datePicker.show()
         }
+
+
         btnSave.setOnClickListener {
             val updatedName = itemName.text.toString()
             val updatedQuantity = itemQuantity.text.toString().toIntOrNull() ?: 1
 
-            // Parse back date from EditText
-           // val dateText = itemExpiryDate.text.toString().replace("Expiry Date: ", "")
-            //val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-          //  val parsedDate = formatter.parse(dateText)
-           // val updatedExpiry = parsedDate?.time ?: System.currentTimeMillis()
+
             val updatedExpiry = calendar.timeInMillis
-            val updatedCategory = itemCategory.text.toString().ifBlank { "Others" }
+            val updatedCategory = spinnerCategory.selectedItem.toString()
 
             onItemUpdatedListener?.onItemUpdated(updatedName, updatedQuantity, updatedExpiry, updatedCategory)
 
@@ -106,5 +126,25 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
         }
 
     }
+
+//    private fun updateCategoryItemCounts() {
+//        // Reset all category counts to 0
+//        categoryList.forEach { it.itemCount = 0 }
+//
+//        // Count items for each category
+//        listOfItems.forEach { item ->
+//            val category = categoryList.find { it.id.equals(item.categoryId, ignoreCase = true) }
+//
+//            if (category != null) {
+//                category.itemCount++
+//            } else {
+//                // Handle invalid category
+//                println("CategoryWarning: Item '${item.name}' has an invalid category '${item.categoryId}'")
+//            }
+//        }
+//
+//        // Update the adapter to reflect changes
+//        categoryAdapter.notifyDataSetChanged()
+//    }
 
 }
