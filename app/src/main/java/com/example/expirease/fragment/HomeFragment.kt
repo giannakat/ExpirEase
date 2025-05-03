@@ -102,8 +102,24 @@ class HomeFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val item = filteredList[position]
-                consumeItem(item)
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Consume Item")
+                    .setMessage("Are you sure you want to consume \"${item.name}\"?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        consumeItem(item)
+                    }
+                    .setNegativeButton("No") { _, _ ->
+                        // Restore the swiped item visually
+                        itemAdapter.notifyItemChanged(position)
+                    }
+                    .setOnCancelListener {
+                        // Handle back press/cancel to restore item
+                        itemAdapter.notifyItemChanged(position)
+                    }
+                    .show()
             }
+
         })
 
         itemTouchHelper.attachToRecyclerView(itemRecyclerView)
