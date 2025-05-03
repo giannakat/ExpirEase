@@ -85,7 +85,6 @@ class ProfileActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             if (validateFields()) {
                 saveChanges()
-                finish()
             }
         }
 

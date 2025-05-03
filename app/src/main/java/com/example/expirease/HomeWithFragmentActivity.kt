@@ -1,19 +1,9 @@
-// HomeWithFragmentActivity.kt
 package com.example.expirease
 
-import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.drawable.DrawableCompat
-import com.example.expirease.app.MyApplication
-import com.example.expirease.fragment.*
-import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.Base64
@@ -23,15 +13,23 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.expirease.app.MyApplication
+import com.example.expirease.fragment.*
 import com.example.expirease.viewmodel.SharedItemViewModel
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
 class HomeWithFragmentActivity : AppCompatActivity() {
-    private lateinit var sharedItemViewModel: SharedItemViewModel
 
+    private lateinit var sharedItemViewModel: SharedItemViewModel
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     lateinit var toggle: ActionBarDrawerToggle
@@ -50,7 +48,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         reference = db.getReference("Users")
         auth = FirebaseAuth.getInstance()
 
-        // Load HomeFragment initially
+        // Load initial fragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, HomeFragment())
@@ -59,6 +57,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
+
         val menuItem = navView.menu.findItem(R.id.nav_logout)
         menuItem.icon = ContextCompat.getDrawable(this, R.drawable.ic_nav_logout)
 
@@ -70,27 +69,21 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             this, drawerLayout, toolbar,
             R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
-
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
         updateToolbarStyleForFragment(HomeFragment())
 
-        // Notification button
-        val notifButton: ImageView = findViewById(R.id.notif_icon)
-        notifButton.setOnClickListener {
+        findViewById<ImageView>(R.id.notif_icon).setOnClickListener {
             startActivity(Intent(this, NotificationsActivity::class.java))
         }
 
-        // Profile header click
         val headerView = navView.getHeaderView(0)
-        val profileHeader = headerView.findViewById<LinearLayout>(R.id.profile)
-        profileHeader.setOnClickListener {
+        headerView.findViewById<LinearLayout>(R.id.profile).setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
             drawerLayout.closeDrawers()
         }
 
-        // Navigation item click listener
         navView.setNavigationItemSelectedListener { menuItem ->
             if (menuItem.itemId == R.id.nav_logout) {
                 showLogoutDialog()
@@ -111,7 +104,6 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, newFragment)
                     .commit()
-                //change design of toolbar
                 supportFragmentManager.executePendingTransactions()
                 updateToolbarStyleForFragment(newFragment)
             }
@@ -120,45 +112,52 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             true
         }
 
-        // Logout item styling
-        val menu = navView.menu
-        val logoutItem = menu.findItem(R.id.nav_logout)
+        // Make logout red
+        val logoutItem = navView.menu.findItem(R.id.nav_logout)
         val spanString = SpannableString(logoutItem.title)
         spanString.setSpan(ForegroundColorSpan(Color.RED), 0, spanString.length, 0)
         logoutItem.title = spanString
-        val icon = logoutItem.icon
-        icon?.let {
+        logoutItem.icon?.let {
             val wrapped = DrawableCompat.wrap(it)
             DrawableCompat.setTint(wrapped, Color.RED)
             logoutItem.icon = wrapped
         }
 
-        // Update the header with the username
         updateNavHeader()
     }
 
-    // Method to update the navigation header with the name
+    // Ensure header is refreshed every time activity resumes (like after returning from profile)
+    override fun onResume() {
+        super.onResume()
+        updateNavHeader()
+    }
+
     private fun updateNavHeader() {
         val headerView = navView.getHeaderView(0)
-        val nameTextView = headerView.findViewById<TextView>(R.id.username) // Assuming you have a TextView with id "username" in your layout
-        val profileImageView = headerView.findViewById<ImageView>(R.id.profilepic) // Add this for profile image (make sure your header layout has an ImageView)
+        val nameTextView = headerView.findViewById<TextView>(R.id.username)
+        val emailTextView = headerView.findViewById<TextView>(R.id.email)
+        val profileImageView = headerView.findViewById<ImageView>(R.id.profilepic)
 
-        // Get the current user from FirebaseAuth
         val user = auth.currentUser
         if (user != null) {
             val userRef = reference.child(user.uid)
-
             userRef.get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val dataSnapshot = task.result
+                    val data = task.result
 
-                    // Fetch the name (or use "USER" if null or empty)
-                    val name = dataSnapshot?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "USER"
+                    val name = data?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "USER"
+                    var email = data?.child("email")?.value?.toString()
+
+                    // Fallback if email is missing in database
+                    if (email.isNullOrEmpty()) {
+                        email = user.email ?: "Not Available"
+                        userRef.child("email").setValue(email)  // Save email to database
+                    }
+
                     nameTextView.text = name
+                    emailTextView.text = email
 
-                    // Fetch and decode the Base64 profile image
-                    val base64Image = dataSnapshot?.child("profileImage")?.value?.toString()
-
+                    val base64Image = data?.child("profileImage")?.value?.toString()
                     if (!base64Image.isNullOrEmpty()) {
                         try {
                             val decodedBytes = Base64.decode(base64Image, Base64.DEFAULT)
@@ -166,77 +165,57 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                             profileImageView.setImageBitmap(bitmap)
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            profileImageView.setImageResource(R.drawable.img_placeholder_user) // fallback image if decode fails
+                            profileImageView.setImageResource(R.drawable.img_placeholder_user)
                         }
                     } else {
-                        profileImageView.setImageResource(R.drawable.img_placeholder_user) // fallback image if no image in database
+                        profileImageView.setImageResource(R.drawable.img_placeholder_user)
                     }
                 } else {
-                    Log.e("HomeWithFragmentActivity", "Failed to get name or image", task.exception)
+                    Log.e("NavHeader", "Error fetching user data", task.exception)
                     nameTextView.text = "USER"
+                    emailTextView.text = "Not Available"
                     profileImageView.setImageResource(R.drawable.img_placeholder_user)
                 }
             }
         } else {
             nameTextView.text = "USER"
+            emailTextView.text = "Not Available"
             profileImageView.setImageResource(R.drawable.img_placeholder_user)
         }
     }
 
-
-    // Handle logout dialog
     fun showLogoutDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Logout")
         builder.setMessage("Are you sure you want to log out?")
-
         builder.setPositiveButton("Logout") { _, _ ->
-            Log.d("Logout", "Logout button clicked")
             Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show()
 
             val app = application as MyApplication
             val user = FirebaseAuth.getInstance().currentUser
 
             if (user != null) {
-                Log.d("Logout", "User is authenticated. UID: ${user.uid}")
-
-                // Calling saveItemsToFirebase from MyApplication
                 sharedItemViewModel.saveItemsToFirebase {
-                    Log.d("Logout", "Items saved. Proceeding to logout.")
                     FirebaseAuth.getInstance().signOut()
-                    Log.d("Logout", "User signed out")
-
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
+                    startActivity(Intent(this, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
                     finish()
                 }
             } else {
-                Log.d("Logout", "No authenticated user. Skipping Firebase save.")
-
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+                startActivity(Intent(this, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
                 finish()
             }
         }
 
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            Log.d("Logout", "Logout canceled")
-            dialog.dismiss()
-        }
+        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
 
         val dialog = builder.create()
         dialog.show()
-
-        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(Color.RED)
-        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
-        layoutParams.topMargin = 50
-        positiveButton.layoutParams = layoutParams
-
-        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(Color.BLACK)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(Color.RED)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLACK)
     }
 
     fun updateToolbarStyleForFragment(fragment: Fragment) {
@@ -249,7 +228,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                 toolbar.setBackgroundColor(Color.TRANSPARENT)
                 toolbar.elevation = 0f
                 toolbarTitle.text = "ExpirEase"
-                toolbarTitle.setTextColor(ContextCompat.getColor(this, R.color.green)) // for better contrast on transparent bg
+                toolbarTitle.setTextColor(ContextCompat.getColor(this, R.color.green))
                 notifIcon.setColorFilter(ContextCompat.getColor(this, R.color.green))
                 toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.green)
             }
@@ -291,5 +270,4 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             }
         }
     }
-
 }
