@@ -3,11 +3,14 @@ package com.example.expirease
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.expirease.data.Users
@@ -36,6 +39,45 @@ class RegisterActivity : AppCompatActivity() {
         val passwordField = binding.createPassword
         val confirmPasswordField = binding.confirmPassword
         val signupButton = binding.signupButton
+
+
+        var isPasswordVisible1 = false
+        var isPasswordVisible2 = false
+
+        val passwordEditText: EditText = findViewById(R.id.create_password)
+        val togglePassword1: ImageView = findViewById(R.id.iv_toggle_password1)
+        val confirmPasswordEditText: EditText = findViewById(R.id.confirm_password)
+        val togglePassword2: ImageView = findViewById(R.id.iv_toggle_password2)
+
+        togglePassword1.setOnClickListener {
+            isPasswordVisible1 = !isPasswordVisible1
+            if (isPasswordVisible1) {
+                // Show password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword1.setImageResource(R.drawable.ic_eye_open)
+            } else {
+                // Hide password
+                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword1.setImageResource(R.drawable.ic_eye_closed)
+            }
+            // Keep cursor at the end
+            passwordEditText.setSelection(passwordEditText.text.length)
+        }
+
+        togglePassword2.setOnClickListener {
+            isPasswordVisible2 = !isPasswordVisible2
+            if (isPasswordVisible2) {
+                // Show password
+                confirmPasswordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePassword2.setImageResource(R.drawable.ic_eye_open)
+            } else {
+                // Hide password
+                confirmPasswordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePassword2.setImageResource(R.drawable.ic_eye_closed)
+            }
+            // Keep cursor at the end
+            passwordEditText.setSelection(confirmPasswordEditText.text.length)
+        }
 
         signupButton.setOnClickListener {
             val username = nameField.text.toString()

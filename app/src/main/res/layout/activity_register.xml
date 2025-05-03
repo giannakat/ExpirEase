@@ -40,7 +40,6 @@
         android:padding="12dp"
         android:layout_marginTop="10dp"
         android:textColor="#707070"
-
         android:ems="10"
         android:background="@drawable/edittext_background"
         android:inputType="text"
@@ -78,20 +77,35 @@
         android:layout_marginTop="20dp"
         android:textSize="20sp"/>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
 
-    <EditText
-        android:id="@+id/create_password"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textSize="18sp"
-        android:padding="12dp"
-        android:layout_marginTop="10dp"
-        android:textColor="#707070"
+        <EditText
+            android:id="@+id/create_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:textColor="#707070"
+            android:ems="10"
+            android:background="@drawable/edittext_background"
+            android:inputType="textPassword"
+            android:hint="Enter your password"/>
 
-        android:ems="10"
-        android:background="@drawable/edittext_background"
-        android:inputType="textPassword"
-        android:hint="Enter your password"/>
+        <ImageView
+            android:id="@+id/iv_toggle_password1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/ic_eye_closed"
+            android:contentDescription="Toggle Visibility"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"/>
+    </RelativeLayout>
 
 
     <TextView
@@ -103,20 +117,35 @@
         android:layout_marginTop="20dp"
         android:textSize="20sp"/>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
 
-    <EditText
-        android:id="@+id/confirm_password"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textSize="18sp"
-        android:padding="12dp"
-        android:layout_marginTop="10dp"
-        android:textColor="#707070"
+        <EditText
+            android:id="@+id/confirm_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:textColor="#707070"
+            android:ems="10"
+            android:background="@drawable/edittext_background"
+            android:inputType="textPassword"
+            android:hint="Enter your password"/>
 
-        android:ems="10"
-        android:background="@drawable/edittext_background"
-        android:inputType="textPassword"
-        android:hint="Enter your password"/>
+        <ImageView
+            android:id="@+id/iv_toggle_password2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/ic_eye_closed"
+            android:contentDescription="Toggle Visibility"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/loginTextView"
