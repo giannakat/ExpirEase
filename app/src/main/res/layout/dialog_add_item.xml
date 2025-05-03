@@ -50,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Category: "
+            android:textStyle="bold"
             android:textSize="16dp"/>
 
 
@@ -74,6 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Expiry Date: "
+            android:textStyle="bold"
             android:textSize="16dp"/>
 
         <TextView
@@ -110,12 +112,13 @@
             android:textStyle="bold"
             android:layout_marginEnd="10dp"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_decrease"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@color/accent"
-            android:text="-"/>
+            style="@style/CircleButton"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:text="-"
+            />
 
         <EditText
             android:id="@+id/edit_item_quantity"
@@ -126,12 +129,13 @@
             android:inputType="number"
             android:paddingHorizontal="15dp"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_increase"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@color/accent"
-            android:text="+"/>
+            style="@style/CircleButton"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:text="+"
+            />
     </LinearLayout>
 
 
@@ -143,20 +147,19 @@
         android:layout_marginVertical="20dp"
         android:gravity="center">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_cancel"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            android:background="@drawable/border_button"
+            style="@style/OutlinedCustomButton"
             android:layout_marginEnd="4dp"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_add_item"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:text="Add Item"
-            android:background="@drawable/button_background"
             android:layout_marginStart="4dp"/>
 
     </LinearLayout>

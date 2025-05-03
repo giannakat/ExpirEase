@@ -17,20 +17,26 @@ class NotificationRecyclerViewAdapter(
 ) : RecyclerView.Adapter<NotificationRecyclerViewAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val photo: ImageView = view.findViewById(R.id.item_photo)
-        private val name: TextView = view.findViewById(R.id.item_name)
-        private val expiry: TextView = view.findViewById(R.id.item_expiryDate)
+        private val photo: ImageView = view.findViewById(R.id.notif_photo)
+        private val title: TextView = view.findViewById(R.id.notif_title)
+        private val details: TextView = view.findViewById(R.id.notif_details)
 
         fun bind(item: Item, onClick: (Item) -> Unit) {
             photo.setImageResource(item.photoResource)
-            name.text = "Urgent!"
             val formattedExpiryDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(item.expiryDate))
-            val expiryText = if (item.expiryDate < System.currentTimeMillis()) {
-                "${item.name} has expired on $formattedExpiryDate"
+            val name: String
+            val msg: String
+
+            if (item.expiryDate < System.currentTimeMillis()) {
+                name = "${item.name} is already expired!"
+                msg = "${item.name} has expired on $formattedExpiryDate. Throw them out to save more space."
             } else {
-                "${item.name} will expire on $formattedExpiryDate"
+                name = "${item.name} is almost expired!"
+                msg = "${item.name} will expire $formattedExpiryDate. Consume or donate them before it's too late."
             }
-            expiry.text = expiryText
+
+            title.text = name
+            details.text = msg
             itemView.setOnClickListener { onClick(item) }
         }
     }

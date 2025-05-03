@@ -8,7 +8,7 @@
     <!-- Border (Black) -->
     <stroke
         android:width="2dp"
-        android:color="@color/green" />
+        android:color="@color/primaryColor" />
 
     <!-- Rounded Corners (Optional) -->
     <corners

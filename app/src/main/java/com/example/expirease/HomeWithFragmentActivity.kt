@@ -145,12 +145,12 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     val data = task.result
 
-                    val name = data?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "USER"
+                    val name = data?.child("name")?.value?.toString()?.takeIf { it.isNotEmpty() } ?: "Username"
                     var email = data?.child("email")?.value?.toString()
 
                     // Fallback if email is missing in database
                     if (email.isNullOrEmpty()) {
-                        email = user.email ?: "Not Available"
+                        email = user.email ?: ""
                         userRef.child("email").setValue(email)  // Save email to database
                     }
 
@@ -172,14 +172,14 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                     }
                 } else {
                     Log.e("NavHeader", "Error fetching user data", task.exception)
-                    nameTextView.text = "USER"
-                    emailTextView.text = "Not Available"
+                    nameTextView.text = "Username"
+                    emailTextView.text = ""
                     profileImageView.setImageResource(R.drawable.img_placeholder_user)
                 }
             }
         } else {
-            nameTextView.text = "USER"
-            emailTextView.text = "Not Available"
+            nameTextView.text = "Username"
+            emailTextView.text = ""
             profileImageView.setImageResource(R.drawable.img_placeholder_user)
         }
     }
@@ -228,13 +228,13 @@ class HomeWithFragmentActivity : AppCompatActivity() {
                 toolbar.setBackgroundColor(Color.TRANSPARENT)
                 toolbar.elevation = 0f
                 toolbarTitle.text = "ExpirEase"
-                toolbarTitle.setTextColor(ContextCompat.getColor(this, R.color.green))
-                notifIcon.setColorFilter(ContextCompat.getColor(this, R.color.green))
-                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.green)
+                toolbarTitle.setTextColor(ContextCompat.getColor(this, R.color.primaryColor))
+                notifIcon.setColorFilter(ContextCompat.getColor(this, R.color.primaryColor))
+                toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.primaryColor)
             }
 
             is HouseholdFragment -> {
-                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.setBackgroundColor(getColor(R.color.primaryColor))
                 toolbar.elevation = 8f
                 toolbarTitle.text = "Household"
                 toolbarTitle.setTextColor(Color.WHITE)
@@ -243,7 +243,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             }
 
             is HistoryFragment -> {
-                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.setBackgroundColor(getColor(R.color.primaryColor))
                 toolbar.elevation = 8f
                 toolbarTitle.text = "History"
                 toolbarTitle.setTextColor(Color.WHITE)
@@ -252,7 +252,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             }
 
             is SettingsFragment -> {
-                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.setBackgroundColor(getColor(R.color.primaryColor))
                 toolbar.elevation = 8f
                 toolbarTitle.text = "Settings"
                 toolbarTitle.setTextColor(Color.WHITE)
@@ -261,7 +261,7 @@ class HomeWithFragmentActivity : AppCompatActivity() {
             }
 
             is CalendarFragment -> {
-                toolbar.setBackgroundColor(getColor(R.color.green))
+                toolbar.setBackgroundColor(getColor(R.color.primaryColor))
                 toolbar.elevation = 8f
                 toolbarTitle.text = "Calendar"
                 toolbarTitle.setTextColor(Color.WHITE)

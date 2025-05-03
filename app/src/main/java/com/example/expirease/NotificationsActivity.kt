@@ -3,7 +3,9 @@ package com.example.expirease
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -16,7 +18,7 @@ import com.example.expirease.viewmodel.SharedItemViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
-class NotificationsActivity : AppCompatActivity() {
+class   NotificationsActivity : AppCompatActivity() {
     private val viewModel: SharedItemViewModel by viewModels()
 
     private lateinit var expiringSoonAdapter: NotificationRecyclerViewAdapter
@@ -29,6 +31,9 @@ class NotificationsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notifications)
+        val expiringSoonText: TextView = findViewById(R.id.expiringsoon)
+        val expiredText: TextView = findViewById(R.id.expired)
+
 
         val backButton: ImageView = findViewById(R.id.back_button)
         backButton.setOnClickListener {
@@ -80,6 +85,9 @@ class NotificationsActivity : AppCompatActivity() {
             if (itemList != null) {
                 expiredList.addAll(itemList.filter { it.expiryDate < now })
             }
+
+            expiringSoonText.visibility = if (expiringSoonList.isNotEmpty()) View.VISIBLE else View.GONE
+            expiredText.visibility = if (expiredList.isNotEmpty()) View.VISIBLE else View.GONE
 
             expiringSoonAdapter.notifyDataSetChanged()
             expiredAdapter.notifyDataSetChanged()

@@ -47,8 +47,6 @@
 
         </LinearLayout>
 
-
-<!--        expiry date      -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -152,11 +150,11 @@
                 android:orientation="horizontal"
                 android:layout_gravity="start">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/CircleButton"
                     android:id="@+id/btn_decrease"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@color/accent"
+                    android:layout_width="40dp"
+                    android:layout_height="50dp"
                     android:text="-"/>
 
                 <EditText
@@ -168,28 +166,15 @@
                     android:inputType="number"
                     android:paddingHorizontal="15dp"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/CircleButton"
                     android:id="@+id/btn_increase"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@color/accent"
+                    android:layout_width="40dp"
+                    android:layout_height="50dp"
                     android:text="+"/>
             </LinearLayout>
 
 
-
-
-<!--            <EditText-->
-<!--                android:id="@+id/item_quantity"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="4"-->
-<!--                android:background="@null"-->
-<!--                android:textSize="16sp"-->
-<!--                android:layout_marginVertical="8dp"-->
-<!--                android:paddingLeft="40dp"-->
-<!--                android:focusable="false"-->
-<!--                android:cursorVisible="false"/>-->
 
         </LinearLayout>
 
@@ -198,19 +183,19 @@
             android:layout_height="match_parent"
             android:gravity="center">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_cancel"
+                style="@style/OutlinedCustomButton"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/border_button"
                 android:layout_margin="5dp"
                 android:text="Cancel"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/CustomButton"
                 android:id="@+id/btn_save"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_background"
                 android:layout_margin="5dp"
                 android:text="Save"
                 />

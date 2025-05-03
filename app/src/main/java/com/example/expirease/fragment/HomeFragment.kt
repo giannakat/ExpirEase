@@ -266,6 +266,8 @@ class HomeFragment : Fragment() {
                 val imageResId = getImageForCategory(selectedCategory)
                 addItem(name, quantity, selectedExpiryDate, selectedCategory, imageResId)
                 dialog.dismiss()
+            }else{
+                Toast.makeText(requireContext(), "An item must have name and category!", Toast.LENGTH_LONG).show()
             }
         }
 

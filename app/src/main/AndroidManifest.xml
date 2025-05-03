@@ -37,8 +37,6 @@
         <activity android:name=".CustomListViewActivity" android:exported="false" />
         <activity android:name=".HomeWithFragmentActivity" android:exported="false" android:theme="@style/Theme.ExpirEase"/>
         <activity android:name=".DevelopersActivity" android:exported="false" />
-        <activity android:name=".LogoutActivity" android:exported="false" />
-        <activity android:name=".SettingsActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
         <activity android:name=".SplashScreenActivity" android:exported="false"/>
         <activity android:name=".RegisterActivity" android:exported="false" />

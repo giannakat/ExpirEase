@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:text="Change Photo "
                 android:textSize="14sp"
-                android:textColor="@color/green"
+                android:textColor="@color/primaryColor"
                 android:textStyle="bold"/>
 
             <ImageView
@@ -65,10 +65,6 @@
             android:layout_marginEnd="0dp"/>
 
         </LinearLayout>
-
-
-
-
         <!-- Name Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -293,22 +289,24 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveProfileButton"
                 android:layout_width="160dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/button_background"
+                android:layout_height="60dp"
                 android:text="Save Changes"
                 android:textColor="@color/white"
                 android:layout_marginRight="20dp"/>
-            <Button
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/OutlinedCustomButton"
                 android:id="@+id/back_button"
                 android:layout_width="160dp"
-                android:layout_height="match_parent"
+                android:layout_height="60dp"
                 android:text="Back"
-                android:background="@drawable/border_button"
                 android:textColor="@color/black"/>
         </LinearLayout>
 

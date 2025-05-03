@@ -27,7 +27,7 @@
             android:text="Meet the Team"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:textColor="@color/green"
+            android:textColor="@color/primaryColor"
             android:layout_marginBottom="20dp"
             android:gravity="center" />
 

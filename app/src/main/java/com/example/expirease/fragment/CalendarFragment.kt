@@ -29,6 +29,7 @@ class CalendarFragment : Fragment() {
     private lateinit var calendarView: CalendarView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ItemRecyclerViewAdapter
+    private lateinit var emptyTextView: TextView
 
     private var selectedDate: LocalDate = LocalDate.now()
 
@@ -47,6 +48,8 @@ class CalendarFragment : Fragment() {
         val monthTextView = view.findViewById<TextView>(R.id.monthTextView)
         val prevButton = view.findViewById<ImageButton>(R.id.previousMonthButton)
         val nextButton = view.findViewById<ImageButton>(R.id.nextMonthButton)
+        emptyTextView = view.findViewById(R.id.emptyTextView)
+
 
         adapter = ItemRecyclerViewAdapter(mutableListOf(), {}, {})
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -102,9 +105,14 @@ class CalendarFragment : Fragment() {
                         filterItemsForDate(data.date)
                         calendarView.notifyCalendarChanged()
                     }
+
+                    val hasItems = sharedItemViewModel.getItemsForDate(data.date).isNotEmpty()
+                    container.dotIndicator.visibility = if (hasItems) View.VISIBLE else View.GONE
+
                 } else {
                     container.dayText.setTextColor(Color.GRAY)
                     container.view.setOnClickListener(null)
+                    container.dotIndicator.visibility = View.GONE
                 }
 
                 // Highlight selected day
@@ -120,6 +128,11 @@ class CalendarFragment : Fragment() {
     //filter list based on selected date
     private fun filterItemsForDate(date: LocalDate) {
         val filtered = sharedItemViewModel.getItemsForDate(date)
+        if (filtered.isEmpty()) {
+            emptyTextView.visibility = View.VISIBLE
+        } else {
+            emptyTextView.visibility = View.GONE
+        }
         adapter.updateData(filtered.toMutableList())
     }
 
@@ -127,6 +140,6 @@ class CalendarFragment : Fragment() {
     inner class DayViewContainer(view: View) : ViewContainer(view) {
         val dayText: TextView = view.findViewById(R.id.calendarDayText)
         val container: FrameLayout = view.findViewById(R.id.dayContainer)
-
+        val dotIndicator: View = view.findViewById(R.id.dotIndicator)
     }
 }

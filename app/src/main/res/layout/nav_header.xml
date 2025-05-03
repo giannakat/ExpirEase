@@ -7,7 +7,7 @@
     android:gravity="center_vertical"
     android:paddingVertical="30dp"
     android:paddingHorizontal="4dp"
-    android:background="@color/accent">
+    android:background="#8BC36C">
 
 
     <ImageView
@@ -30,7 +30,7 @@
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="25dp"
+            android:textSize="24dp"
             android:textStyle="bold"
             android:maxLines="2"
             android:ellipsize="end"
@@ -42,8 +42,7 @@
             android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:textStyle="italic"
+            android:textSize="14dp"
             android:maxLines="2"
             android:ellipsize="end"
             android:layout_weight="1"

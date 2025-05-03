@@ -19,7 +19,7 @@
         android:textStyle="bold"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
-        android:textColor="@color/green"
+        android:textColor="@color/primaryColor"
         android:text="Sign Up"/>
 
     <TextView
@@ -158,14 +158,13 @@
         android:text="Already have an account? Login"
         tools:ignore="TouchTargetSizeCheck" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id = "@+id/signup_button"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:text="Sign Up"
-        android:background="@drawable/button_background"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="40dp"
+        />
 
-    </Button>
 </LinearLayout>
 </ScrollView>

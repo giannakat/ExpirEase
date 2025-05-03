@@ -17,7 +17,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="35dp"
         android:layout_marginBottom="35dp"
-        android:textColor="@color/green"
+        android:textColor="@color/primaryColor"
         android:text="LOGIN"/>
 
     <TextView
@@ -94,16 +94,13 @@
         android:focusable="true" />
 
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id = "@+id/btnlogin"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:text="LOGIN"
-        android:background="@drawable/button_background"
-        android:layout_marginTop="50dp">
-
-    </Button>
-
+        android:layout_marginTop="50dp"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"

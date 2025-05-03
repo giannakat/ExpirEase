@@ -108,4 +108,5 @@ dependencies {
     implementation("com.github.yalantis:ucrop:2.2.8")
     implementation(libs.androidx.appcompat.v142)
 
+    implementation ("com.google.android.material:material:1.11.0")
 }
