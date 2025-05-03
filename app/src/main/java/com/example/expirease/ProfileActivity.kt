@@ -186,14 +186,12 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun validateFields(): Boolean {
         return if (
-            etName.text.isNotEmpty() &&
             etUsername.text.isNotEmpty() &&
-            etPhone.text.isNotEmpty() &&
             etPassword.text.isNotEmpty()
         ) {
             true
         } else {
-            Toast.makeText(this, "All fields must be filled!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Username and password shouldn't be empty!", Toast.LENGTH_SHORT).show()
             false
         }
     }
