@@ -31,10 +31,17 @@ class ConsumedItemFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view_history)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        historyAdapter = HistoryAdapter(mutableListOf()) { item ->
-            sharedItemViewModel.restoreItem(item)
-            Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
-        }
+        historyAdapter = HistoryAdapter(
+            items = emptyList(),
+            onRestore = { item ->
+                sharedItemViewModel.restoreItem(item)
+                Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
+            },
+            onDelete = { item ->
+                sharedItemViewModel.deleteItem(item)
+                Toast.makeText(requireContext(), "${item.name} deleted!", Toast.LENGTH_SHORT).show()
+            }
+        )
 
         recyclerView.adapter = historyAdapter
 
@@ -42,5 +49,4 @@ class ConsumedItemFragment : Fragment() {
             historyAdapter.submitList(items.filter { it.status == ItemStatus.CONSUMED })
         }
     }
-
 }

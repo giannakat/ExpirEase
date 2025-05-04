@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,27 +32,42 @@ class AllItemFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view_history)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        historyAdapter = HistoryAdapter(mutableListOf()) { item ->
-            if (item.status != ItemStatus.ACTIVE) {
-                sharedItemViewModel.restoreItem(item)
-                Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(requireContext(), "Cannot restore expired item!", Toast.LENGTH_SHORT).show()
+        // Initialize the adapter with an empty list and the onRestore function
+        historyAdapter = HistoryAdapter(
+            items = emptyList(),
+            onRestore = { item ->
+                if (item.status != ItemStatus.ACTIVE) {
+                    sharedItemViewModel.restoreItem(item)
+                    Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Cannot restore expired item!", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onDelete = { item ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Confirm Deletion")
+                    .setMessage("Are you sure you want to delete ${item.name}?")
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        sharedItemViewModel.deleteItem(item)
+                        Toast.makeText(requireContext(), "${item.name} deleted!", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
             }
-        }
+        )
+
 
         recyclerView.adapter = historyAdapter
 
+        // Observe allItems from the ViewModel and update the adapter with the filtered items
         sharedItemViewModel.allItems.observe(viewLifecycleOwner) { items ->
             val filteredItems = items.filter {
                 it.status == ItemStatus.DELETED ||
-                it.status == ItemStatus.CONSUMED ||
-                it.status == ItemStatus.EXPIRED
+                        it.status == ItemStatus.CONSUMED ||
+                        it.status == ItemStatus.EXPIRED
             }
-            // Pass the original items directly to the adapter
-            historyAdapter.submitList(filteredItems)
+            historyAdapter.submitList(filteredItems) // Update the adapter's list with filtered items
         }
-
     }
-
 }

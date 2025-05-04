@@ -344,18 +344,19 @@ class HomeFragment : Fragment() {
     }
 
     private fun showItemOptionsDialog(item: Item): Boolean {
+        // Directly show the confirmation dialog on long press
         AlertDialog.Builder(requireContext())
-            .setTitle(item.name)
-            .setItems(arrayOf("Consume", "Delete")) { _, which ->
-                when (which) {
-                    0 -> consumeItem(item)
-                    1 -> deleteItem(item)
-                }
+            .setTitle("Confirm Deletion")
+            .setMessage("Are you sure you want to delete \"${item.name}\"?")
+            .setPositiveButton("Yes") { _, _ ->
+                deleteItem(item)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("No", null)
             .show()
+
         return true
     }
+
 
     private fun consumeItem(item: Item) {
         if (item.quantity > 1) {

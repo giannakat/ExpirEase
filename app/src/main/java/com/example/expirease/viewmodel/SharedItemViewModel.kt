@@ -153,4 +153,28 @@ class SharedItemViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteItem(item: Item) {
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (child in snapshot.children) {
+                    val existingItem = child.getValue(Item::class.java)
+                    if (existingItem?.name == item.name && existingItem.expiryDate == item.expiryDate) {
+                        child.ref.removeValue()
+                        break
+                    }
+                }
+
+                // Update LiveData after deletion
+                _allItems.value = _allItems.value?.filterNot {
+                    it.name == item.name && it.expiryDate == item.expiryDate
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ViewModel", "Delete failed: ${error.message}")
+            }
+        })
+    }
+
 }

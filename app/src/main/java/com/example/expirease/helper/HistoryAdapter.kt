@@ -3,7 +3,6 @@ package com.example.expirease.helper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -16,8 +15,9 @@ import java.util.Date
 import java.util.Locale
 
 class HistoryAdapter(
-    private var items: List<Item>, // make it mutable through a setter
-    private val onRestore: (Item) -> Unit
+    private var items: List<Item>,
+    private val onRestore: (Item) -> Unit,
+    private val onDelete: (Item) -> Unit
 ) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -37,42 +37,37 @@ class HistoryAdapter(
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val item = items[position]
         holder.itemName.text = item.name
-        holder.itemAction.text = item.status.toString() ?: "Unknown"
+        holder.itemAction.text = item.status.toString()
 
         val displayFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val formattedDate = displayFormat.format(Date(item.expiryDate))
-        holder.itemDate.text = "Expiry: " + formattedDate
-//        holder.itemDate.text = item.expiryDate.toString() ?: "No date"
+        holder.itemDate.text = "Expiry: $formattedDate"
 
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)
-                .setTitle("Product: " + item.name)
-                .setMessage(
-                    if (item.status == ItemStatus.EXPIRED)
-                        "This item has expired and cannot be restored."
-                    else
-                        "Do you want to restore this item?"
-                )
-                .setPositiveButton("Restore") { dialog, _ ->
-                    if (item.status != ItemStatus.EXPIRED) {
-                        onRestore(item)
-                    } else {
-                        Toast.makeText(
-                            holder.itemView.context,
-                            "Cannot restore expired item.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .apply {
-                    if (item.status == ItemStatus.EXPIRED) {
-                        // Disable restore button if expired
-                        setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-                        setNegativeButton(null, null)
+                .setTitle("Options for: ${item.name}")
+                .setItems(arrayOf("Restore", "Delete")) { _, which ->
+                    when (which) {
+                        0 -> { // Restore
+                            if (item.status != ItemStatus.EXPIRED) {
+                                AlertDialog.Builder(holder.itemView.context)
+                                    .setTitle("Restore Item")
+                                    .setMessage("Are you sure you want to restore \"${item.name}\"?")
+                                    .setPositiveButton("Yes") { _, _ -> onRestore(item) }
+                                    .setNegativeButton("No", null)
+                                    .show()
+                            } else {
+                                Toast.makeText(
+                                    holder.itemView.context,
+                                    "Cannot restore expired item.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        1 -> {
+                            // Directly call delete without dialog
+                            onDelete(item)
+                        }
                     }
                 }
                 .show()
@@ -80,7 +75,6 @@ class HistoryAdapter(
         }
     }
 
-    // Now submitList is outside onBindViewHolder
     fun submitList(newItems: List<Item>) {
         items = newItems
         notifyDataSetChanged()

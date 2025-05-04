@@ -19,6 +19,7 @@ class ExpiredItemFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var historyAdapter: HistoryAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,9 +31,17 @@ class ExpiredItemFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view_history)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        historyAdapter = HistoryAdapter(mutableListOf()) { item ->
-            Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
-        }
+        historyAdapter = HistoryAdapter(
+            items = emptyList(),
+            onRestore = { item ->
+                sharedItemViewModel.restoreItem(item)
+                Toast.makeText(requireContext(), "${item.name} restored!", Toast.LENGTH_SHORT).show()
+            },
+            onDelete = { item ->
+                sharedItemViewModel.deleteItem(item)
+                Toast.makeText(requireContext(), "${item.name} deleted!", Toast.LENGTH_SHORT).show()
+            }
+        )
 
         recyclerView.adapter = historyAdapter
 
@@ -40,6 +49,4 @@ class ExpiredItemFragment : Fragment() {
             historyAdapter.submitList(items.filter { it.status == ItemStatus.EXPIRED })
         }
     }
-
-
 }
