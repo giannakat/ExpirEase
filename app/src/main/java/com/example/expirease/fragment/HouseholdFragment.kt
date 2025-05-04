@@ -41,8 +41,8 @@ class HouseholdFragment : Fragment() {
             val dialog = HouseholdDetailsDialogFragment()
             val bundle = Bundle().apply {
                 putString("id", member.id)
-                putString("firstname", member.firstname)
-                putString("lastname", member.lastname)
+                putString("firstname", member.username)
+                putString("lastname", member.email)
                 putInt("photo", member.photoResource)
             }
             dialog.arguments = bundle
@@ -62,17 +62,30 @@ class HouseholdFragment : Fragment() {
         addButton.setOnClickListener {
             val addDialog = AddMemberDialogFragment()
             addDialog.setOnMemberAddedListener(object : AddMemberDialogFragment.OnMemberAddedListener {
-                override fun onMemberAdded(firstname: String, lastname: String) {
-                    val newMember = Member(
-                        firstname = firstname,
-                        lastname = lastname,
-                        photoResource = R.drawable.img_product_banana // Default image
-                    )
-                    addMemberToDatabase(newMember)
+                override fun onMemberAdded(username: String, email: String) {
+                    val memberId = database.push().key
+                    if (memberId != null) {
+                        val newMember = Member(
+                            id = memberId,
+                            username = username,
+                            email = email,
+                            photoResource = R.drawable.img_placeholder_user // Default image
+                        )
+                        database.child(memberId).setValue(newMember).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                showToast("Member added")
+                            } else {
+                                showToast("Error adding member")
+                            }
+                        }
+                    } else {
+                        showToast("Error generating member ID")
+                    }
                 }
             })
             addDialog.show(parentFragmentManager, "AddMemberDialog")
         }
+
 
         // Fetch members from Firebase
         fetchMembersFromDatabase()

@@ -8,11 +8,15 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import com.example.expirease.R
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 class AddMemberDialogFragment : DialogFragment() {
 
     interface OnMemberAddedListener {
-        fun onMemberAdded(firstname: String, lastname: String)
+        fun onMemberAdded(username: String, email: String)
     }
 
     private var addListener: OnMemberAddedListener? = null
@@ -37,16 +41,37 @@ class AddMemberDialogFragment : DialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val firstNameInput = view.findViewById<EditText>(R.id.edit_firstname)
-        val lastNameInput = view.findViewById<EditText>(R.id.edit_lastname)
+        val emailInput = view.findViewById<EditText>(R.id.edit_email)
         val addButton = view.findViewById<Button>(R.id.btn_add_member)
 
         addButton.setOnClickListener {
-            val firstname = firstNameInput.text.toString().trim()
-            val lastname = lastNameInput.text.toString().trim()
-            if (firstname.isNotEmpty() && lastname.isNotEmpty()) {
-                addListener?.onMemberAdded(firstname, lastname)
-                dismiss()
+            val email = emailInput.text.toString().trim()
+            if (email.isNotEmpty()) {
+                val usersRef = FirebaseDatabase.getInstance().getReference("Users")
+                usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        var found = false
+                        for (userSnapshot in snapshot.children) {
+                            val userEmail = userSnapshot.child("email").getValue(String::class.java)
+                            val username = userSnapshot.child("username").getValue(String::class.java)
+                            if (userEmail == email && username != null) {
+                                addListener?.onMemberAdded(username, email)
+                                dismiss()
+                                found = true
+                                break
+                            }
+                        }
+                        if (!found) {
+                            emailInput.error = "No user found with that email."
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        emailInput.error = "Database error: ${error.message}"
+                    }
+                })
+            } else {
+                emailInput.error = "Email cannot be empty"
             }
         }
     }

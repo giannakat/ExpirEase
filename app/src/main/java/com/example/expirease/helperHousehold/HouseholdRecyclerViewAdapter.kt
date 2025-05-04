@@ -16,13 +16,13 @@ class HouseholdRecyclerViewAdapter(
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val photo: ImageView = view.findViewById(R.id.item_photo)
-        val firstname: TextView = view.findViewById(R.id.member_firstname)
-        val lastname: TextView = view.findViewById(R.id.member_lastname)
+        val username: TextView = view.findViewById(R.id.member_username)
+        val email: TextView = view.findViewById(R.id.member_email)
 
         fun bind(item: Member, onClick: (Member) -> Unit) {
             photo.setImageResource(item.photoResource)
-            firstname.text = item.firstname
-            lastname.text = item.lastname
+            username.text = item.username
+            email.text = item.email
             itemView.setOnClickListener { onClick(item) }
         }
     }

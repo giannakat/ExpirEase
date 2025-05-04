@@ -15,7 +15,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/household_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="500dp"
             android:nestedScrollingEnabled="false" />
 
         <!-- Add button below -->
@@ -26,7 +26,9 @@
             android:layout_height="70dp"
             android:text="+"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="bottom"/>
 
     </LinearLayout>
+
 </ScrollView>
