@@ -54,7 +54,7 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         val daysRemaining = TimeUnit.MILLISECONDS.toDays(diff)
 
         val (statusText, cardColor) = when {
-            daysRemaining < 0 -> "Expired" to Color.parseColor("#FFCDD2")  // Red
+            daysRemaining <= 0 -> "Expired" to Color.parseColor("#FFCDD2")  // Red
             daysRemaining <= 3 -> "Expiring" to Color.parseColor("#FFF9C4") // Yellow
             else -> "Fresh" to Color.parseColor("#C8E6C9")               // Green
         }

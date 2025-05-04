@@ -13,9 +13,15 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.Toast
 import com.example.expirease.R
 import com.example.expirease.helper.OnItemUpdatedListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -23,6 +29,8 @@ import java.util.Locale
 
 class EditItemBottomSheet : BottomSheetDialogFragment() {
     var onItemUpdatedListener: OnItemUpdatedListener? = null
+    var itemNameKey: String? = null // Using item name as Firebase key
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,22 +41,19 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-
         dialog.setOnShowListener {
             val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheet?.setBackgroundColor(Color.TRANSPARENT)
         }
-
         return dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val itemPhoto = view.findViewById<ImageView>(R.id.item_photo)
-        val itemName = view.findViewById<EditText>(R.id.item_name)
-        val itemQuantity = view.findViewById<EditText>(R.id.edit_item_quantity)
-        val itemExpiryDate = view.findViewById<EditText>(R.id.item_expiryDate)
+        val itemName = view.findViewById<EditText>(R.id.item_name2)
+        val itemQuantity = view.findViewById<EditText>(R.id.edit_item_quantity2)
+        val itemExpiryDate = view.findViewById<EditText>(R.id.item_expiryDate2)
         val spinnerCategory = view.findViewById<Spinner>(R.id.spinner_category)
-//        val itemCategory = view.findViewById<EditText>(R.id.item_category)
         val btnSave = view.findViewById<Button>(R.id.btn_save)
         val btnCancel = view.findViewById<Button>(R.id.btn_cancel)
         val btnCalendar = view.findViewById<ImageButton>(R.id.btn_show_calendar)
@@ -60,14 +65,13 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
         val categoryOptions = arrayOf("Dairy", "Meat", "Vegetable", "Fruit", "Beverage", "Others")
         spinnerCategory.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryOptions)
 
-
         // Retrieve data from arguments
         arguments?.let {
             itemPhoto.setImageResource(it.getInt("photo", R.drawable.img_placeholder_product))
             itemName.setText(it.getString("name", "Unknown Item"))
             itemQuantity.setText(it.getInt("quantity", 0).toString())
 
-            val expiryMillis = it.getLong("expiryDate", System.currentTimeMillis())  // Get expiry date
+            val expiryMillis = it.getLong("expiryDate", System.currentTimeMillis())
             val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(expiryMillis))
             itemExpiryDate.setText(formattedDate)
             calendar.timeInMillis = expiryMillis
@@ -75,8 +79,11 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
             val category = it.getString("category", "others")
             val index = categoryOptions.indexOfFirst { it.equals(category, ignoreCase = true) }
             if (index >= 0) spinnerCategory.setSelection(index)
+
+            itemNameKey = it.getString("name") // Use name as Firebase key
         }
 
+        // Quantity update buttons
         btnIncrease.setOnClickListener {
             val current = itemQuantity.text.toString().toIntOrNull() ?: 0
             itemQuantity.setText((current + 1).toString())
@@ -89,62 +96,70 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
+        // Date picker
         btnCalendar.setOnClickListener {
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
             val datePicker = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
-                // Update the EditText with selected date
                 val formatted = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
                 itemExpiryDate.setText(formatted)
-
-                // Save the date back to calendar if needed
                 calendar.set(selectedYear, selectedMonth, selectedDay)
-
             }, year, month, day)
 
             datePicker.show()
         }
 
-
+        // Save button logic
         btnSave.setOnClickListener {
-            val updatedName = itemName.text.toString()
-            val updatedQuantity = itemQuantity.text.toString().toIntOrNull() ?: 1
-
-
+            val updatedName = itemName.text.toString().trim()
+            val updatedQuantity = itemQuantity.text.toString().toIntOrNull() ?: 0
             val updatedExpiry = calendar.timeInMillis
             val updatedCategory = spinnerCategory.selectedItem.toString()
 
-            onItemUpdatedListener?.onItemUpdated(updatedName, updatedQuantity, updatedExpiry, updatedCategory)
+            // Validate input
+            if (updatedName.isEmpty() || updatedQuantity <= 0 || updatedCategory.isEmpty()) {
+                Toast.makeText(requireContext(), "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            dismiss()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val ref = FirebaseDatabase.getInstance().getReference("Users")
+                .child(userId)
+                .child("items")
+
+            // Search item by original name passed as argument
+            val originalName = arguments?.getString("name") ?: return@setOnClickListener
+
+            ref.orderByChild("name").equalTo(originalName).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val itemSnapshot = snapshot.children.first()
+                        val itemKey = itemSnapshot.key!!
+
+                        // Update fields
+                        ref.child(itemKey).child("name").setValue(updatedName)
+                        ref.child(itemKey).child("quantity").setValue(updatedQuantity)
+                        ref.child(itemKey).child("expiryDate").setValue(updatedExpiry)
+                        ref.child(itemKey).child("categoryId").setValue(updatedCategory)
+
+                        onItemUpdatedListener?.onItemUpdated(updatedName, updatedQuantity, updatedExpiry, updatedCategory)
+                        dismiss()
+                    } else {
+                        Toast.makeText(requireContext(), "Item not found for update", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(requireContext(), "Failed to access database", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
 
+        // Cancel button (dismiss without saving)
         btnCancel.setOnClickListener {
             dismiss()
         }
-
     }
-
-//    private fun updateCategoryItemCounts() {
-//        // Reset all category counts to 0
-//        categoryList.forEach { it.itemCount = 0 }
-//
-//        // Count items for each category
-//        listOfItems.forEach { item ->
-//            val category = categoryList.find { it.id.equals(item.categoryId, ignoreCase = true) }
-//
-//            if (category != null) {
-//                category.itemCount++
-//            } else {
-//                // Handle invalid category
-//                println("CategoryWarning: Item '${item.name}' has an invalid category '${item.categoryId}'")
-//            }
-//        }
-//
-//        // Update the adapter to reflect changes
-//        categoryAdapter.notifyDataSetChanged()
-//    }
-
 }

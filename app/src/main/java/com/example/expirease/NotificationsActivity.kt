@@ -18,22 +18,16 @@ import com.example.expirease.viewmodel.SharedItemViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
-class   NotificationsActivity : AppCompatActivity() {
+class NotificationsActivity : AppCompatActivity() {
     private val viewModel: SharedItemViewModel by viewModels()
 
-    private lateinit var expiringSoonAdapter: NotificationRecyclerViewAdapter
-    private lateinit var expiredAdapter: NotificationRecyclerViewAdapter
-
-    private var expiringSoonList: MutableList<Item> = mutableListOf()
-    private var expiredList: MutableList<Item> = mutableListOf()
+    private lateinit var adapter: NotificationRecyclerViewAdapter
+    private val combinedList: MutableList<Any> = mutableListOf() // Class-level variable
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notifications)
-        val expiringSoonText: TextView = findViewById(R.id.expiringsoon)
-        val expiredText: TextView = findViewById(R.id.expired)
-
 
         val backButton: ImageView = findViewById(R.id.back_button)
         backButton.setOnClickListener {
@@ -41,56 +35,61 @@ class   NotificationsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val recyclerView1 = findViewById<RecyclerView>(R.id.notif_recyclerview1)
-        recyclerView1.layoutManager = LinearLayoutManager(this)
-        expiringSoonAdapter = NotificationRecyclerViewAdapter(expiringSoonList, onClick = {})
-        recyclerView1.adapter = expiringSoonAdapter
+        // Initialize RecyclerView and Adapter
+        val recyclerView = findViewById<RecyclerView>(R.id.notif_recyclerview1)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = NotificationRecyclerViewAdapter(combinedList) { /* onClick */ }
+        recyclerView.adapter = adapter
 
-        val recyclerView2 = findViewById<RecyclerView>(R.id.notif_recyclerview2)
-        recyclerView2.layoutManager = LinearLayoutManager(this)
-        expiredAdapter = NotificationRecyclerViewAdapter(expiredList, onClick = {})
-        recyclerView2.adapter = expiredAdapter
-
-        val swipeToDeleteCallback1 = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        // Swipe-to-delete logic
+        val swipeToDeleteCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val item = expiringSoonList[viewHolder.adapterPosition]
-                deleteItemFromFirebase(item)
+                val swipedItem = combinedList[viewHolder.adapterPosition]
+                if (swipedItem is Item) {
+                    deleteItemFromFirebase(swipedItem)
+                    combinedList.removeAt(viewHolder.adapterPosition)
+                    adapter.notifyItemRemoved(viewHolder.adapterPosition)
+                } else {
+                    // Don't allow swipe for headers
+                    adapter.notifyItemChanged(viewHolder.adapterPosition)
+                }
             }
         }
+        ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView)
 
-        val swipeToDeleteCallback2 = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val item = expiredList[viewHolder.adapterPosition]
-                deleteItemFromFirebase(item)
-            }
-        }
-
-        ItemTouchHelper(swipeToDeleteCallback1).attachToRecyclerView(recyclerView1)
-        ItemTouchHelper(swipeToDeleteCallback2).attachToRecyclerView(recyclerView2)
-
+        // Observe filtered items from ViewModel
         viewModel.filteredItems.observe(this, Observer { itemList ->
             val now = System.currentTimeMillis()
 
-            expiringSoonList.clear()
-            expiredList.clear()
+            val expiringSoon = itemList?.filter {
+                it.expiryDate in now..(now + 3 * 24 * 60 * 60 * 1000)
+            } ?: emptyList()
 
-            if (itemList != null) {
-                expiringSoonList.addAll(itemList.filter {
-                    it.expiryDate in now..(now + 7 * 24 * 60 * 60 * 1000)
-                })
+            val expired = itemList?.filter {
+                it.expiryDate < now
+            } ?: emptyList()
+
+            // Clear previous list and update with headers and filtered items
+            combinedList.clear()
+
+            // Add "Expiring Soon" header and items
+            if (expiringSoon.isNotEmpty()) {
+                combinedList.add("Expiring Soon") // Add header
+                combinedList.addAll(expiringSoon) // Add items
             }
 
-            if (itemList != null) {
-                expiredList.addAll(itemList.filter { it.expiryDate < now })
+            // Add "Expired" header and items
+            if (expired.isNotEmpty()) {
+                combinedList.add("Expired") // Add header
+                combinedList.addAll(expired) // Add items
             }
 
-            expiringSoonText.visibility = if (expiringSoonList.isNotEmpty()) View.VISIBLE else View.GONE
-            expiredText.visibility = if (expiredList.isNotEmpty()) View.VISIBLE else View.GONE
+            // Control visibility of header TextViews based on lists
 
-            expiringSoonAdapter.notifyDataSetChanged()
-            expiredAdapter.notifyDataSetChanged()
+            // Notify adapter of data changes
+            adapter.notifyDataSetChanged()
         })
     }
 
