@@ -47,7 +47,7 @@ android:background="@android:color/transparent">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:background="@android:color/transparent"/>
 
     <TextView
@@ -55,7 +55,7 @@ android:background="@android:color/transparent">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="12sp"
         android:background="@android:color/transparent"/>
 </LinearLayout>
 </LinearLayout>

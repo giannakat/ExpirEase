@@ -22,7 +22,7 @@
         <com.google.android.material.button.MaterialButton
             style="@style/OutlinedCustomButton"
             android:id="@+id/add"
-            android:layout_width="345dp"
+            android:layout_width="match_parent"
             android:layout_height="70dp"
             android:text="+"
             android:layout_marginTop="30dp"

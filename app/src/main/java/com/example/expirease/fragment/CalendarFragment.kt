@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -98,7 +99,10 @@ class CalendarFragment : Fragment() {
                 val today = LocalDate.now()
                 if (data.position == DayPosition.MonthDate) {
                     container.dayText.setTextColor(Color.BLACK)
-                    container.dayText.setTypeface(null, if (data.date == today) Typeface.BOLD else Typeface.NORMAL)
+                    container.dayText.apply {
+                        setTypeface(null, if (data.date == today) Typeface.BOLD else Typeface.NORMAL)
+                        setTextColor(if (data.date == today) Color.GREEN else currentTextColor) // Default color (currentTextColor) if not today
+                    }
 
                     container.view.setOnClickListener {
                         selectedDate = data.date
@@ -117,9 +121,9 @@ class CalendarFragment : Fragment() {
 
                 // Highlight selected day
                 if (data.date == selectedDate) {
-                    container.dayText.setBackgroundResource(R.drawable.bg_selected_day)
+                    container.dayBox.setBackgroundResource(R.drawable.bg_selected_day)
                 } else {
-                    container.dayText.setBackgroundColor(Color.TRANSPARENT)
+                    container.dayBox.setBackgroundColor(Color.TRANSPARENT)
                 }
             }
         }
@@ -139,6 +143,7 @@ class CalendarFragment : Fragment() {
     //linkes custom day layout to be used in bind()
     inner class DayViewContainer(view: View) : ViewContainer(view) {
         val dayText: TextView = view.findViewById(R.id.calendarDayText)
+        val dayBox: LinearLayout = view.findViewById(R.id.dayBox)
         val container: FrameLayout = view.findViewById(R.id.dayContainer)
         val dotIndicator: View = view.findViewById(R.id.dotIndicator)
     }

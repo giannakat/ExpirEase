@@ -52,6 +52,7 @@
                     android:textStyle="bold"
                     android:textAlignment="center"
                     android:text="April 2025"
+                    android:textColor="@color/primaryColor"
                     android:layout_weight="1"/>
 
                 <ImageButton

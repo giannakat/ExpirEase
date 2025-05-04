@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+
 import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expirease.R
 import com.example.expirease.data.Item
 import java.text.SimpleDateFormat
 import java.util.*
+import android.graphics.Color
 
 class NotificationRecyclerViewAdapter(
     private val listOfItems: MutableList<Any>, // Accepting mixed types (String headers and Item objects)
@@ -25,12 +28,13 @@ class NotificationRecyclerViewAdapter(
         private val photo: ImageView = view.findViewById(R.id.notif_photo)
         private val title: TextView = view.findViewById(R.id.notif_title)
         private val details: TextView = view.findViewById(R.id.notif_details)
-
+        private val card: CardView = view.findViewById(R.id.card_view)
         fun bind(item: Any, onClick: (Item) -> Unit) {
             if (item is String) {
                 // Handle header (String)
+                card.setCardBackgroundColor(Color.TRANSPARENT)
+                card.cardElevation = 0f
                 title.text = item
-                title.setTextSize(20f) // Make it bold and bigger for header
                 details.visibility = View.GONE // Hide details for the header
                 photo.visibility = View.GONE  // Hide photo for the header
             } else if (item is Item) {
