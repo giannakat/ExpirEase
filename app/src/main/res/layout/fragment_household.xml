@@ -15,19 +15,19 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/household_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
+            android:layout_height="550dp"
             android:nestedScrollingEnabled="false" />
 
         <!-- Add button below -->
         <com.google.android.material.button.MaterialButton
             style="@style/OutlinedCustomButton"
             android:id="@+id/add"
-            android:layout_width="match_parent"
+            android:layout_width="345dp"
             android:layout_height="70dp"
             android:text="+"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:layout_marginBottom="20dp"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="center"/>
 
     </LinearLayout>
 
