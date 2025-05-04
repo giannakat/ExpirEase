@@ -124,29 +124,6 @@ class SharedItemViewModel : ViewModel() {
         updateItem(item)
     }
 
-    fun saveItemsToFirebase(onComplete: () -> Unit) {
-        val user = FirebaseAuth.getInstance().currentUser
-        val items = _allItems.value ?: emptyList()
-
-        if (user != null) {
-            val uid = user.uid
-            val databaseRef = FirebaseDatabase.getInstance().getReference("Users/$uid/items")
-
-            databaseRef.setValue(items)
-                .addOnSuccessListener {
-                    Log.d("Firebase", "Items saved successfully")
-                    onComplete()
-                }
-                .addOnFailureListener { e ->
-                    Log.e("Firebase", "Failed to save items", e)
-                    onComplete()
-                }
-        } else {
-            Log.w("Firebase", "User is null during saveItemsToFirebase")
-            onComplete()
-        }
-    }
-
     fun updateItemInViewModel(updated: Item) {
         _allItems.value = _allItems.value?.map {
             if (it.name == updated.name && it.expiryDate == updated.expiryDate) updated else it

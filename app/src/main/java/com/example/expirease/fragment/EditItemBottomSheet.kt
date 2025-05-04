@@ -65,7 +65,7 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
 
         val calendar = Calendar.getInstance()
 
-        val categoryOptions = arrayOf("Dairy", "Meat", "Vegetable", "Fruit", "Beverage", "Others")
+        val categoryOptions = arrayOf("Dairy", "Meat", "Vegetables", "Fruits", "Beverages", "Others")
         spinnerCategory.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryOptions)
 
         // Retrieve data from arguments

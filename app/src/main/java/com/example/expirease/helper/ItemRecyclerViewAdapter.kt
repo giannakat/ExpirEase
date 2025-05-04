@@ -81,11 +81,4 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         notifyDataSetChanged()
     }
 
-    fun updateItem(updatedItem: Item) {
-        val position = listOfItems.indexOfFirst { it.name == updatedItem.name }
-        if (position != -1) {
-            listOfItems[position] = updatedItem
-            notifyItemChanged(position)
-        }
-    }
 }
