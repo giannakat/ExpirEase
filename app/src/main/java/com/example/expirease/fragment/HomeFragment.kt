@@ -31,7 +31,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var categoryRecyclerView: RecyclerView
     private lateinit var categoryAdapter: CategoryRecyclerViewAdapter
-    private val sharedItemViewModel: SharedItemViewModel by activityViewModels()
+    val sharedItemViewModel: SharedItemViewModel by activityViewModels()
 
     private lateinit var itemAdapter: ItemRecyclerViewAdapter
     private lateinit var filteredList: MutableList<Item>
@@ -335,9 +335,11 @@ class HomeFragment : Fragment() {
                     item.categoryId = it.toString()
                 }
                 itemAdapter.notifyDataSetChanged()
+
+                // Update category item counts after item is updated
+                updateCategoryItemCounts()
             }
         }
-
         bottomSheet.show(parentFragmentManager, "EditItemBottomSheet")
     }
 
@@ -379,13 +381,5 @@ class HomeFragment : Fragment() {
         itemAdapter.notifyDataSetChanged()
         Toast.makeText(requireContext(), "${item.name} deleted!", Toast.LENGTH_SHORT).show()
         updateCategoryItemCounts()
-    }
-
-    private fun updateCategoryCounts() {
-        categoryList.forEach { it.itemCount = 0 }
-        listOfItems.forEach { item ->
-            categoryList.find { it.id == item.categoryId }?.incrementItemCount()
-        }
-        categoryAdapter.notifyDataSetChanged()
     }
 }

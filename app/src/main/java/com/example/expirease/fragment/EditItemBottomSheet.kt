@@ -3,6 +3,7 @@ package com.example.expirease.fragment
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.graphics.Color
+import android.graphics.Color.parseColor
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,8 @@ import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import com.example.expirease.R
+import com.example.expirease.data.Category
+import com.example.expirease.data.Item
 import com.example.expirease.helper.OnItemUpdatedListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -116,13 +119,33 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
             val updatedName = itemName.text.toString().trim()
             val updatedQuantity = itemQuantity.text.toString().toIntOrNull() ?: 0
             val updatedExpiry = calendar.timeInMillis
-            val updatedCategory = spinnerCategory.selectedItem.toString()
+            val updatedCategoryName = spinnerCategory.selectedItem.toString()
 
             // Validate input
-            if (updatedName.isEmpty() || updatedQuantity <= 0 || updatedCategory.isEmpty()) {
+            if (updatedName.isEmpty() || updatedQuantity <= 0 || updatedCategoryName.isEmpty()) {
                 Toast.makeText(requireContext(), "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            // Determine the category ID and background color based on the selected category name
+            val updatedCategoryId = updatedCategoryName.lowercase()  // Use the name as the ID
+            val updatedCategoryBackgroundColor = when (updatedCategoryName.lowercase()) {
+                "fruits" -> parseColor("#DFFAD6")  // example color
+                "vegetables" -> parseColor("#E0F0FD")
+                "dairy" -> parseColor("#ECEEFB")
+                "meat" -> parseColor("#FFEEE5")
+                "beverages" -> parseColor("#FFF0CC")
+                else -> parseColor("#FFEED6")  // default color for "others"
+            }
+
+            // Create updatedCategory with the additional parameters
+            val updatedCategory = Category(
+                id = updatedCategoryId,
+                displayName = updatedCategoryName,
+                backgroundColor = updatedCategoryBackgroundColor
+            )
+
+            val updatedPhotoRes = getImageForCategory(updatedCategory)
 
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
             val ref = FirebaseDatabase.getInstance().getReference("Users")
@@ -138,13 +161,41 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
                         val itemSnapshot = snapshot.children.first()
                         val itemKey = itemSnapshot.key!!
 
-                        // Update fields
+                        // Update fields in the database
                         ref.child(itemKey).child("name").setValue(updatedName)
                         ref.child(itemKey).child("quantity").setValue(updatedQuantity)
                         ref.child(itemKey).child("expiryDate").setValue(updatedExpiry)
-                        ref.child(itemKey).child("categoryId").setValue(updatedCategory)
+                        ref.child(itemKey).child("categoryId").setValue(updatedCategoryName)
+                        ref.child(itemKey).child("photoResource").setValue(updatedPhotoRes)
 
-                        onItemUpdatedListener?.onItemUpdated(updatedName, updatedQuantity, updatedExpiry, updatedCategory)
+                        // Update the ViewModel with the new values
+                        val updatedItem = Item(
+                            name = updatedName,
+                            quantity = updatedQuantity,
+                            expiryDate = updatedExpiry,
+                            categoryId = updatedCategoryName,
+                            photoResource = updatedPhotoRes
+                        )
+                        (activity as? HomeFragment)?.sharedItemViewModel?.updateItemInViewModel(updatedItem)
+
+                        // Update the UI elements in the fragment (such as the category and photo)
+                        (activity as? HomeFragment)?.apply {
+                            // Update the UI with the new item data
+                            sharedItemViewModel.updateItemInViewModel(updatedItem)
+
+                            // Ensure the spinner is updated to reflect the new category
+                            spinnerCategory.setSelection(categoryOptions.indexOf(updatedCategoryName))
+
+                            // Update the image for the item based on the selected category
+                            itemPhoto.setImageResource(updatedPhotoRes)
+                        }
+
+                        onItemUpdatedListener?.onItemUpdated(
+                            updatedName,
+                            updatedQuantity,
+                            updatedExpiry,
+                            updatedCategoryName
+                        )
                         dismiss()
                     } else {
                         Toast.makeText(requireContext(), "Item not found for update", Toast.LENGTH_SHORT).show()
@@ -160,6 +211,17 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
         // Cancel button (dismiss without saving)
         btnCancel.setOnClickListener {
             dismiss()
+        }
+    }
+
+    private fun getImageForCategory(category: Category): Int {
+        return when (category.displayName.lowercase()) {
+            "fruits" -> R.drawable.img_product_banana
+            "vegetables" -> R.drawable.img_category_vegetable
+            "dairy" -> R.drawable.img_category_dairy
+            "meat" -> R.drawable.img_category_meat
+            "beverages" -> R.drawable.img_category_beverage
+            else -> R.drawable.img_category_others
         }
     }
 }

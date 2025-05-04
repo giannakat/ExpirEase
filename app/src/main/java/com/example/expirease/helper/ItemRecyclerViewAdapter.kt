@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,6 +17,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, private val onClick : (Item) -> Unit, private val onLongClick : (Item) -> Unit ): RecyclerView.Adapter<ItemRecyclerViewAdapter.ItemViewHolder>() {
+
     class ItemViewHolder(view : View) : RecyclerView.ViewHolder(view){
         val cardView: CardView = itemView.findViewById(R.id.card_view)
         val photo = view.findViewById<ImageView>(R.id.item_photo)
@@ -28,7 +28,6 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         fun bind(item: Item) {
             // set text, image, etc.
         }
-
     }
 
     override fun onCreateViewHolder(
@@ -43,8 +42,9 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         val item = listOfItems[position]
         holder.bind(item)
 
+        // Setting the image from the photoResource property
         holder.photo.setImageResource(item.photoResource)
-        holder.name.setText(item.name)
+        holder.name.text = item.name
         holder.quantity.text = "Quantity: ${item.quantity}"
 
         val currentDate = Date()
@@ -54,7 +54,7 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         val daysRemaining = TimeUnit.MILLISECONDS.toDays(diff)
 
         val (statusText, cardColor) = when {
-            daysRemaining <= 0 -> "Expired" to Color.parseColor("#FFCDD2")  // Red
+            daysRemaining < 0 -> "Expired" to Color.parseColor("#FFCDD2")  // Red
             daysRemaining <= 3 -> "Expiring" to Color.parseColor("#FFF9C4") // Yellow
             else -> "Fresh" to Color.parseColor("#C8E6C9")               // Green
         }
@@ -81,5 +81,11 @@ class ItemRecyclerViewAdapter(private val listOfItems: MutableList<Item>, privat
         notifyDataSetChanged()
     }
 
-
+    fun updateItem(updatedItem: Item) {
+        val position = listOfItems.indexOfFirst { it.name == updatedItem.name }
+        if (position != -1) {
+            listOfItems[position] = updatedItem
+            notifyItemChanged(position)
+        }
+    }
 }

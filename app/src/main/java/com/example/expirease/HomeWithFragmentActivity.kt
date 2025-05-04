@@ -191,17 +191,15 @@ class HomeWithFragmentActivity : AppCompatActivity() {
         builder.setPositiveButton("Logout") { _, _ ->
             Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show()
 
-            val app = application as MyApplication
             val user = FirebaseAuth.getInstance().currentUser
 
             if (user != null) {
-                sharedItemViewModel.saveItemsToFirebase {
                     FirebaseAuth.getInstance().signOut()
                     startActivity(Intent(this, LoginActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     })
                     finish()
-                }
+
             } else {
                 startActivity(Intent(this, LoginActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

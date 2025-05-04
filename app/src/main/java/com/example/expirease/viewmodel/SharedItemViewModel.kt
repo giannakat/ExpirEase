@@ -147,6 +147,12 @@ class SharedItemViewModel : ViewModel() {
         }
     }
 
+    fun updateItemInViewModel(updated: Item) {
+        _allItems.value = _allItems.value?.map {
+            if (it.name == updated.name && it.expiryDate == updated.expiryDate) updated else it
+        }
+    }
+
     fun dismissItem(item: Item) {
         val user = FirebaseAuth.getInstance().currentUser
         val itemId = "${item.name}_${item.expiryDate}"
