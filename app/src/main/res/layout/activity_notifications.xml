@@ -38,20 +38,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Expiring Soon -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/notif_recyclerview1"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginTop="20dp"
-                android:layout_marginHorizontal="20dp"/>
-
-            <!-- Expired -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notif_recyclerview2"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="600dp"
                 android:nestedScrollingEnabled="false"
                 android:layout_marginTop="20dp"
                 android:layout_marginHorizontal="20dp"/>
