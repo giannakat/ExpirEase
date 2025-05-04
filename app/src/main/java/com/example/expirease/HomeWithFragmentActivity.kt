@@ -57,9 +57,26 @@ class HomeWithFragmentActivity : AppCompatActivity() {
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
+        // Disable default tinting to allow manual control
+        navView.itemIconTintList = null
 
-        val menuItem = navView.menu.findItem(R.id.nav_logout)
-        menuItem.icon = ContextCompat.getDrawable(this, R.drawable.ic_nav_logout)
+// Apply tint manually to each item
+        for (i in 0 until navView.menu.size()) {
+            val item = navView.menu.getItem(i)
+
+            item.icon?.let {
+                val wrapped = DrawableCompat.wrap(it)
+
+                // Tint logout item red, others black
+                if (item.itemId == R.id.nav_logout) {
+                    DrawableCompat.setTint(wrapped, Color.RED)
+                } else {
+                    DrawableCompat.setTint(wrapped, ContextCompat.getColor(this, R.color.black))
+                }
+
+                item.icon = wrapped
+            }
+        }
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
