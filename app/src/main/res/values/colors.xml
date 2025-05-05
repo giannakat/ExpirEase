@@ -11,8 +11,7 @@
     <color name="bgyellow">#fae49e</color>
     <color name="bgblue">#d6ebe8</color>
     <color name="custom_ripple_color">#66FFFFFF</color>
-
-    <!-- Added Red and Yellow -->
     <color name="red">#FF0000</color>
     <color name="yellow">#FFFF00</color>
+    <color name="gray">#808080</color>
 </resources>

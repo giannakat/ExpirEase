@@ -1,32 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dayContainer"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:padding="6dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp">
 
+    <!-- Wrapper with rounded selection support -->
     <LinearLayout
         android:id="@+id/dayBox"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@android:color/transparent"
+        android:padding="4dp">
 
+        <!-- Day number -->
         <TextView
             android:id="@+id/calendarDayText"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:background="#eeeeee"
-            android:textColor="#000000" />
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="center" />
 
+        <!-- Dot indicator container -->
         <View
             android:id="@+id/dotIndicator"
             android:layout_width="6dp"
             android:layout_height="6dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:background="@drawable/dot_background"
             android:visibility="gone" />
     </LinearLayout>
+
 </FrameLayout>

@@ -5,7 +5,8 @@
     android:paddingBottom="0dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginTop="20dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -37,6 +38,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/primaryColor" />
+        android:background="@color/gray" />
 
 </LinearLayout>

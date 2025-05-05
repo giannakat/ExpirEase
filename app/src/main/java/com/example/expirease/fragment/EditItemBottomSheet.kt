@@ -62,7 +62,7 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
         val btnCalendar = view.findViewById<ImageButton>(R.id.btn_show_calendar)
         val btnIncrease = view.findViewById<Button>(R.id.btn_increase)
         val btnDecrease = view.findViewById<Button>(R.id.btn_decrease)
-
+        val btnEditName = view.findViewById<ImageView>(R.id.editName)
         val calendar = Calendar.getInstance()
 
         val categoryOptions = arrayOf("Dairy", "Meat", "Vegetables", "Fruits", "Beverages", "Others")
@@ -86,6 +86,13 @@ class EditItemBottomSheet : BottomSheetDialogFragment() {
             itemNameKey = it.getString("name") // Use name as Firebase key
         }
 
+        btnEditName.setOnClickListener{
+            itemName.isFocusableInTouchMode = true
+            itemName.isFocusable = true
+            itemName.isCursorVisible = true
+            itemName.requestFocus()
+            itemName.selectAll()
+        }
         // Quantity update buttons
         btnIncrease.setOnClickListener {
             val current = itemQuantity.text.toString().toIntOrNull() ?: 0
