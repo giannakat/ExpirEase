@@ -25,14 +25,8 @@ class SettingsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
         //preference
-        val darkmodeBtn: LinearLayout = view.findViewById(R.id.preference_darkmode)
         val languageBtn: LinearLayout = view.findViewById(R.id.preference_language)
         val reminderBtn: LinearLayout = view.findViewById(R.id.preference_reminder)
-
-        //darkmode
-        darkmodeBtn.setOnClickListener {
-            //TODO add toggle options here
-        }
 
         //reminder options
         reminderBtn.setOnClickListener {
